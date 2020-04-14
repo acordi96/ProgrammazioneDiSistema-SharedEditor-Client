@@ -29,10 +29,10 @@ list(REMOVE_DUPLICATES LIBRARIES)
 add_executable(prova
         main.cpp
         prova.pro
-        prova.pro.user textedit.cpp textedit.h stacked.h stacked.cpp)
+        prova.pro.user textedit.cpp textedit.h stacked.h stacked.cpp registrationform.h registrationform.cpp  )
 target_link_libraries(prova ${LIBRARIES})
 target_link_libraries(prova Boost::thread)
 target_link_libraries(prova Boost::regex)
 if(MSVC OR MINGW)
-    target_link_libraries(client ws2_32 mswsock)
+    target_link_libraries(prova ws2_32 mswsock)
 endif()

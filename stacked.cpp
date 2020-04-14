@@ -5,6 +5,8 @@
 #include <QRegularExpression>
 #include <iostream>
 #include <boost/asio.hpp>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QLabel>
 #include "json.hpp"
 
 using json = nlohmann::json;
@@ -161,7 +163,7 @@ void stacked::on_form_regButton_clicked(){
              boost::asio::connect(s, iterator);
 
              json j = json{
-                    {"operation","SIGNUP_R"},
+                    {"operation","request_signup"},
                     {"email",email.toStdString()},
                     {"username",user.toStdString()},
                     {"password",psw1.toStdString()}
@@ -182,7 +184,8 @@ void stacked::on_form_regButton_clicked(){
              json messageServer = json::parse(messageFromServer);
              std::string requestType = messageServer.at("response").get<std::string>();
 
-             if(requestType=="SIGNUP_OK"){
+
+             if(requestType=="SIGNUP_SUCCESS"){
                  ui->stackedWidget->setCurrentIndex(2);
              }
              else{
@@ -190,6 +193,7 @@ void stacked::on_form_regButton_clicked(){
                  QVBoxLayout *layout = new QVBoxLayout();
                  dialog->setLayout(layout);
                  layout->addWidget(new QLabel("Error! Something went wrong. Try again later."));
+
                  QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
                  layout->addWidget(buttonBox);
 
