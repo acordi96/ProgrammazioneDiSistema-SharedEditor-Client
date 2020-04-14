@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="prova"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\..\;CMake Files\..\..\..\..\..\;CMake Files\..\..\..\..\..\boost\;CMake Files\..\..\..\..\..\boost\lib\;CMake Files\..\..\..\..\..\boost\lib\cmake\;CMake Files\..\..\..\..\..\boost\lib\cmake\Boost-1.72.0\;CMake Files\..\..\..\..\..\boost\lib\cmake\boost_headers-1.72.0\;CMake Files\..\..\..\..\..\boost\lib\cmake\boost_regex-1.72.0\;CMake Files\..\..\..\..\..\boost\lib\cmake\boost_thread-1.72.0\;CMake Files\..\..\..\..\..\boost\lib\cmake\boost_chrono-1.72.0\;CMake Files\..\..\..\..\..\Qt\;CMake Files\..\..\..\..\..\Qt\5.12.3\;CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\;CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\;CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\;CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Core\;CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\;CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Widgets\;CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5PrintSupport\;CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Sql\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="prova">
+				<Option output="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/prova.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DQT_CORE_LIB"/>
+					<Add option="-DQT_GUI_LIB"/>
+					<Add option="-DQT_WIDGETS_LIB"/>
+					<Add option="-DQT_PRINTSUPPORT_LIB"/>
+					<Add option="-DQT_SQL_LIB"/>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add directory="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/prova_autogen/include"/>
+					<Add directory="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/."/>
+					<Add directory="C:/Qt/5.12.3/mingw73_64/include"/>
+					<Add directory="C:/Qt/5.12.3/mingw73_64/include/QtCore"/>
+					<Add directory="C:/Qt/5.12.3/mingw73_64/./mkspecs/win32-g++"/>
+					<Add directory="C:/Qt/5.12.3/mingw73_64/include/QtGui"/>
+					<Add directory="C:/Qt/5.12.3/mingw73_64/include/QtANGLE"/>
+					<Add directory="C:/Qt/5.12.3/mingw73_64/include/QtWidgets"/>
+					<Add directory="C:/Qt/5.12.3/mingw73_64/include/QtPrintSupport"/>
+					<Add directory="C:/Qt/5.12.3/mingw73_64/include/QtSql"/>
+					<Add directory="C:/boost/include/boost-1_72"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/x86_64-w64-mingw32"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include-fixed"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/../../../../x86_64-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 prova"/>
+					<CompileFile command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="prova/fast">
+				<Option output="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/prova.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DQT_CORE_LIB"/>
+					<Add option="-DQT_GUI_LIB"/>
+					<Add option="-DQT_WIDGETS_LIB"/>
+					<Add option="-DQT_PRINTSUPPORT_LIB"/>
+					<Add option="-DQT_SQL_LIB"/>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add directory="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/prova_autogen/include"/>
+					<Add directory="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/."/>
+					<Add directory="C:/Qt/5.12.3/mingw73_64/include"/>
+					<Add directory="C:/Qt/5.12.3/mingw73_64/include/QtCore"/>
+					<Add directory="C:/Qt/5.12.3/mingw73_64/./mkspecs/win32-g++"/>
+					<Add directory="C:/Qt/5.12.3/mingw73_64/include/QtGui"/>
+					<Add directory="C:/Qt/5.12.3/mingw73_64/include/QtANGLE"/>
+					<Add directory="C:/Qt/5.12.3/mingw73_64/include/QtWidgets"/>
+					<Add directory="C:/Qt/5.12.3/mingw73_64/include/QtPrintSupport"/>
+					<Add directory="C:/Qt/5.12.3/mingw73_64/include/QtSql"/>
+					<Add directory="C:/boost/include/boost-1_72"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/x86_64-w64-mingw32"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include/c++/backward"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include-fixed"/>
+					<Add directory="C:/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/../../../../x86_64-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 prova/fast"/>
+					<CompileFile command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="prova_autogen">
+				<Option working_dir="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 prova_autogen"/>
+					<CompileFile command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/PROGRA~1/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/prova_autogen/mocs_compilation.cpp">
+			<Option target="prova"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/main.cpp">
+			<Option target="prova"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/prova.pro">
+			<Option target="prova"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/prova.pro.user">
+			<Option target="prova"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/registrationform.cpp">
+			<Option target="prova"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/registrationform.h">
+			<Option target="prova"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/stacked.cpp">
+			<Option target="prova"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/stacked.h">
+			<Option target="prova"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/textedit.cpp">
+			<Option target="prova"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/textedit.h">
+			<Option target="prova"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/BoostDetectToolset-1.72.0.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/Boost-1.72.0/BoostConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\Boost-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/Boost-1.72.0/BoostConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\Boost-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_headers-1.72.0/boost_headers-config-version.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_headers-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_headers-1.72.0/boost_headers-config.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_headers-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_regex-1.72.0/boost_regex-config-version.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_regex-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_regex-1.72.0/boost_regex-config.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_regex-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_regex-1.72.0/libboost_regex-variant-mgw81-mt-d-x32-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_regex-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_regex-1.72.0/libboost_regex-variant-mgw81-mt-d-x64-1_72-shared.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_regex-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_regex-1.72.0/libboost_regex-variant-mgw81-mt-d-x64-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_regex-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_regex-1.72.0/libboost_regex-variant-mgw81-mt-s-x32-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_regex-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_regex-1.72.0/libboost_regex-variant-mgw81-mt-s-x64-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_regex-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_regex-1.72.0/libboost_regex-variant-mgw81-mt-sd-x32-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_regex-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_regex-1.72.0/libboost_regex-variant-mgw81-mt-sd-x64-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_regex-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_regex-1.72.0/libboost_regex-variant-mgw81-mt-x32-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_regex-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_regex-1.72.0/libboost_regex-variant-mgw81-mt-x64-1_72-shared.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_regex-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_regex-1.72.0/libboost_regex-variant-mgw81-mt-x64-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_regex-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_thread-1.72.0/boost_thread-config-version.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_thread-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_thread-1.72.0/boost_thread-config.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_thread-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_thread-1.72.0/libboost_thread-variant-mgw81-mt-d-x32-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_thread-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_thread-1.72.0/libboost_thread-variant-mgw81-mt-d-x64-1_72-shared.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_thread-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_thread-1.72.0/libboost_thread-variant-mgw81-mt-d-x64-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_thread-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_thread-1.72.0/libboost_thread-variant-mgw81-mt-s-x32-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_thread-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_thread-1.72.0/libboost_thread-variant-mgw81-mt-s-x64-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_thread-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_thread-1.72.0/libboost_thread-variant-mgw81-mt-sd-x32-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_thread-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_thread-1.72.0/libboost_thread-variant-mgw81-mt-sd-x64-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_thread-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_thread-1.72.0/libboost_thread-variant-mgw81-mt-x32-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_thread-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_thread-1.72.0/libboost_thread-variant-mgw81-mt-x64-1_72-shared.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_thread-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_thread-1.72.0/libboost_thread-variant-mgw81-mt-x64-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_thread-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_chrono-1.72.0/boost_chrono-config-version.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_chrono-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_chrono-1.72.0/boost_chrono-config.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_chrono-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_chrono-1.72.0/libboost_chrono-variant-mgw81-mt-d-x32-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_chrono-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_chrono-1.72.0/libboost_chrono-variant-mgw81-mt-d-x64-1_72-shared.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_chrono-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_chrono-1.72.0/libboost_chrono-variant-mgw81-mt-d-x64-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_chrono-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_chrono-1.72.0/libboost_chrono-variant-mgw81-mt-s-x32-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_chrono-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_chrono-1.72.0/libboost_chrono-variant-mgw81-mt-s-x64-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_chrono-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_chrono-1.72.0/libboost_chrono-variant-mgw81-mt-sd-x32-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_chrono-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_chrono-1.72.0/libboost_chrono-variant-mgw81-mt-sd-x64-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_chrono-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_chrono-1.72.0/libboost_chrono-variant-mgw81-mt-x32-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_chrono-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_chrono-1.72.0/libboost_chrono-variant-mgw81-mt-x64-1_72-shared.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_chrono-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../boost/lib/cmake/boost_chrono-1.72.0/libboost_chrono-variant-mgw81-mt-x64-1_72-static.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\boost\lib\cmake\boost_chrono-1.72.0\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Core/Qt5CoreConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Core\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Core/Qt5CoreConfigExtras.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Core\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Core\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Core/Qt5CoreConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Core\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Core/Qt5CoreMacros.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Core\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5GuiConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5GuiConfigExtras.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5GuiConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5Gui_QGifPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5Gui_QICNSPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5Gui_QICOPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5Gui_QJpegPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5Gui_QMinimalIntegrationPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5Gui_QOffscreenIntegrationPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5Gui_QTgaPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5Gui_QTiffPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5Gui_QTuioTouchPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5Gui_QWbmpPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5Gui_QWebpPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5Gui_QWindowsDirect2DIntegrationPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5Gui_QWindowsIntegrationPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Gui\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Widgets/Qt5WidgetsConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Widgets\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Widgets/Qt5WidgetsConfigExtras.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Widgets\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Widgets/Qt5WidgetsConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Widgets\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Widgets/Qt5WidgetsMacros.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Widgets\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Widgets/Qt5Widgets_QWindowsVistaStylePlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Widgets\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5PrintSupport/Qt5PrintSupportConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5PrintSupport\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5PrintSupport/Qt5PrintSupportConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5PrintSupport\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5PrintSupport/Qt5PrintSupport_QWindowsPrinterSupportPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5PrintSupport\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Sql/Qt5SqlConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Sql\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Sql/Qt5SqlConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Sql\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Sql/Qt5Sql_QMYSQLDriverPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Sql\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Sql/Qt5Sql_QODBCDriverPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Sql\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Sql/Qt5Sql_QPSQLDriverPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Sql\"/>
+		</Unit>
+		<Unit filename="C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/../../../../../Qt/5.12.3/mingw73_64/lib/cmake/Qt5Sql/Qt5Sql_QSQLiteDriverPlugin.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\Qt\5.12.3\mingw73_64\lib\cmake\Qt5Sql\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

@@ -1,0 +1,4 @@
+"C:\Program Files\JetBrains\CLion 2019.2.4\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=C:\boost\lib\cmake\Boost-1.72.0 -DBOOST_ROOT=C:\boost -DBOOST_LIBRARYDIR=C:boost\lib -DBOOST_INCLUDEDIR=C:\boost\include -DBoost_COMPILER=mgw81 -G "CodeBlocks - MinGW Makefiles" C:\Users\gabriele\Desktop\ProgettoPDS\progetto_prova
+-- Configuring done
+-- Generating done
+-- Build files have been written to: C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug
