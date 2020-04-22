@@ -1,4 +1,4 @@
-C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/CMakeFiles/prova.dir
-C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug/CMakeFiles/prova_autogen.dir
+/home/cordi/prog_prova_git/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/cordi/prog_prova_git/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/cordi/prog_prova_git/cmake-build-debug/CMakeFiles/prova.dir
+/home/cordi/prog_prova_git/cmake-build-debug/CMakeFiles/prova_autogen.dir

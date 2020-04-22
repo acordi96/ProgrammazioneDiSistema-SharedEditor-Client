@@ -1,4 +1,35 @@
-"C:\Program Files\JetBrains\CLion 2019.2.4\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=C:\boost\lib\cmake\Boost-1.72.0 -DBOOST_ROOT=C:\boost -DBOOST_LIBRARYDIR=C:boost\lib -DBOOST_INCLUDEDIR=C:\boost\include -DBoost_COMPILER=mgw81 -G "CodeBlocks - MinGW Makefiles" C:\Users\gabriele\Desktop\ProgettoPDS\progetto_prova
+/snap/clion/111/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=/home/cordi/Qt/5.12.3/gcc_64/lib/cmake;/home/cordi/boost/lib/cmake/Boost-1.72.0 -DBOOST_ROOT=/home/cordi/boost -DBOOST_LIBRARYDIR=/home/cordi/boost/lib -DBOOST_INCLUDEDIR=/home/cordi/boost/include -G "CodeBlocks - Unix Makefiles" /home/cordi/prog_prova_git
+-- The C compiler identification is GNU 7.5.0
+-- The CXX compiler identification is GNU 7.5.0
+-- Check for working C compiler: /usr/bin/cc
+-- Check for working C compiler: /usr/bin/cc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Check for working CXX compiler: /usr/bin/c++
+-- Check for working CXX compiler: /usr/bin/c++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - found
+-- Found Threads: TRUE  
 -- Configuring done
 -- Generating done
--- Build files have been written to: C:/Users/gabriele/Desktop/ProgettoPDS/progetto_prova/cmake-build-debug
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    BOOST_INCLUDEDIR
+    BOOST_LIBRARYDIR
+    BOOST_ROOT
+
+
+-- Build files have been written to: /home/cordi/prog_prova_git/cmake-build-debug

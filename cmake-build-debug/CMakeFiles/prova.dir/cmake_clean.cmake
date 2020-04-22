@@ -1,15 +1,13 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/prova_autogen.dir/AutogenOldSettings.txt"
+  "CMakeFiles/prova_autogen.dir/AutogenUsed.txt"
   "CMakeFiles/prova_autogen.dir/ParseCache.txt"
   "prova_autogen"
-  "CMakeFiles/prova.dir/main.cpp.obj"
-  "CMakeFiles/prova.dir/prova_autogen/mocs_compilation.cpp.obj"
-  "CMakeFiles/prova.dir/registrationform.cpp.obj"
-  "CMakeFiles/prova.dir/stacked.cpp.obj"
-  "CMakeFiles/prova.dir/textedit.cpp.obj"
-  "libprova.dll.a"
-  "prova.exe"
-  "prova.exe.manifest"
+  "CMakeFiles/prova.dir/main.cpp.o"
+  "CMakeFiles/prova.dir/prova_autogen/mocs_compilation.cpp.o"
+  "CMakeFiles/prova.dir/registrationform.cpp.o"
+  "CMakeFiles/prova.dir/stacked.cpp.o"
+  "CMakeFiles/prova.dir/textedit.cpp.o"
+  "prova"
   "prova.pdb"
 )
 
