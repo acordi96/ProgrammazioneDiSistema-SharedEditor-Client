@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "textedit.h"
+#include "Client.h"
 namespace Ui {
 class stacked;
 }
@@ -17,6 +18,11 @@ public:
 
 private:
     Ui::stacked *ui;
+    Client *client_;
+    void sendmessage(message mess);
+    std::string readMessage();
+public slots:
+    void showPopupSuccess(QString result);
 private slots:
    void on_loginButton_clicked();
    void on_form_regButton_clicked();

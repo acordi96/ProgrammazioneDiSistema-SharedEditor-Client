@@ -48,8 +48,8 @@ const QString rsrcPath = ":/images/mac";
 const QString rsrcPath = ":/images/win";
 #endif
 
-TextEdit::TextEdit(QWidget *parent)
-        : QMainWindow(parent)
+TextEdit::TextEdit(Client* c, QWidget *parent)
+        : QMainWindow(parent), client_(c)
 {
 #ifdef Q_OS_OSX
     setUnifiedTitleAndToolBarOnMac(true);
@@ -61,6 +61,9 @@ TextEdit::TextEdit(QWidget *parent)
             this, &TextEdit::currentCharFormatChanged);
     connect(textEdit, &QTextEdit::cursorPositionChanged,
             this, &TextEdit::cursorPositionChanged);
+    //CAPIRE PERCHE NON FUNZIONA
+    connect(client_, &Client::insertSymbol, this, &TextEdit::showSymbol);
+
     setCentralWidget(textEdit);
 
     setToolButtonStyle(Qt::ToolButtonFollowStyle);
@@ -702,8 +705,42 @@ void TextEdit::cursorPositionChanged()
         int headingLevel = textEdit->textCursor().blockFormat().headingLevel();
         comboStyle->setCurrentIndex(headingLevel ? headingLevel + 8 : 0);
     }
-}
+    std::cout << textEdit->toPlainText().toStdString() << std::endl;
+    //prendo riga e colonna
+    //std::cout << textEdit->textCursor().columnNumber() << std::endl;
 
+    /*
+    std::cout << textEdit->textCursor().blockNumber() << std::endl; //prende la posizione della riga
+    int startIndex = textEdit->textCursor().selectionStart(); //prende la posizione del cursore
+    int endIndex = textEdit->textCursor().selectionEnd(); //stessa cosa
+    std::cout << startIndex << " " << endIndex << std::endl;
+    std::cout << "il testo: " << textEdit->toPlainText().toStdString().at(cur-1) << std::endl; //prende il carattere corrente
+   */
+    int cur = textEdit->textCursor().columnNumber(); //prende la posizione del cursore nella riga
+    char  c = textEdit->toPlainText().toStdString().at(cur-1);
+
+    std::pair<int, char> m;
+    m = std::make_pair(cur-1, c);
+    json j = json{
+            {"operation", "insert"},
+            {"corpo",m}
+    };
+    std::string msg = j.dump().c_str();
+    size_t size_msg = msg.size();
+    message mess;
+    mess.body_length(msg.size());
+    std::memcpy(mess.body(), msg.data(), mess.body_length());
+    mess.body()[mess.body_length()] = '\0';
+    mess.encode_header();
+    std::cout <<"Messaggio da inviare al server: "<< mess.body() << std::endl;
+    client_->write(mess);
+}
+void TextEdit::showSymbol(std::pair<int, QChar> corpo) {
+    int pos = corpo.first;
+    QChar c = corpo.second;
+    std::cout << "Sono qui per capire" << std::endl;
+    textEdit->toPlainText().insert(pos, c);
+}
 void TextEdit::clipboardDataChanged()
 {
 #ifndef QT_NO_CLIPBOARD

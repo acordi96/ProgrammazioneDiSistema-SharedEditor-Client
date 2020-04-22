@@ -8,7 +8,7 @@
 #include <QMainWindow>
 #include <QMap>
 #include <QPointer>
-
+#include "Client.h"
 QT_BEGIN_NAMESPACE
 class QAction;
 class QComboBox;
@@ -24,13 +24,13 @@ class TextEdit : public QMainWindow
 Q_OBJECT
 
 public:
-    TextEdit(QWidget *parent = 0);
+    TextEdit(Client* c, QWidget *parent = 0);
 
     bool load(const QString &f);
 
 public slots:
     void fileNew();
-
+    void showSymbol(std::pair<int, QChar> corpo);
 protected:
     void closeEvent(QCloseEvent *e) override;
 signals:
@@ -61,7 +61,7 @@ private slots:
     void printPreview(QPrinter *);
 
 private:
-
+    Client *client_;
     void setupFileActions();
     void setupEditActions();
     void setupTextActions();
