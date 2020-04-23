@@ -178,6 +178,7 @@ void stacked::on_form_regButton_clicked(){
 void stacked::showPopupSuccess(QString result) {
     if(result == "LOGIN_SUCCESS" || result == "SIGNUP_SUCCESS") {
         ui->stackedWidget->setCurrentIndex(2);
+        std::cout << "Il colore e' " << client_->getColor().toStdString() << std::endl;
     } else  {
         QDialog *dialog = new QDialog();
         QVBoxLayout *layout = new QVBoxLayout();

@@ -718,7 +718,7 @@ void TextEdit::cursorPositionChanged()
    */
     int cur = textEdit->textCursor().columnNumber(); //prende la posizione del cursore nella riga
     char  c = textEdit->toPlainText().toStdString().at(cur-1);
-
+    //textEdit->setStyleSheet(client_->getColor());
     std::pair<int, char> m;
     m = std::make_pair(cur-1, c);
     json j = json{

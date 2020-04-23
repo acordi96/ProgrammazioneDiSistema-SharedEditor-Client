@@ -30,7 +30,14 @@ public:
     std::string do_header();
     std::string do_body();
     std::string handleRequestType(const json &json, const std::string &type_request);
-    signals:
+
+    const QString &getUser() const;
+    void setUser(const QString &user);
+
+    const QString &getColor() const;
+    void setColor(const QString &color);
+
+signals:
             void formResultSuccess(QString result);
     void insertSymbol(std::pair<int, QChar> corpo);
 private:
@@ -46,6 +53,11 @@ private:
     tcp::socket socket_;
     message read_msg_;
     message_queue write_msgs_;
+
+
+    //cose da salvare
+    QString user;
+    QString color;
 };
 
 #endif //PROGETTO_PROVA_CLIENT_H
