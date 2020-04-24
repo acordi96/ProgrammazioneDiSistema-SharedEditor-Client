@@ -27,6 +27,7 @@
 #include <QMessageBox>
 #include <QMimeData>
 #include <QTextBlockFormat>
+
 #if defined(QT_PRINTSUPPORT_LIB)
 #include <QtPrintSupport/qtprintsupportglobal.h>
 #if QT_CONFIG(printer)
@@ -718,6 +719,11 @@ void TextEdit::cursorPositionChanged()
    */
     int cur = textEdit->textCursor().columnNumber(); //prende la posizione del cursore nella riga
     char  c = textEdit->toPlainText().toStdString().at(cur-1);
+    //PARTE SCRITTA DA ANGELO, TO DO (CANCELLARE PARTE SCRITTA DA MIRIAM)
+    QTextCursor cu = textEdit->textCursor();
+    cu.movePosition(QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor);
+    std::cout << "La posizione: " << cu.position() << " e carattere:  " << cu.selectedText().toStdString() << std::endl;
+   //FINE
     //textEdit->setStyleSheet(client_->getColor());
     std::pair<int, char> m;
     m = std::make_pair(cur-1, c);
@@ -725,6 +731,8 @@ void TextEdit::cursorPositionChanged()
             {"operation", "insert"},
             {"corpo",m}
     };
+
+
     std::string msg = j.dump().c_str();
     size_t size_msg = msg.size();
     message mess;
