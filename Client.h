@@ -38,8 +38,8 @@ public:
     void setColor(const QString &color);
 
 signals:
-            void formResultSuccess(QString result);
-    void insertSymbol(std::pair<int, QChar> corpo);
+    void formResultSuccess(QString result);
+    void insertSymbol(int pos, QChar c);
 private:
     void do_connect();
     void do_read_header();

@@ -30,7 +30,7 @@ public:
 
 public slots:
     void fileNew();
-    void showSymbol(std::pair<int, QChar> corpo);
+    void showSymbol(int pos, QChar c);
 protected:
     void closeEvent(QCloseEvent *e) override;
 signals:
@@ -55,7 +55,7 @@ private slots:
 
     void currentCharFormatChanged(const QTextCharFormat &format);
     void cursorPositionChanged();
-
+    void localInsert();
     void clipboardDataChanged();
     void about();
     void printPreview(QPrinter *);

@@ -93,12 +93,12 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         }
         emit formResultSuccess(res);
         return type_request;
-    }else if(type_request=="insert_res"){
+       }else if(type_request=="insert_res"){
         std::pair<int, char> corpo;
         corpo = js.at("corpo").get<std::pair<int, char>>();
         std::pair<int, QChar> corpo2(corpo.first, static_cast<QChar>(corpo.second));
         //non funziona
-        emit insertSymbol(corpo2);
+        emit insertSymbol(corpo.first,static_cast<QChar>(corpo.second));
         return type_request;
     }
     return type_request;

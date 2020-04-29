@@ -19,12 +19,17 @@ SOURCES += \
     main.cpp \
     registrationform.cpp \
     stacked.cpp \
-    textedit.cpp
+    textedit.cpp \
+    Client.cpp  \
+    message.cpp
 
 HEADERS += \
     registrationform.h \
     stacked.h \
-    textedit.h
+    textedit.h \
+    Client.h \
+    message.h \
+    json.hpp
 
 FORMS += \
     registrationform.ui \

@@ -202,6 +202,9 @@ void stacked::on_fileButton_clicked(){
 
     ui->stackedWidget->setCurrentIndex(3);
 }
+void stacked::on_newFileButton_clicked(){
+    ui->stackedWidget->setCurrentIndex(3);
+}
 void stacked::logout(){
     ui->stackedWidget->setCurrentIndex(2);
 }

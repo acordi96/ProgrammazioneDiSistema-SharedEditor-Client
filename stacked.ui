@@ -305,7 +305,7 @@
             <set>Qt::AlignCenter</set>
            </property>
           </widget>
-          <widget class="QPushButton" name="pushButton_6">
+          <widget class="QPushButton" name="newFileButton">
            <property name="geometry">
             <rect>
              <x>40</x>
@@ -508,7 +508,7 @@ background-color: rgb(32, 74, 135);
   <tabstop>pushButton_3</tabstop>
   <tabstop>pushButton_5</tabstop>
   <tabstop>psw_log_line</tabstop>
-  <tabstop>pushButton_6</tabstop>
+  <tabstop>newFileButton</tabstop>
  </tabstops>
  <resources>
   <include location="project_icons.qrc"/>
