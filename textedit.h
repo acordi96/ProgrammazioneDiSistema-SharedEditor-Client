@@ -31,8 +31,11 @@ public:
 public slots:
     void fileNew();
     void showSymbol(int pos, QChar c);
+    void eraseSymbols(int start,int end);
+    //void show_Symbol(std::pair<int,char> tuple);
 protected:
     void closeEvent(QCloseEvent *e) override;
+    bool eventFilter(QObject *obj, QEvent *ev) override;
 signals:
     void logout();
     void closeAll();

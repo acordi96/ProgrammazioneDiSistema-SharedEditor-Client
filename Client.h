@@ -40,6 +40,8 @@ public:
 signals:
     void formResultSuccess(QString result);
     void insertSymbol(int pos, QChar c);
+    void eraseSymbols(int startIndex, int endIndex);
+    void showSymbol(std::pair<int,char> tuple);
 private:
     void do_connect();
     void do_read_header();

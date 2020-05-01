@@ -99,6 +99,13 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::pair<int, QChar> corpo2(corpo.first, static_cast<QChar>(corpo.second));
         //non funziona
         emit insertSymbol(corpo.first,static_cast<QChar>(corpo.second));
+        //emit showSymbol(corpo);
+        return type_request;
+    }else if(type_request=="remove_res"){
+        int start, end;
+        start = js.at("start").get<int>();
+        end = js.at("end").get<int>();
+        emit eraseSymbols(start,end);
         return type_request;
     }
     return type_request;
