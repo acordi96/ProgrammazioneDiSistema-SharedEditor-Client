@@ -112,9 +112,17 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         end = js.at("end").get<int>();
         emit eraseSymbols(start,end);
         return type_request;
-    }else if (type_request == "request_new_file"){
+    }else if (type_request == "new_file_created"){
         std::cout << "richiesta file tornata ";
+        QString res = QString::fromStdString("new_file_created");
+        emit formResultSuccess(res);
         return type_request;
+    }else if (type_request == "new_file_already_exist"){
+        std::cout << "Errore file gia esistente";
+        QString res = QString::fromStdString(type_request);
+        emit formResultSuccess(res);
+        return type_request;
+
     }
     return type_request;
 }

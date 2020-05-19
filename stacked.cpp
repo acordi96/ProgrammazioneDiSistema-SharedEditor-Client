@@ -195,6 +195,13 @@ void stacked::showPopupSuccess(QString result) {
             layout->addWidget(new QLabel("Error! Invalid username and/or password"));
         }else if(result == "SIGNUP_ERROR_DUPLICATE_USERNAME"){
             layout->addWidget(new QLabel("Error! Username already exixts"));
+        }else if(result == "new_file_created"){
+
+            layout->addWidget(new QLabel("File correclty created"));
+            ui->stackedWidget->setCurrentIndex(3);
+        }else if(result == "new_file_already_exist"){
+            std::cout << "\n filemgia esistente ";
+            layout->addWidget(new QLabel("File already exists"));
         }
 
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -266,15 +273,11 @@ void stacked::on_newFileButton_clicked(){
             layout->addWidget(new QLabel("Error! characters \\,/,:,*,?,\",<,>,| are not allowed in a file's name"));
             QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
             layout->addWidget(buttonBox);
-
             connect(buttonBox,&QDialogButtonBox::accepted,dialog,&QDialog::accept);
-
             dialog->exec();
-
             if(modalWindow.exec()==0)
                 break;
         }
-
 
         while (modalWindow.textValue().length() > 100){
 
@@ -284,28 +287,19 @@ void stacked::on_newFileButton_clicked(){
             layout->addWidget(new QLabel("Error! The max length of a file's name is 100 characters"));
             QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
             layout->addWidget(buttonBox);
-
             connect(buttonBox,&QDialogButtonBox::accepted,dialog,&QDialog::accept);
-
             dialog->exec();
-
             if(modalWindow.exec()==0)
                 break;
-
         }
 
-
-
-        // devo inviare al server la richiesta per creare un nuovo file
-
+        //invio al server la richiesta per creare un nuovo file
         try {
-
             json j = json{
                     {"operation","request_new_file"},
                     {"name",modalWindow.textValue().toStdString()},
                     {"username",client_->getUser().toStdString()}
             };
-
             /*
              *  PRENDI I DATI E INVIA A SERVER
              * */
@@ -324,14 +318,8 @@ void stacked::on_newFileButton_clicked(){
 
         QString testo = modalWindow.textValue();
         std::cout << "CLICK SUL PULSANTE CREATE " << testo.toStdString() ;
-
-
     }
-
     //modalWindow.exec();
-
-
-
     //ui->stackedWidget->setCurrentIndex(3);
 }
 
