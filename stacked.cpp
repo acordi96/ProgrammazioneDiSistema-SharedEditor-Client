@@ -176,6 +176,11 @@ void stacked::on_form_regButton_clicked(){
     }
 }
 
+
+
+// type_request=="QUERY_ERROR"    LOGIN_ERROR
+// || type_request=="CONNESSION_ERROR" || SIGNUP_ERROR_DUPLICATE_USERNAME || SIGNUP_ERROR_INSERT_FAILED)
+
 void stacked::showPopupSuccess(QString result) {
     if(result == "LOGIN_SUCCESS" || result == "SIGNUP_SUCCESS") {
         ui->stackedWidget->setCurrentIndex(2);
@@ -184,7 +189,14 @@ void stacked::showPopupSuccess(QString result) {
         QDialog *dialog = new QDialog();
         QVBoxLayout *layout = new QVBoxLayout();
         dialog->setLayout(layout);
-        layout->addWidget(new QLabel("Error! Invalid username and/or password"));
+        if(result == "QUERY_ERROR" || result =="CONNESSION_ERROR" || result == "SIGNUP_ERROR_INSERT_FAILED"){
+            layout->addWidget(new QLabel("Error with the DB, try again"));
+        }else if(result == "LOGIN_ERROR"){
+            layout->addWidget(new QLabel("Error! Invalid username and/or password"));
+        }else if(result == "SIGNUP_ERROR_DUPLICATE_USERNAME"){
+            layout->addWidget(new QLabel("Error! Username already exixts"));
+        }
+
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
         layout->addWidget(buttonBox);
 

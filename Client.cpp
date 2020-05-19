@@ -79,8 +79,9 @@ void Client::do_read_body()
         }
     });
 }
+
 std::string Client::handleRequestType(const json &js, const std::string &type_request) {
-    if(type_request=="LOGIN_SUCCESS" || type_request=="SIGNUP_SUCCESS"|| type_request=="LOGIN_ERROR" || type_request=="QUERY_ERROR" || type_request=="CONNESSION_ERROR"){
+    if(type_request=="LOGIN_SUCCESS" || type_request=="SIGNUP_SUCCESS"){
         QString res = QString::fromStdString(type_request);
         if(type_request=="LOGIN_SUCCESS") {
             std::string name = js.at("username").get<std::string>();
@@ -93,7 +94,11 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         }
         emit formResultSuccess(res);
         return type_request;
-       }else if(type_request=="insert_res"){
+    }else if (type_request=="LOGIN_ERROR" || type_request=="QUERY_ERROR" || type_request=="CONNESSION_ERROR"
+    || type_request=="SIGNUP_ERROR_DUPLICATE_USERNAME" || type_request=="SIGNUP_ERROR_INSERT_FAILED" ){
+        QString res = QString::fromStdString(type_request);
+        emit formResultSuccess(res);
+    }else if(type_request=="insert_res"){
         std::pair<int, char> corpo;
         corpo = js.at("corpo").get<std::pair<int, char>>();
         std::pair<int, QChar> corpo2(corpo.first, static_cast<QChar>(corpo.second));
