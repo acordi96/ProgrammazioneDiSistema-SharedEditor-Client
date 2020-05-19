@@ -66,7 +66,7 @@ void Client::do_read_body()
     {
         if (!ec)
         {
-            std::cout << "Messaggio ricevuto dal server: " << read_msg_.body() << std::endl;
+            std::cout << "\n Messaggio ricevuto dal server: " << read_msg_.body() << std::endl;
             json messageFromClient = json::parse(read_msg_.body());
             std::string requestType = messageFromClient.at("response").get<std::string>();
             std::string response = handleRequestType(messageFromClient, requestType);
@@ -106,6 +106,9 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         start = js.at("start").get<int>();
         end = js.at("end").get<int>();
         emit eraseSymbols(start,end);
+        return type_request;
+    }else if (type_request == "request_new_file"){
+        std::cout << "richiesta file tornata ";
         return type_request;
     }
     return type_request;

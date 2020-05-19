@@ -5,6 +5,7 @@
 #include <QRegularExpression>
 #include <iostream>
 #include <boost/asio.hpp>
+#include <QtWidgets/QInputDialog>
 #include "json.hpp"
 
 using json = nlohmann::json;
@@ -198,16 +199,92 @@ void stacked::on_reglogButton_clicked(){
     ui->stackedWidget->setCurrentIndex(1);
 
 }
+
 void stacked::on_fileButton_clicked(){
 
     ui->stackedWidget->setCurrentIndex(3);
 }
+
 void stacked::on_newFileButton_clicked(){
-    ui->stackedWidget->setCurrentIndex(3);
+
+
+
+
+
+    QInputDialog modalWindow;
+    QString label = "File name: ";
+    modalWindow.setLabelText(label);
+    modalWindow.setWindowTitle("New FIle");
+    modalWindow.setMinimumSize(QSize(300, 150));
+    modalWindow.setSizePolicy(QSizePolicy::MinimumExpanding,
+                              QSizePolicy::MinimumExpanding);
+    modalWindow.setCancelButtonText("cancel");
+    modalWindow.setOkButtonText("create");
+
+    if ( modalWindow.exec() == 1)
+    {
+
+        while (modalWindow.textValue() == ""){
+
+            QDialog *dialog = new QDialog();
+            QVBoxLayout *layout = new QVBoxLayout();
+            dialog->setLayout(layout);
+            layout->addWidget(new QLabel("Insert a name for the new file"));
+            QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+            layout->addWidget(buttonBox);
+
+            connect(buttonBox,&QDialogButtonBox::accepted,dialog,&QDialog::accept);
+
+            dialog->exec();
+
+            if(modalWindow.exec()==0)
+                break;
+
+        }
+
+        // devo inviare al server la richiesta per creare un nuovo file
+
+        try {
+
+            json j = json{
+                    {"operation","request_new_file"},
+                    {"name",modalWindow.textValue().toStdString()},
+                    {"username",client_->getUser().toStdString()}
+            };
+
+            /*
+             *  PRENDI I DATI E INVIA A SERVER
+             * */
+            std::string mess = j.dump().c_str();
+            message msg;
+            msg.body_length(mess.size());
+            std::memcpy(msg.body(), mess.data(), msg.body_length());
+            msg.body()[msg.body_length()] = '\0';
+            msg.encode_header();
+            std::cout <<"Richiesta da inviare al server "<< msg.body() << std::endl;
+            sendmessage(msg);
+
+        } catch (std::exception& e) {
+            std::cerr << "Exception: " << e.what() << "\n";
+        }
+
+        QString testo = modalWindow.textValue();
+        std::cout << "CLICK SUL PULSANTE CREATE " << testo.toStdString() ;
+
+
+    }
+
+    //modalWindow.exec();
+
+
+
+    //ui->stackedWidget->setCurrentIndex(3);
 }
+
 void stacked::logout(){
     ui->stackedWidget->setCurrentIndex(2);
 }
+
 void stacked::closeAll(){
     this->close();
 }
