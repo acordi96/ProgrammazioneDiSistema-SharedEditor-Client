@@ -219,10 +219,6 @@ void stacked::on_fileButton_clicked(){
 
 void stacked::on_newFileButton_clicked(){
 
-
-
-
-
     QInputDialog modalWindow;
     QString label = "File name: ";
     modalWindow.setLabelText(label);
@@ -253,6 +249,52 @@ void stacked::on_newFileButton_clicked(){
                 break;
 
         }
+        //controllo valdità formato nome file
+        while( modalWindow.textValue().toStdString().find_first_of('\\')!=std::string::npos ||
+               modalWindow.textValue().toStdString().find_first_of('/')!=std::string::npos ||
+               modalWindow.textValue().toStdString().find_first_of(':')!=std::string::npos ||
+               modalWindow.textValue().toStdString().find_first_of('*')!=std::string::npos ||
+               modalWindow.textValue().toStdString().find_first_of('?')!=std::string::npos ||
+               modalWindow.textValue().toStdString().find_first_of('"')!=std::string::npos ||
+               modalWindow.textValue().toStdString().find_first_of('<')!=std::string::npos ||
+               modalWindow.textValue().toStdString().find_first_of('>')!=std::string::npos ||
+               modalWindow.textValue().toStdString().find_first_of('|')!=std::string::npos
+                ){
+            QDialog *dialog = new QDialog();
+            QVBoxLayout *layout = new QVBoxLayout();
+            dialog->setLayout(layout);
+            layout->addWidget(new QLabel("Error! characters \\,/,:,*,?,\",<,>,| are not allowed in a file's name"));
+            QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+            layout->addWidget(buttonBox);
+
+            connect(buttonBox,&QDialogButtonBox::accepted,dialog,&QDialog::accept);
+
+            dialog->exec();
+
+            if(modalWindow.exec()==0)
+                break;
+        }
+
+
+        while (modalWindow.textValue().length() > 100){
+
+            QDialog *dialog = new QDialog();
+            QVBoxLayout *layout = new QVBoxLayout();
+            dialog->setLayout(layout);
+            layout->addWidget(new QLabel("Error! The max length of a file's name is 100 characters"));
+            QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+            layout->addWidget(buttonBox);
+
+            connect(buttonBox,&QDialogButtonBox::accepted,dialog,&QDialog::accept);
+
+            dialog->exec();
+
+            if(modalWindow.exec()==0)
+                break;
+
+        }
+
+
 
         // devo inviare al server la richiesta per creare un nuovo file
 
