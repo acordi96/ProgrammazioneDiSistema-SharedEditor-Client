@@ -86,6 +86,11 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         if(type_request=="LOGIN_SUCCESS") {
             std::string name = js.at("username").get<std::string>();
             std::string color = js.at("colorUser").get<std::string>();
+            std::list<std::string> files = js.at("files").get<std::list<std::string>>();
+            std::list <std::string> :: iterator it;
+            std::cout << "\n prima del for ";
+            for(it = files.begin(); it != files.end(); ++it)
+                std::cout << '\n' << *it;
             QString Qname = QString::fromUtf8(name.data(), name.size());
             QString Qcolor = QString::fromUtf8(color.data(), color.size());
 
@@ -123,6 +128,11 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         emit formResultSuccess(res);
         return type_request;
 
+    }else if (type_request == "errore_salvataggio_file_db"){
+        std::cout << "Errore caricamento file nel db";
+        QString res = QString::fromStdString(type_request);
+        emit formResultSuccess(res);
+        return type_request;
     }
     return type_request;
 }

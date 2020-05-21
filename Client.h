@@ -37,6 +37,8 @@ public:
     const QString &getColor() const;
     void setColor(const QString &color);
 
+
+
 signals:
     void formResultSuccess(QString result);
     void insertSymbol(int pos, QChar c);
@@ -60,6 +62,7 @@ private:
     //cose da salvare
     QString user;
     QString color;
+    QList<std::string > files;
 };
 
 #endif //PROGETTO_PROVA_CLIENT_H
