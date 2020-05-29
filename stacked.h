@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "textedit.h"
+#include "userpage.h"
 #include "Client.h"
 namespace Ui {
 class stacked;
@@ -27,8 +28,8 @@ private slots:
    void on_loginButton_clicked();
    void on_form_regButton_clicked();
    void on_reglogButton_clicked();
-   void on_fileButton_clicked();
-   void on_newFileButton_clicked();
+   //void on_fileButton_clicked();
+   //void on_newFileButton_clicked();
    void logout();
    void closeAll();
 };

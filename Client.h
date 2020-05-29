@@ -37,6 +37,9 @@ public:
     const QString &getColor() const;
     void setColor(const QString &color);
 
+    void setFiles(const QList<std::string> &list);
+
+    QList<std::string > files;
 
 
 signals:
@@ -62,7 +65,7 @@ private:
     //cose da salvare
     QString user;
     QString color;
-    QList<std::string > files;
+
 };
 
 #endif //PROGETTO_PROVA_CLIENT_H

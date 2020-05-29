@@ -21,9 +21,13 @@ stacked::stacked(QWidget *parent) :
     connect(te,&TextEdit::logout,this,&stacked::logout);
     connect(te,&TextEdit::closeAll,this,&stacked::closeAll);
     QObject::connect(client_, &Client::formResultSuccess, this, &stacked::showPopupSuccess);
-
+    //Userpage *up = new Userpage(this,client_);
     ui->setupUi(this);
+    //ui->stackedWidget->addWidget(up);
     ui->stackedWidget->addWidget(te);
+
+    //Userpage *up = new Userpage();
+    //ui->stackedWidget->addWidget(up);
 }
 
 stacked::~stacked()
@@ -41,6 +45,12 @@ stacked::~stacked()
 void stacked::on_loginButton_clicked(){
     QString user = ui->user_log_line->text();
     QString psw = ui->psw_log_line->text();
+   /* QPushButton *b1 = new QPushButton();
+    QPushButton *b2 = new QPushButton();
+    b2->setObjectName("button2");
+    b1->setObjectName("button1");
+    ui->listaProva->*/
+
 
     if(user.isEmpty() || psw.isEmpty()){
         QDialog *dialog = new QDialog();
@@ -145,6 +155,7 @@ void stacked::on_form_regButton_clicked(){
              /*
               *  PRENDI I DATI E INVIA A SERVER
               * */
+             std::cout << "\n username inviato per la registrazione: " + user.toStdString() ;
              std::string mess = j.dump().c_str();
             message msg;
             msg.body_length(mess.size());
@@ -183,7 +194,11 @@ void stacked::on_form_regButton_clicked(){
 
 void stacked::showPopupSuccess(QString result) {
     if(result == "LOGIN_SUCCESS" || result == "SIGNUP_SUCCESS") {
-        ui->stackedWidget->setCurrentIndex(2);
+        Userpage *up = new Userpage(this,client_);
+        //ui->setupUi(this);
+        ui->stackedWidget->addWidget(up);
+        ui->stackedWidget->setCurrentIndex(3);
+        //ui->stackedWidget->setCurrentIndex(2);
         std::cout << "Il colore e' " << client_->getColor().toStdString() << std::endl;
     } else  {
         QDialog *dialog = new QDialog();
@@ -199,6 +214,7 @@ void stacked::showPopupSuccess(QString result) {
 
             layout->addWidget(new QLabel("File correclty created"));
             ui->stackedWidget->setCurrentIndex(3);
+            //ui->stackedWidget->setCurrentIndex(3);
         }else if(result == "new_file_already_exist"){
             std::cout << "\n filemgia esistente ";
             layout->addWidget(new QLabel("File already exists"));
@@ -218,12 +234,12 @@ void stacked::on_reglogButton_clicked(){
     ui->stackedWidget->setCurrentIndex(1);
 
 }
-
+/*
 void stacked::on_fileButton_clicked(){
 
     ui->stackedWidget->setCurrentIndex(3);
-}
-
+}*/
+/*
 void stacked::on_newFileButton_clicked(){
 
     QInputDialog modalWindow;
@@ -300,9 +316,9 @@ void stacked::on_newFileButton_clicked(){
                     {"name",modalWindow.textValue().toStdString()},
                     {"username",client_->getUser().toStdString()}
             };
-            /*
-             *  PRENDI I DATI E INVIA A SERVER
-             * */
+
+              //PRENDI I DATI E INVIA A SERVER
+
             std::string mess = j.dump().c_str();
             message msg;
             msg.body_length(mess.size());
@@ -321,10 +337,11 @@ void stacked::on_newFileButton_clicked(){
     }
     //modalWindow.exec();
     //ui->stackedWidget->setCurrentIndex(3);
-}
+}*/
 
 void stacked::logout(){
-    ui->stackedWidget->setCurrentIndex(2);
+    ui->stackedWidget->setCurrentIndex(3);
+    //ui->stackedWidget->setCurrentIndex(2);
 }
 
 void stacked::closeAll(){

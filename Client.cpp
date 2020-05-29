@@ -83,19 +83,23 @@ void Client::do_read_body()
 std::string Client::handleRequestType(const json &js, const std::string &type_request) {
     if(type_request=="LOGIN_SUCCESS" || type_request=="SIGNUP_SUCCESS"){
         QString res = QString::fromStdString(type_request);
+        std::string name = js.at("username").get<std::string>();
+        QString Qname = QString::fromUtf8(name.data(), name.size());
+        this->setUser(Qname);
+        std::string color = js.at("colorUser").get<std::string>();
+        QString Qcolor = QString::fromUtf8(color.data(), color.size());
+        this->setColor(Qcolor);
+
         if(type_request=="LOGIN_SUCCESS") {
-            std::string name = js.at("username").get<std::string>();
-            std::string color = js.at("colorUser").get<std::string>();
+
             std::list<std::string> files = js.at("files").get<std::list<std::string>>();
+            QList<std::string> QFiles = QList<std::string>::fromStdList(files);
+            this->setFiles(QFiles);
             std::list <std::string> :: iterator it;
             std::cout << "\n prima del for ";
             for(it = files.begin(); it != files.end(); ++it)
                 std::cout << '\n' << *it;
-            QString Qname = QString::fromUtf8(name.data(), name.size());
-            QString Qcolor = QString::fromUtf8(color.data(), color.size());
 
-            this->setColor(Qcolor);
-            this->setUser(Qname);
         }
         emit formResultSuccess(res);
         return type_request;
@@ -184,4 +188,8 @@ const QString &Client::getColor() const {
 
 void Client::setColor(const QString &color) {
     Client::color = color;
+}
+
+void Client::setFiles(const QList<std::string> &list) {
+    Client::files = list;
 }
