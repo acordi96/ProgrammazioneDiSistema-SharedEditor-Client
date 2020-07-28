@@ -38,8 +38,8 @@ stacked::~stacked()
  *  indici
  *  0 = loginpage
  *  1 = registration form
- *  2 = userpage
- *  3 = texteditor
+ *  2 = texteditor
+ *  3 = userpage
  *
  * */
 void stacked::on_loginButton_clicked(){
@@ -213,7 +213,7 @@ void stacked::showPopupSuccess(QString result) {
         }else if(result == "new_file_created"){
 
             layout->addWidget(new QLabel("File correclty created"));
-            ui->stackedWidget->setCurrentIndex(3);
+            ui->stackedWidget->setCurrentIndex(2);
             //ui->stackedWidget->setCurrentIndex(3);
         }else if(result == "new_file_already_exist"){
             std::cout << "\n filemgia esistente ";
@@ -347,3 +347,4 @@ void stacked::logout(){
 void stacked::closeAll(){
     this->close();
 }
+

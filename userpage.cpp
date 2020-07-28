@@ -109,6 +109,9 @@ void Userpage::setupUserinfo(){
     newFileButton = new QPushButton(userinfo);
     newFileButton->setGeometry(QRect(113,280,89,25));
     newFileButton->setStyleSheet(QString::fromUtf8("QPushButton:hover{color: rgb(32,74,135);}"));
+    QIcon icon;
+    icon.addFile(QString::fromUtf8(":/Science-Plus2-Math-icon.png"),QSize(),QIcon::Normal,QIcon::Off);
+    newFileButton->setIcon(icon);
     newFileButton->setFlat(true);
     newFileButton->setText(QString::fromUtf8("New File"));
     newFileButton->setObjectName("newFileButton");
@@ -219,7 +222,7 @@ void Userpage::handleButton()
         QString testo = modalWindow.textValue();
         std::cout << "CLICK SUL PULSANTE CREATE " << testo.toStdString() ;
     }
-    //modalWindow.exec();
+    //modalWindow.exec()
     //ui->stackedWidget->setCurrentIndex(3);
 }
 

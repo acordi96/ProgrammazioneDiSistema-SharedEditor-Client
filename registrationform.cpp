@@ -2,7 +2,7 @@
 #include "ui_registrationform.h"
 
 registrationform::registrationform(QWidget *parent) :
-    QMainWindow(parent),formResultSuccess
+    QMainWindow(parent),
     ui(new Ui::registrationform)
 {
     ui->setupUi(this);

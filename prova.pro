@@ -21,7 +21,8 @@ SOURCES += \
     stacked.cpp \
     textedit.cpp \
     Client.cpp  \
-    message.cpp
+    message.cpp \
+    userpage.cpp
 
 HEADERS += \
     registrationform.h \
@@ -29,6 +30,7 @@ HEADERS += \
     textedit.h \
     Client.h \
     message.h \
+    userpage.h \
     json.hpp
 
 FORMS += \

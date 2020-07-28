@@ -17,7 +17,6 @@ class Userpage : public QMainWindow
     Q_OBJECT
 public:
     Userpage(QWidget *parent = 0,Client *c= nullptr);
-
 private:
     void setupRecentFiles();
     void setupUserinfo();
