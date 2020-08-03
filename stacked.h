@@ -32,6 +32,7 @@ private slots:
    //void on_newFileButton_clicked();
    void logout();
    void closeAll();
+
 };
 
 #endif // STACKED_H

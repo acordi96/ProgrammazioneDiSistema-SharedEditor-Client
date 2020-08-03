@@ -1,5 +1,6 @@
 #include "userpage.h"
 #include "Client.h"
+#include "stacked.h"
 
 
 #include <QHBoxLayout>
@@ -12,6 +13,8 @@
 #include <iostream>
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QDialogButtonBox>
+#include <QMenu>
+#include <QtCore/QModelIndex>
 
 Userpage::Userpage(QWidget *parent,Client *c):
                     QMainWindow(parent),client_(c)
@@ -70,10 +73,17 @@ void Userpage::setupRecentFiles(){
         std::string s = iter1.next();
         std::cout <<"\nentrato nel while dei file ";
         button = new QPushButton(scrollAreaWidgets);
+        button->setContextMenuPolicy(Qt::CustomContextMenu);
+        //QRightClickButton *button = new QRightClickButton(this);
+        //connect(button, SIGNAL(rightClicked()), this, SLOT(onRightClicked()));
         std::cout << "\n" << s;
-        button->setObjectName(QString::fromUtf8("button_")+QString::fromStdString(s));
+        button->setObjectName(QString::fromStdString(s));
         button->setText(QString::fromStdString(s));
         verticalLayout->addWidget(button);
+
+        connect(button,SIGNAL(clicked()),SLOT(on_button_clicked()));
+        connect(button, SIGNAL(customContextMenuRequested(QPoint)),
+                SLOT(customMenuRequested(QPoint)));
     }
 
 
@@ -230,4 +240,64 @@ void Userpage::handleButton()
 void Userpage::sendmessage(message mess) {
     client_->write(mess);
 }
+
+void Userpage::onRightClicked() {
+    std::cout << "\n click tasto destro \n";
+    //creo context menu
+    QMenu *menu = new QMenu(this);
+   // QMenu *menu = new QMenu(this);
+    menu->addAction(new QAction("Action 1", this));
+    menu->addAction(new QAction("Action 2", this));
+    menu->addAction(new QAction("Action 3", this));
+
+
+}
+
+void Userpage::customMenuRequested(QPoint pos) {
+    //QModelIndex index=button->indexAt(pos);
+    std::cout << "\n creazione del menu \n" << "pos = " << pos.x() <<","<<pos.y();
+    QMenu *menu=new QMenu(this);
+    menu->addAction(new QAction("Open", this));
+    menu->addAction(new QAction("Rename", this));
+    menu->addAction(new QAction("Delete", this));
+    //pos.setX(pos.x());
+    pos.setY(pos.y()+100);
+    menu->exec(mapToGlobal(pos));
+    //menu->popup(pos);
+}
+
+void Userpage::on_button_clicked(){
+    QObject *sender =  QObject::sender ();
+    QString str = sender->objectName();
+    std::string s = str.toStdString();
+    //QMessageBox::information(0, "Button", sender->objectName());
+    std::cout << "\n bottone schiacciato" << s <<"\n";
+
+    try {
+        json j = json{
+                {"operation","open_file"},
+                {"name",s},
+                {"username",client_->getUser().toStdString()}
+        };
+
+        //PRENDI I DATI E INVIA A SERVER
+        std::cout << "\ninvio richiesta apertura file: " << s << " \n username inviato per la creazione del file: " << client_->getUser().toStdString();
+        std::string mess = j.dump().c_str();
+        message msg;
+        msg.body_length(mess.size());
+        std::memcpy(msg.body(), mess.data(), msg.body_length());
+        msg.body()[msg.body_length()] = '\0';
+        msg.encode_header();
+        std::cout <<"Richiesta da inviare al server "<< msg.body() << std::endl;
+        sendmessage(msg);
+
+    } catch (std::exception& e) {
+        std::cerr << "Exception: " << e.what() << "\n";
+    }
+
+
+}
+
+
+
 
