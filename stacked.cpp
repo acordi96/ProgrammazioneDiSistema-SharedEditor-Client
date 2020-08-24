@@ -216,8 +216,12 @@ void stacked::showPopupSuccess(QString result) {
             ui->stackedWidget->setCurrentIndex(2);
             //ui->stackedWidget->setCurrentIndex(3);
         }else if(result == "new_file_already_exist"){
-            std::cout << "\n filemgia esistente ";
+            std::cout << "\n file già esistente ";
             layout->addWidget(new QLabel("File already exists"));
+        }else if (result == "file_opened"){
+            std::cout<<"\n file aperto";
+            ui->stackedWidget->setCurrentIndex(2);
+
         }
 
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);

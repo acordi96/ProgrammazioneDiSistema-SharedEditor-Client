@@ -69,6 +69,7 @@ void Client::do_read_body()
             std::cout << "\n Messaggio ricevuto dal server: " << read_msg_.body() << std::endl;
             json messageFromClient = json::parse(read_msg_.body());
             std::string requestType = messageFromClient.at("response").get<std::string>();
+            std::cout << "\n requestType : " + requestType;
             std::string response = handleRequestType(messageFromClient, requestType);
 
             do_read_header();
@@ -104,7 +105,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         emit formResultSuccess(res);
         return type_request;
     }else if (type_request=="LOGIN_ERROR" || type_request=="QUERY_ERROR" || type_request=="CONNESSION_ERROR"
-    || type_request=="SIGNUP_ERROR_DUPLICATE_USERNAME" || type_request=="SIGNUP_ERROR_INSERT_FAILED" ){
+    || type_request=="SIGNUP_ERROR_DUPLICATE_USERNAME" || type_request=="SIGNUP_ERROR_INSERT_FAILED" || type_request == "FILE_OPEN_FAILED" ){
         QString res = QString::fromStdString(type_request);
         emit formResultSuccess(res);
     }else if(type_request=="insert_res"){
@@ -137,6 +138,13 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         QString res = QString::fromStdString(type_request);
         emit formResultSuccess(res);
         return type_request;
+    }else if (type_request == "file_opened"){
+        //file aperto con successo
+        std::cout << "file aperto correttamente ";
+        QString res = QString::fromStdString("file_opened");
+        emit formResultSuccess(res);
+        return type_request;
+
     }
     return type_request;
 }

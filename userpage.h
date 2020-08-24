@@ -27,10 +27,21 @@ private:
     QWidget *recent;
     QWidget *userinfo;
 
+
+
 private slots:
     void handleButton();
+    void onRightClicked();
+
+
+public slots:
+    void customMenuRequested(QPoint pos);
+    void on_button_clicked();
+
+
 private:
     QPushButton *newFileButton;
+
 };
 
 #endif // USERPAGE_H
