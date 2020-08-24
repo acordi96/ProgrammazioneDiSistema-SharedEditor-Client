@@ -338,7 +338,9 @@ void stacked::on_newFileButton_clicked(){
     //modalWindow.exec();
     //ui->stackedWidget->setCurrentIndex(3);
 }*/
-
+void stacked::on_form_cancButton_clicked(){
+    ui->stackedWidget->setCurrentIndex(0);
+}
 void stacked::logout(){
     ui->stackedWidget->setCurrentIndex(3);
     //ui->stackedWidget->setCurrentIndex(2);

@@ -110,7 +110,7 @@ void Userpage::setupUserinfo(){
     newFileButton->setGeometry(QRect(113,280,89,25));
     newFileButton->setStyleSheet(QString::fromUtf8("QPushButton:hover{color: rgb(32,74,135);}"));
     QIcon icon;
-    icon.addFile(QString::fromUtf8(":/Science-Plus2-Math-icon.png"),QSize(),QIcon::Normal,QIcon::Off);
+    icon.addFile(QString::fromUtf8(":/images/Science-Plus2-Math-icon.png"),QSize(),QIcon::Normal,QIcon::Off);
     newFileButton->setIcon(icon);
     newFileButton->setFlat(true);
     newFileButton->setText(QString::fromUtf8("New File"));

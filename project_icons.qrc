@@ -39,5 +39,6 @@
         <file>images/win/exportpdf.png</file>
         <file>images/mac/exportpdf.png</file>
         <file>images/Science-Plus2-Math-icon.png</file>
+        <file>images/Arrows-Left-2-icon.png</file>
     </qresource>
 </RCC>

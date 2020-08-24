@@ -8,8 +8,6 @@ set(CMAKE_CXX_FLAGS "--coverage")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
-set(CMAKE_PREFIX_PATH ${BOOST_LIBRARYDIR}\\cmake)
-set(BOOST_ROOT "C:/boost_1_72_0")
 
 find_package(Boost CONFIG REQUIRED COMPONENTS regex)
 find_package(Boost CONFIG REQUIRED COMPONENTS thread)
