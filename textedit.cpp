@@ -846,7 +846,12 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev){
         int key = key_ev->key();
         if (obj == textEdit){
             if(!key_ev->text().isEmpty()){
-                if(!(key == Qt::Key_Backspace) && !(key==Qt::Key_Delete) && !(key==Qt::Key_Escape)){
+                if( !(key == Qt::Key_Backspace) &&
+                    !(key==Qt::Key_Delete) &&
+                    !(key==Qt::Key_Escape) &&
+                    !(key_ev->text().toStdString().c_str()[0]==22) && //paste
+                    !(key_ev->text().toStdString().c_str()[0]==3) && //copy
+                    !(key_ev->text().toStdString().c_str()[0]==1)){ //ctrl+a
                     // get data
                     std::pair<int, char> tuple;
                     QTextCursor cursor = textEdit->textCursor();
@@ -908,6 +913,75 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev){
                     std::cout <<"Messaggio da inviare al server: "<< mess.body() << std::endl;
                     client_->write(mess);
                     return QObject::eventFilter(obj,ev);
+                }
+                //*********************PASTE*****************************************
+                else if(key_ev->text().toStdString().c_str()[0]==22){
+                    QClipboard *clipboard = QGuiApplication::clipboard();
+                    QString pastedText = clipboard->text();
+                    std::cout<<"Incollato "<<pastedText.length()<<" caratteri"<<std::endl;
+
+                    std::pair<int, char> tuple;
+                    QTextCursor cursor = textEdit->textCursor();
+                    int pos;
+
+                    if(cursor.hasSelection()){
+                        pos=cursor.selectionStart();
+                        int startIndex = cursor.selectionStart();
+                        int endIndex = cursor.selectionEnd();
+
+                        cursor.beginEditBlock();
+                        cursor.setPosition(startIndex,QTextCursor::MoveAnchor);
+                        cursor.setPosition(endIndex,QTextCursor::KeepAnchor);
+                        textEdit->setTextCursor(cursor);
+                        cursor.endEditBlock();
+
+                        json j = json{
+                                {"operation","remove"},
+                                {"start", startIndex},
+                                {"end",endIndex}
+                        };
+                        std::string msg = j.dump().c_str();
+                        size_t size_msg = msg.size();
+                        message mess;
+                        mess.body_length(msg.size());
+                        std::memcpy(mess.body(), msg.data(), mess.body_length());
+                        mess.body()[mess.body_length()] = '\0';
+                        mess.encode_header();
+                        std::cout <<"Messaggio da inviare al server: "<< mess.body() << std::endl;
+                        client_->write(mess);
+                    }
+                    else{
+                        pos = cursor.position();
+                    }
+                    for(int i=0; i<pastedText.length(); i++) {
+                        textEdit->setTextCursor(cursor);
+                        char c = pastedText.toStdString().c_str()[i];
+                        tuple = std::make_pair(pos,c);
+                        pos++;
+                        json j = json{
+                                {"operation","insert"},
+                                {"corpo",tuple}
+                        };
+                        std::string msg = j.dump().c_str();
+                        size_t size_msg = msg.size();
+                        message mess;
+                        mess.body_length(msg.size());
+                        std::memcpy(mess.body(), msg.data(), mess.body_length());
+                        mess.body()[mess.body_length()] = '\0';
+                        mess.encode_header();
+                        std::cout <<"Messaggio da inviare al server: "<< mess.body() << std::endl;
+                        client_->write(mess);
+                    }
+                }
+                //*********************COPY*****************************************
+                else if(key_ev->text().toStdString().c_str()[0]==3){
+                    //do nothing
+                    std::cout<<"Copiato"<<std::endl;
+                }
+                //*********************CTRL+A*****************************************
+                else if(key_ev->text().toStdString().c_str()[0]==1){
+                    //do nothing
+                    std::cout<<"Selezionato tutto"<<std::endl;
                 }
                 //*********************BACKSPACE*************************************
                 else if(key == Qt::Key_Backspace){
