@@ -27,7 +27,7 @@ list(REMOVE_DUPLICATES LIBRARIES)
 add_executable(progetto_prova main.cpp prova.pro prova.pro.user textedit.cpp textedit.h
         stacked.h stacked.cpp Client.cpp Client.h message.cpp message.h
         userpage.cpp userpage.h
-        )
+        lib/md5.cpp lib/md5.h)
 
 #target_link_libraries(DBMSProject ${Boost_LIBRARIES})  # that didn't work
 

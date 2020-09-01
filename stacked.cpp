@@ -7,6 +7,7 @@
 #include <boost/asio.hpp>
 #include <QtWidgets/QInputDialog>
 #include "json.hpp"
+#include "lib/md5.h"
 
 using json = nlohmann::json;
 using boost::asio::ip::tcp;
@@ -74,7 +75,8 @@ void stacked::on_loginButton_clicked(){
                json j = json{
                    {"operation", "request_login"},
                    {"username",user.toStdString()},
-                   {"password",psw.toStdString()}
+                   {"password", md5(psw.toUtf8().constData())
+                   }
                    };
                std::string mess = j.dump().c_str();
                 message msg;
@@ -150,7 +152,7 @@ void stacked::on_form_regButton_clicked(){
                     {"operation","request_signup"},
                     {"email",email.toStdString()},
                     {"username",user.toStdString()},
-                    {"password",psw1.toStdString()}
+                    {"password",md5(psw1.toUtf8().constData())}
              };
              /*
               *  PRENDI I DATI E INVIA A SERVER
