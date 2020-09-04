@@ -1,6 +1,7 @@
 #include "userpage.h"
 #include "Client.h"
 #include "stacked.h"
+#include "customButton.h"
 
 
 #include <QHBoxLayout>
@@ -40,8 +41,11 @@ void Userpage::setupRecentFiles(){
 
 
     QScrollArea *scrollArea = new QScrollArea(recent);
-    scrollArea->setGeometry(QRect(10,60,121,101));
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    /*QDialog *title = new QDialog();
+    title->setGeometry(QRect(30,90,100,130));
+    title->setWindowIconText("titolo");*/
+    scrollArea->setGeometry(QRect(10,60,300,300));
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     scrollArea->setWidgetResizable(true);
     scrollArea->setStyleSheet(QString::fromUtf8("QPushButton {border: 0px;}"
                                                  "QPushButton:hover {background-color: rgb(32, 74, 135)}"));
@@ -49,39 +53,23 @@ void Userpage::setupRecentFiles(){
     QVBoxLayout *verticalLayout = new QVBoxLayout(scrollAreaWidgets);
     scrollAreaWidgets->setStyleSheet(QString::fromUtf8("QPushButton {border: 0px;}"
                                                        "QPushButton:hover {background-color: rgb(32, 74, 135);}"));
-    /*
-     *  for (int i =0; i< num_Files; i++ ){
-     *          button = new QPushButton(scrollAreaWidgets);
-     *          button->setObjectName(QString::fromUtf8("button"+i);
-     *          button->setText(QString::fromUtf8(nome_file);
-     *  }
-     *
-     * */
-    QPushButton *button;
-   /* for (int var = 0; var < 8; ++var) {
-        button = new QPushButton(scrollAreaWidgets);
-        button->setObjectName(QString::fromUtf8("button_")+QString::number(var));
-        button->setText(QString::fromUtf8("nomefile.txt"));
-        verticalLayout->addWidget(button);
-    }*/
-    QListIterator<std::string> iter1(client_->files);
-    std::cout << "\n prima del while files" << " dimensione " << client_->files.size();
+    QLabel *title = new QLabel(QString::fromUtf8("author    title"),scrollArea);
+    title->setGeometry(QRect(0,0,300,20));
 
-    /*while(iter1.hasNext())*/
-    /*for(int i=0;i<client_->files.size();i++)*/
-    while(iter1.hasNext()){
-        std::string s = iter1.next();
+    QPushButton *button;
+
+    for (auto p : client_->files){
+        //std::string s = iter1.next();
         std::cout <<"\nentrato nel while dei file ";
         button = new QPushButton(scrollAreaWidgets);
         button->setContextMenuPolicy(Qt::CustomContextMenu);
-        //QRightClickButton *button = new QRightClickButton(this);
-        //connect(button, SIGNAL(rightClicked()), this, SLOT(onRightClicked()));
-        std::cout << "\n" << s;
-        button->setObjectName(QString::fromStdString(s));
-        button->setText(QString::fromStdString(s));
+        std::cout << "\n" << p.first << ": " << p.second << "\n";
+        button->setObjectName(QString::fromStdString(p.first));
+        button->setText(QString::fromStdString(p.first)+":   "+QString::fromStdString(p.second));
+        //button->setContentsMargins(10,0,0,0);
         verticalLayout->addWidget(button);
 
-        connect(button,SIGNAL(clicked()),SLOT(on_button_clicked()));
+        connect(button,SIGNAL(clicked()),SLOT(on_fileName_clicked()));
         connect(button, SIGNAL(customContextMenuRequested(QPoint)),
                 SLOT(customMenuRequested(QPoint)));
     }
@@ -130,15 +118,12 @@ void Userpage::setupUserinfo(){
 
     hLayout->addWidget(userinfo);
 
-    connect(newFileButton, SIGNAL (released()), this, SLOT (handleButton()));
+    connect(newFileButton, SIGNAL (released()), this, SLOT (handleNewFileButton()));
 }
 
-void Userpage::handleButton()
+void Userpage::handleNewFileButton()
 {
-    // change the text
-        //newFileButton->setText("Example");
-    // resize button
-        //newFileButton->resize(100,100);
+
     QInputDialog modalWindow;
     QString label = "File name: ";
     modalWindow.setLabelText(label);
@@ -241,38 +226,39 @@ void Userpage::sendmessage(message mess) {
     client_->write(mess);
 }
 
-void Userpage::onRightClicked() {
-    std::cout << "\n click tasto destro \n";
-    //creo context menu
-    QMenu *menu = new QMenu(this);
-   // QMenu *menu = new QMenu(this);
-    menu->addAction(new QAction("Action 1", this));
-    menu->addAction(new QAction("Action 2", this));
-    menu->addAction(new QAction("Action 3", this));
-
-
-}
-
 void Userpage::customMenuRequested(QPoint pos) {
     //QModelIndex index=button->indexAt(pos);
+
+
+    QObject *sender =  QObject::sender ();
+    QString str = sender->objectName();
+    fileName = str.toStdString();
+    //QMessageBox::information(0, "Button", sender->objectName());
+    std::cout << "\n bottone schiacciato " << fileName <<"\n";
+
+
     std::cout << "\n creazione del menu \n" << "pos = " << pos.x() <<","<<pos.y();
     QMenu *menu=new QMenu(this);
-    menu->addAction(new QAction("Open", this));
-    menu->addAction(new QAction("Rename", this));
-    menu->addAction(new QAction("Delete", this));
+    menu->addAction("Open", this,SLOT(openFile()));
+    menu->addAction("Rename", this,SLOT(renameFile()));
+    menu->addAction("Delete", this, SLOT(deleteFile()));
     //pos.setX(pos.x());
     pos.setY(pos.y()+100);
     menu->exec(mapToGlobal(pos));
     //menu->popup(pos);
 }
 
-void Userpage::on_button_clicked(){
-    QObject *sender =  QObject::sender ();
-    QString str = sender->objectName();
-    std::string s = str.toStdString();
-    //QMessageBox::information(0, "Button", sender->objectName());
-    std::cout << "\n bottone schiacciato" << s <<"\n";
-
+void Userpage::on_fileName_clicked(int i){
+    std::string s;
+    if(i==0) {
+        QObject *sender = QObject::sender();
+        QString str = sender->objectName();
+        s = str.toStdString();
+        //QMessageBox::information(0, "Button", sender->objectName());
+        std::cout << "\n bottone schiacciato" << s << "\n";
+    }else {
+        s = fileName;
+    }
     try {
         json j = json{
                 {"operation","open_file"},
@@ -298,6 +284,113 @@ void Userpage::on_button_clicked(){
 
 }
 
+void Userpage::openFile(){
+    std::cout << "\napri file\n";
 
+    //QMessageBox::information(0, "Button", sender->objectName());
+    std::cout << "\n bottone schiacciato: " << fileName <<"\n";
+    on_fileName_clicked(1);
+
+
+}
+
+void Userpage::renameFile(){
+    std::cout<<"\nrinomina file";
+    QInputDialog modalWindow;
+    QString label = "New name: ";
+    modalWindow.setLabelText(label);
+    modalWindow.setWindowTitle("Rename file");
+    modalWindow.setMinimumSize(QSize(300, 150));
+    modalWindow.setSizePolicy(QSizePolicy::MinimumExpanding,
+                              QSizePolicy::MinimumExpanding);
+    modalWindow.setCancelButtonText("cancel");
+    modalWindow.setOkButtonText("rename");
+
+    if ( modalWindow.exec() == 1) {
+
+        while (modalWindow.textValue() == "") {
+
+            QDialog *dialog = new QDialog();
+            QVBoxLayout *layout = new QVBoxLayout();
+            dialog->setLayout(layout);
+            layout->addWidget(new QLabel("Insert a name for the new file"));
+            QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+            layout->addWidget(buttonBox);
+
+            connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+
+            dialog->exec();
+
+            if (modalWindow.exec() == 0)
+                break;
+
+        }
+        //controllo valdità formato nome file
+        while (modalWindow.textValue().toStdString().find_first_of('\\') != std::string::npos ||
+               modalWindow.textValue().toStdString().find_first_of('/') != std::string::npos ||
+               modalWindow.textValue().toStdString().find_first_of(':') != std::string::npos ||
+               modalWindow.textValue().toStdString().find_first_of('*') != std::string::npos ||
+               modalWindow.textValue().toStdString().find_first_of('?') != std::string::npos ||
+               modalWindow.textValue().toStdString().find_first_of('"') != std::string::npos ||
+               modalWindow.textValue().toStdString().find_first_of('<') != std::string::npos ||
+               modalWindow.textValue().toStdString().find_first_of('>') != std::string::npos ||
+               modalWindow.textValue().toStdString().find_first_of('|') != std::string::npos
+                ) {
+            QDialog *dialog = new QDialog();
+            QVBoxLayout *layout = new QVBoxLayout();
+            dialog->setLayout(layout);
+            layout->addWidget(new QLabel("Error! characters \\,/,:,*,?,\",<,>,| are not allowed in a file's name"));
+            QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+            layout->addWidget(buttonBox);
+            connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+            dialog->exec();
+            if (modalWindow.exec() == 0)
+                break;
+        }
+
+        while (modalWindow.textValue().length() > 100) {
+
+            QDialog *dialog = new QDialog();
+            QVBoxLayout *layout = new QVBoxLayout();
+            dialog->setLayout(layout);
+            layout->addWidget(new QLabel("Error! The max length of a file's name is 100 characters"));
+            QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+            layout->addWidget(buttonBox);
+            connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+            dialog->exec();
+            if (modalWindow.exec() == 0)
+                break;
+        }
+
+        //invio al server la richiesta per creare un nuovo file
+        try {
+            json j = json{
+                    {"operation", "request_new_name"},
+                    {"old_name", fileName},
+                    {"new_name",modalWindow.textValue().toStdString()},
+                    {"username",  client_->getUser().toStdString()}
+            };
+
+            //PRENDI I DATI E INVIA A SERVER
+            std::cout << "\n username inviato per rinominare file: " + client_->getUser().toStdString();
+            std::string mess = j.dump().c_str();
+            message msg;
+            msg.body_length(mess.size());
+            std::memcpy(msg.body(), mess.data(), msg.body_length());
+            msg.body()[msg.body_length()] = '\0';
+            msg.encode_header();
+            std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
+            sendmessage(msg);
+
+        } catch (std::exception &e) {
+            std::cerr << "Exception: " << e.what() << "\n";
+        }
+    }
+
+}
+
+void Userpage::deleteFile(){
+    std::cout<<"\ncancella file";
+}
 
 

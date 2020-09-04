@@ -26,17 +26,21 @@ private:
     QWidget *page;
     QWidget *recent;
     QWidget *userinfo;
+    std::string fileName;
 
 
 
 private slots:
-    void handleButton();
-    void onRightClicked();
+    void handleNewFileButton();
+    void openFile();
+    void renameFile();
+    void deleteFile();
+    //void onRightClicked();
 
 
 public slots:
     void customMenuRequested(QPoint pos);
-    void on_button_clicked();
+    void on_fileName_clicked(int i = 0);
 
 
 private:

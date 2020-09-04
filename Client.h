@@ -33,13 +33,13 @@ public:
 
     const QString &getUser() const;
     void setUser(const QString &user);
-
     const QString &getColor() const;
     void setColor(const QString &color);
+    void setFiles(const std::list<std::string> &list);
+    //void setFiles(const QList<std::string> &list);
 
-    void setFiles(const QList<std::string> &list);
-
-    QList<std::string > files;
+    std::multimap<std::string,std::string> files;
+    //QList<std::string > files;
 
 
 signals:

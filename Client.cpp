@@ -26,6 +26,7 @@ void Client::do_connect()
             std::cout<<ec.message()<<std::endl;
     });
 }
+
 void Client::write(const message& msg)
 {
     boost::asio::post(io_context_,[this, msg]()
@@ -93,13 +94,28 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
 
         if(type_request=="LOGIN_SUCCESS") {
 
+            //std::multimap<std::string, std::string> files = js.at("files").get<std::multimap<std::string,std::string>>();
             std::list<std::string> files = js.at("files").get<std::list<std::string>>();
-            QList<std::string> QFiles = QList<std::string>::fromStdList(files);
-            this->setFiles(QFiles);
-            std::list <std::string> :: iterator it;
+            //std::list<std::string> files = js.at("files").get<std::list<std::string>>();
+
+            //arrivati a questo punto in files ho l'elenco dei file con relativo autore
+            //devo modificare la parte seguente in modo tale da mostrare a schermo autore + file
+            for (auto p : files){
+                //std::cout << p.first << ": " << p.second << "\n";
+                std::cout << p<< "\n";
+            }
+
+            //QMap<std::string,std::string> QFiles = QMap<std::string,std::string>::fromStdMap(files);
+            //QList<std::string> QFiles = QList<std::string>::fromStdList(files);
+            this->setFiles(files);
+            //std::list <std::string> :: iterator it;
             std::cout << "\n prima del for ";
-            for(it = files.begin(); it != files.end(); ++it)
-                std::cout << '\n' << *it;
+            for (auto p : files){
+                //std::cout << p.first << ": " << p.second << "\n";
+                std::cout << p << "\n";
+            }
+            /*for(it = files.begin(); it != files.end(); ++it)
+                std::cout << '\n' << *it;*/
 
         }
         emit formResultSuccess(res);
@@ -145,9 +161,27 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         emit formResultSuccess(res);
         return type_request;
 
+    } else if (type_request == "file_renamed"){
+        //file rinominato correttamente
+        //aggiorno nome file nella lista dei file
+        std::cout << "\n nuovo nome: " << js.at("newName").get<std::string>();
+        /*QMutableListIterator<std::string> iter1(files);
+        while(iter1.hasNext() ){
+            std::string s = iter1.next();
+            std::cout <<"\nentrato nel while dei file ";
+            if (s==js.at("oldName").get<std::string>()){
+                iter1.setValue(js.at("newName").get<std::string>());
+                break;
+            }
+        }*/
+        QString res = QString::fromStdString("file_renamed");
+        emit formResultSuccess(res);
+        // chiamare funzione che aggiorna interfaccia grafica di userPage, con nuovo nome file
+
     }
     return type_request;
 }
+
 void Client::do_write(message write_msgs_)
 {
     boost::asio::async_write(socket_,boost::asio::buffer(write_msgs_.data(),write_msgs_.length()),[this](boost::system::error_code ec, std::size_t /*length*/)
@@ -163,6 +197,7 @@ void Client::do_write(message write_msgs_)
         }
     });
 }
+
 void Client::do_write()
 {
     boost::asio::async_write(socket_,boost::asio::buffer(write_msgs_.front().data(),write_msgs_.front().length()),[this](boost::system::error_code ec, std::size_t /*length*/)
@@ -198,6 +233,18 @@ void Client::setColor(const QString &color) {
     Client::color = color;
 }
 
-void Client::setFiles(const QList<std::string> &list) {
-    Client::files = list;
+void Client::setFiles(const std::list<std::string> &list) {
+    std::string user;
+    std::string fileName;
+    for(auto p : list ){
+        //std::string token = s.substr(0, s.find(delimiter));
+        user = p.substr(0,p.find("_"));
+        fileName = p.substr(p.find("_")+1,p.size());
+        files.insert({user,fileName});
+    }
+    //Client::files = list;
 }
+
+/*void Client::setFiles(const QList<std::string> &list) {
+    Client::files = list;
+}*/

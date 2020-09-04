@@ -95,6 +95,7 @@ void stacked::on_loginButton_clicked(){
 void stacked::sendmessage(message mess) {
     client_->write(mess);
 }
+
 void stacked::on_form_regButton_clicked(){
     //qui creare richiesta e inviarla al server
     //^[0-9a-zA-Z]+([0-9a-zA-Z][-._+])[0-9a-zA-Z]+@[0-9a-zA-Z]+([-.][0-9a-zA-Z]+)([0-9a-zA-Z][.])[a-zA-Z]{2,6}$
