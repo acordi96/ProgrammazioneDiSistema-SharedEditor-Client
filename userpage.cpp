@@ -18,7 +18,7 @@
 #include <QtCore/QModelIndex>
 
 Userpage::Userpage(QWidget *parent,Client *c):
-                    QMainWindow(parent),client_(c)
+        QMainWindow(parent),client_(c)
 {
     page = new QWidget(this);
     hLayout = new QHBoxLayout(page);
@@ -48,7 +48,7 @@ void Userpage::setupRecentFiles(){
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     scrollArea->setWidgetResizable(true);
     scrollArea->setStyleSheet(QString::fromUtf8("QPushButton {border: 0px;}"
-                                                 "QPushButton:hover {background-color: rgb(32, 74, 135)}"));
+                                                "QPushButton:hover {background-color: rgb(32, 74, 135)}"));
     QWidget *scrollAreaWidgets = new QWidget(scrollArea);
     QVBoxLayout *verticalLayout = new QVBoxLayout(scrollAreaWidgets);
     scrollAreaWidgets->setStyleSheet(QString::fromUtf8("QPushButton {border: 0px;}"
@@ -64,7 +64,7 @@ void Userpage::setupRecentFiles(){
         button = new QPushButton(scrollAreaWidgets);
         button->setContextMenuPolicy(Qt::CustomContextMenu);
         std::cout << "\n" << p.first << ": " << p.second << "\n";
-        button->setObjectName(QString::fromStdString(p.first));
+        button->setObjectName(QString::fromStdString(p.first) + "_|_" + QString::fromStdString(p.second));
         button->setText(QString::fromStdString(p.first)+":   "+QString::fromStdString(p.second));
         //button->setContentsMargins(10,0,0,0);
         verticalLayout->addWidget(button);
@@ -249,8 +249,8 @@ void Userpage::customMenuRequested(QPoint pos) {
 }
 
 void Userpage::on_fileName_clicked(int i){
-    std::string s;
-    if(i==0) {
+    /*std::string s;
+    if(i==0) { //TODO: che caso e'i?
         QObject *sender = QObject::sender();
         QString str = sender->objectName();
         s = str.toStdString();
@@ -258,12 +258,25 @@ void Userpage::on_fileName_clicked(int i){
         std::cout << "\n bottone schiacciato" << s << "\n";
     }else {
         s = fileName;
+    }*/
+    std::string s = QObject::sender()->objectName().toStdString();
+    std::cout << "Premuto bottone " << s <<std::endl;
+    std::string username;
+    std::string name;
+    for(int i = 0; i < s.length(); i++) {
+        if(s[i] == '_' && s[i+1] == '|' && s[i+2] == '_') { //parse button name (username+"_|_"+name)
+            i += 3;
+            while(s[i] != '\0')
+                name += s[i++];
+            break;
+        }
+        username += s[i];
     }
     try {
-        json j = json{
+        json j = json{ //TODO: fixare apertura file con nome utente
                 {"operation","open_file"},
-                {"name",s},
-                {"username",client_->getUser().toStdString()}
+                {"name",name},
+                {"username",username}
         };
 
         //PRENDI I DATI E INVIA A SERVER

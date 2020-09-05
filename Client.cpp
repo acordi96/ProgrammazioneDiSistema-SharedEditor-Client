@@ -14,7 +14,7 @@ Client::Client()
 }
 void Client::do_connect()
 {
-    auto endpoints = resolver_.resolve("127.0.0.1", "3000");
+    auto endpoints = resolver_.resolve(/*"93.43.250.236"*/"127.0.0.1", "3000");
     boost::asio::async_connect(socket_, endpoints,[this](boost::system::error_code ec, tcp::endpoint)
     {
         if (!ec)
@@ -159,6 +159,9 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::cout << "file aperto correttamente ";
         QString res = QString::fromStdString("file_opened");
         emit formResultSuccess(res);
+        std::string toWrite = js.at("toWrite");
+        for(int i = 0; i < toWrite.length(); i++)
+            emit insertSymbol(i,toWrite[i]);
         return type_request;
 
     } else if (type_request == "file_renamed"){
