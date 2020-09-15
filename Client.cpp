@@ -93,31 +93,15 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         this->setColor(Qcolor);
 
         if(type_request=="LOGIN_SUCCESS") {
-
-            //std::multimap<std::string, std::string> files = js.at("files").get<std::multimap<std::string,std::string>>();
             std::list<std::string> files = js.at("files").get<std::list<std::string>>();
-            //std::list<std::string> files = js.at("files").get<std::list<std::string>>();
-
-            //arrivati a questo punto in files ho l'elenco dei file con relativo autore
-            //devo modificare la parte seguente in modo tale da mostrare a schermo autore + file
+            std::cout<<"User "<<this->getUser().toStdString()<<" loggato! File disponibili:"<<std::endl;
             for (auto p : files){
-                //std::cout << p.first << ": " << p.second << "\n";
-                std::cout << p<< "\n";
+                std::cout << p<< std::endl;
             }
-
-            //QMap<std::string,std::string> QFiles = QMap<std::string,std::string>::fromStdMap(files);
-            //QList<std::string> QFiles = QList<std::string>::fromStdList(files);
             this->setFiles(files);
-            //std::list <std::string> :: iterator it;
-            std::cout << "\n prima del for ";
-            for (auto p : files){
-                //std::cout << p.first << ": " << p.second << "\n";
-                std::cout << p << "\n";
-            }
-            /*for(it = files.begin(); it != files.end(); ++it)
-                std::cout << '\n' << *it;*/
 
         }
+        //TODO: qunado ci si registra non si vedono i file
         emit formResultSuccess(res);
         return type_request;
     }else if (type_request=="LOGIN_ERROR" || type_request=="QUERY_ERROR" || type_request=="CONNESSION_ERROR"
@@ -164,7 +148,32 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
             emit insertSymbol(i,toWrite[i]);
         return type_request;
 
-    } else if (type_request == "file_renamed"){
+    } else if (type_request == "open_file"){
+        int maxBuffer = js.at("maxBuffer");
+        QString res = QString::fromStdString("file_opened");
+        std::string toWrite = js.at("toWrite");
+        int part = js.at("partToWrite");
+
+        std::unique_lock<std::mutex> lk(this->m);
+        while(this->writing != part) {
+            this->cv.wait(lk);
+        }
+        for(int i = 0; i < toWrite.length(); i++) {
+            emit insertSymbol((maxBuffer * part) + i, toWrite[i]);
+        }
+        if(this->writing == js.at("ofPartToWrite")) {
+            this->writing = 0;
+            std::cout << "file aperto correttamente ";
+            emit formResultSuccess(res);
+        }
+        else {
+            std::cout<<"written "<<part<<" json"<<std::endl;
+            this->writing++;
+        }
+        this->cv.notify_one();
+
+        return type_request;
+    }else if (type_request == "file_renamed"){
         //file rinominato correttamente
         //aggiorno nome file nella lista dei file
         std::cout << "\n nuovo nome: " << js.at("newName").get<std::string>();

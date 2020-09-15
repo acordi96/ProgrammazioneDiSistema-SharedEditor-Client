@@ -65,7 +65,9 @@ private:
     //cose da salvare
     QString user;
     QString color;
-
+    std::condition_variable cv;
+    std::mutex m;
+    int writing = 0;
 };
 
 #endif //PROGETTO_PROVA_CLIENT_H

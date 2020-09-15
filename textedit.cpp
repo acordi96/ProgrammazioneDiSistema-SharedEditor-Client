@@ -743,12 +743,10 @@ void TextEdit::showSymbol(int pos, QChar c) {
     }
     cur.endEditBlock();
 
-    std::cout << "Sono qui per capire" << std::endl;
-
     //textEdit->setText(textEdit->toPlainText().insert(pos,c));
 
     textEdit->setTextCursor(cur);
-    qDebug()<< "Written in pos: "<< pos << endl;
+    //qDebug()<< "Written in pos: "<< pos << endl;
     textEdit->setFocus();
 }
 
