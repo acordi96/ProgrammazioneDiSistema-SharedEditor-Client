@@ -229,6 +229,16 @@ void Client::do_write()
     });
 }
 
+QString Client::getFileName() const
+{
+    return fileName;
+}
+
+void Client::setFileName(const QString &value)
+{
+    fileName = value;
+}
+
 const QString &Client::getUser() const {
     return user;
 }

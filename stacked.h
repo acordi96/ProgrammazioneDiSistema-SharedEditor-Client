@@ -16,7 +16,6 @@ class stacked : public QMainWindow
 public:
     explicit stacked(QWidget *parent = nullptr);
     ~stacked();
-
 private:
     Ui::stacked *ui;
     Client *client_;
@@ -33,6 +32,7 @@ private slots:
    //void on_newFileButton_clicked();
    void logout();
    void closeAll();
+   void closeFile();
 
 };
 

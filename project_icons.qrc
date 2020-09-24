@@ -13,11 +13,13 @@
         <file>images/win/fileprint.png</file>
         <file>images/win/fileopen.png</file>
         <file>images/win/filenew.png</file>
+        <file>images/win/exportpdf.png</file>
         <file>images/win/editundo.png</file>
         <file>images/win/editredo.png</file>
         <file>images/win/editpaste.png</file>
         <file>images/win/editcut.png</file>
         <file>images/win/editcopy.png</file>
+        <file>images/win/cancel-icon.png</file>
         <file>images/mac/zoomout.png</file>
         <file>images/mac/zoomin.png</file>
         <file>images/mac/textunder.png</file>
@@ -31,14 +33,23 @@
         <file>images/mac/fileprint.png</file>
         <file>images/mac/fileopen.png</file>
         <file>images/mac/filenew.png</file>
+        <file>images/mac/exportpdf.png</file>
         <file>images/mac/editundo.png</file>
         <file>images/mac/editredo.png</file>
         <file>images/mac/editpaste.png</file>
         <file>images/mac/editcut.png</file>
         <file>images/mac/editcopy.png</file>
-        <file>images/win/exportpdf.png</file>
-        <file>images/mac/exportpdf.png</file>
+        <file>images/mac/cancel-icon.png</file>
         <file>images/Science-Plus2-Math-icon.png</file>
+        <file>images/photo_2020-09-22_17-58-05.jpg</file>
+        <file>images/photo_2020-09-22_17-12-53.jpg</file>
+        <file>images/file-sharing.png</file>
         <file>images/Arrows-Left-2-icon.png</file>
+        <file>images/privacy.png</file>
+        <file>images/privacy_64.png</file>
+        <file>images/win/left-arrow.png</file>
+        <file>images/mac/left-arrow.png</file>
+        <file>images/win/user.png</file>
+        <file>images/mac/user.png</file>
     </qresource>
 </RCC>

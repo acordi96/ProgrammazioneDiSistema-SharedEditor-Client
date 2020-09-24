@@ -8,6 +8,7 @@
 #include <QtWidgets/QInputDialog>
 #include "json.hpp"
 #include "lib/md5.h"
+#include <QDesktopWidget>
 
 using json = nlohmann::json;
 using boost::asio::ip::tcp;
@@ -18,14 +19,15 @@ stacked::stacked(QWidget *parent) :
     ui(new Ui::stacked),
     client_(new Client)
 {
-    TextEdit *te = new TextEdit(client_);
-    connect(te,&TextEdit::logout,this,&stacked::logout);
-    connect(te,&TextEdit::closeAll,this,&stacked::closeAll);
+   // TextEdit *te = new TextEdit(client_);
+    //connect(te,&TextEdit::logout,this,&stacked::logout);
+    //connect(te,&TextEdit::closeAll,this,&stacked::closeAll);
     QObject::connect(client_, &Client::formResultSuccess, this, &stacked::showPopupSuccess);
     //Userpage *up = new Userpage(this,client_);
+    //setFixedSize(1000,600);
     ui->setupUi(this);
     //ui->stackedWidget->addWidget(up);
-    ui->stackedWidget->addWidget(te);
+    //ui->stackedWidget->addWidget(te);
 
     //Userpage *up = new Userpage();
     //ui->stackedWidget->addWidget(up);
@@ -195,11 +197,23 @@ void stacked::on_form_regButton_clicked(){
 // type_request=="QUERY_ERROR"    LOGIN_ERROR
 // || type_request=="CONNESSION_ERROR" || SIGNUP_ERROR_DUPLICATE_USERNAME || SIGNUP_ERROR_INSERT_FAILED)
 
+/*
+ * TO DO:
+ *  verifica client_->getFileName/setFileName
+ *
+ * */
 void stacked::showPopupSuccess(QString result) {
     if(result == "LOGIN_SUCCESS" || result == "SIGNUP_SUCCESS") {
         Userpage *up = new Userpage(this,client_);
+        TextEdit *te = new TextEdit(client_);
+        connect(te,&TextEdit::logout,this,&stacked::logout);
+        connect(te,&TextEdit::closeFile,this,&stacked::closeFile);
+        connect(te,&TextEdit::closeAll,this,&stacked::closeAll);
+
         //ui->setupUi(this);
+        ui->stackedWidget->addWidget(te);
         ui->stackedWidget->addWidget(up);
+        setWindowTitle("Userpage");
         ui->stackedWidget->setCurrentIndex(3);
         //ui->stackedWidget->setCurrentIndex(2);
         std::cout << "Il colore e' " << client_->getColor().toStdString() << std::endl;
@@ -216,13 +230,16 @@ void stacked::showPopupSuccess(QString result) {
         }else if(result == "new_file_created"){
 
             layout->addWidget(new QLabel("File correclty created"));
+            //index 2 = text editor
+            setWindowTitle(client_->getFileName());
             ui->stackedWidget->setCurrentIndex(2);
             //ui->stackedWidget->setCurrentIndex(3);
         }else if(result == "new_file_already_exist"){
             std::cout << "\n file già esistente ";
             layout->addWidget(new QLabel("File already exists"));
         }else if (result == "file_opened"){
-            std::cout<<"\n file aperto";
+            std::cout<<"\n file aperto \n";
+            setWindowTitle(client_->getFileName());
             ui->stackedWidget->setCurrentIndex(2);
 
         }
@@ -238,6 +255,7 @@ void stacked::showPopupSuccess(QString result) {
 }
 
 void stacked::on_reglogButton_clicked(){
+    setWindowTitle("Sign Up Page");
     ui->stackedWidget->setCurrentIndex(1);
 
 }
@@ -349,10 +367,14 @@ void stacked::on_form_cancButton_clicked(){
     ui->stackedWidget->setCurrentIndex(0);
 }
 void stacked::logout(){
-    ui->stackedWidget->setCurrentIndex(3);
-    //ui->stackedWidget->setCurrentIndex(2);
+    setWindowTitle("MainWindow");
+    ui->stackedWidget->setCurrentIndex(0);
+    //ui->stackedWidget->setCurrentIndex(3);
 }
-
+void stacked::closeFile(){
+    setWindowTitle("Userpage");
+    ui->stackedWidget->setCurrentIndex(3);
+}
 void stacked::closeAll(){
     this->close();
 }

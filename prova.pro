@@ -16,27 +16,29 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    customcursor.cpp \
     main.cpp \
     registrationform.cpp \
     stacked.cpp \
     textedit.cpp \
     Client.cpp  \
     message.cpp \
-    userpage.cpp
+    userpage.cpp\
+    lib/md5.cpp \
 
 HEADERS += \
+    customcursor.h \
     registrationform.h \
     stacked.h \
     textedit.h \
     Client.h \
     message.h \
     userpage.h \
-    json.hpp
+    json.hpp \
+    lib/md5.h \
 
-FORMS += \
-    registrationform.ui \
-    stacked.ui
-
+RESOURCES += \
+    project_icons.qrc
 INCLUDEPATH += /home/cordi/boost/include
 LIBS += "-L/home/cordi/boost/lib"
 
@@ -45,5 +47,5 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-RESOURCES += \
-    project_icons.qrc
+FORMS += \
+    stacked.ui

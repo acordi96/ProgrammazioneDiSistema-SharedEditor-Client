@@ -11,7 +11,7 @@
 #include <boost/asio.hpp>
 #include "json.hpp"
 #include "message.h"
-
+#include <QColor>
 #ifndef PROGETTO_PROVA_CLIENT_H
 #define PROGETTO_PROVA_CLIENT_H
 
@@ -37,16 +37,21 @@ public:
     void setColor(const QString &color);
     void setFiles(const std::list<std::string> &list);
     //void setFiles(const QList<std::string> &list);
-
+    //                author ,  filename
     std::multimap<std::string,std::string> files;
     //QList<std::string > files;
 
+
+    QString getFileName() const;
+    void setFileName(const QString &value);
 
 signals:
     void formResultSuccess(QString result);
     void insertSymbol(int pos, QChar c);
     void eraseSymbols(int startIndex, int endIndex);
     void showSymbol(std::pair<int,char> tuple);
+    //void addCollaborator(int id,QColor color);// aggiunge collaboratore e crea customcursor
+    //void updateCollaborator(int id, int pos); //aggiorna posizione cursore con quel id
 private:
     void do_connect();
     void do_read_header();
@@ -65,6 +70,7 @@ private:
     //cose da salvare
     QString user;
     QString color;
+    QString fileName;
     std::condition_variable cv;
     std::mutex m;
     int writing = 0;

@@ -5,10 +5,13 @@
 #ifndef PROGETTO_MALNATI2_TEXTEDIT_H
 #define PROGETTO_MALNATI2_TEXTEDIT_H
 
+#include <QListWidget>
 #include <QMainWindow>
 #include <QMap>
 #include <QPointer>
 #include "Client.h"
+#include "customcursor.h"
+
 QT_BEGIN_NAMESPACE
 class QAction;
 class QComboBox;
@@ -19,6 +22,8 @@ class QMenu;
 class QPrinter;
 QT_END_NAMESPACE
 
+class QEvent;
+
 class TextEdit : public QMainWindow
 {
 Q_OBJECT
@@ -27,6 +32,8 @@ public:
     TextEdit(Client* c, QWidget *parent = 0);
 
     bool load(const QString &f);
+
+    QString getFileName() const;
 
 public slots:
     void fileNew();
@@ -38,7 +45,10 @@ protected:
     bool eventFilter(QObject *obj, QEvent *ev) override;
 signals:
     void logout();
+    void closeFile();
     void closeAll();
+    void updateCursor();
+
 private slots:
     void fileOpen();
     bool fileSave();
@@ -62,7 +72,9 @@ private slots:
     void clipboardDataChanged();
     void about();
     void printPreview(QPrinter *);
-
+    void drawRemoteCursors();
+    //void initRemoteCursors(int id_client, QColor remoteColor);
+    //void updateRemoteCursors(int id_client,int pos);
 private:
     Client *client_;
     void setupFileActions();
@@ -76,6 +88,15 @@ private:
     void colorChanged(const QColor &c);
     void alignmentChanged(Qt::Alignment a);
 
+    void resetText();
+    void resetCursors();
+    void updateCursors(const CustomCursor &cursor);
+    void updateCursors();
+    //for debug
+    void setupConnectedUsers();
+    void requestLogout();
+    void closingFile();
+    void draw2(unsigned int position);
     QAction *actionSave;
     QAction *actionTextBold;
     QAction *actionTextUnderline;
@@ -100,6 +121,14 @@ private:
     QToolBar *tb;
     QString fileName;
     QTextEdit *textEdit;
+    QListWidget *connectedUsers;
+
+    bool key_to_handle = false;
+    CustomCursor _newCursor = CustomCursor();
+    CustomCursor _oldCursor = CustomCursor();
+    QString _currentText = QString{};
+    std::map<unsigned int, CustomCursor> _cursorsVector;
+    std::map<unsigned int, QColor> _cursorColors;
 };
 
 

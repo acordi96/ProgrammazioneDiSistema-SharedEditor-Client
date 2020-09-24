@@ -22,10 +22,11 @@ Userpage::Userpage(QWidget *parent,Client *c):
 {
     page = new QWidget(this);
     hLayout = new QHBoxLayout(page);
-    setupRecentFiles();
+    hLayout->setSpacing(0);
     setupUserinfo();
-    hLayout->addWidget(recent);
+    setupRecentFiles();
     hLayout->addWidget(userinfo);
+    hLayout->addWidget(recent);
     std::cout << "\n creazione userpage";
     page->setLayout(hLayout);
     setCentralWidget(page);
@@ -33,6 +34,57 @@ Userpage::Userpage(QWidget *parent,Client *c):
 }
 
 void Userpage::setupRecentFiles(){
+     recent = new QWidget(page);
+     recent->setObjectName(QString::fromUtf8("Recent Files"));
+     recent->setStyleSheet(QString::fromUtf8("background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgba(0, 0, 255, 255), stop:1 rgba(255, 255, 255, 255));"));
+
+     QLabel *recentLabel = new QLabel("Recent Files",recent);
+     recentLabel->setObjectName(QString::fromUtf8("recentLabel"));
+     recentLabel->setGeometry(QRect(20, 0, 261, 31));
+     recentLabel->setStyleSheet(QString::fromUtf8("font: 75 22pt \"Sawasdee Bold\";"));
+     recentLabel->setAlignment(Qt::AlignCenter);
+
+
+     QScrollArea *scrollArea = new QScrollArea(recent);
+     scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
+     scrollArea->setGeometry(QRect(10,60,281,401));
+     scrollArea->setFrameShape(QFrame::NoFrame);
+     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+     scrollArea->setWidgetResizable(true);
+
+     QWidget *scrollAreaWidgets = new QWidget(scrollArea);
+     scrollAreaWidgets->setObjectName(QString::fromUtf8("scrollAreaWidgets"));
+     QVBoxLayout *verticalLayout = new QVBoxLayout(scrollAreaWidgets);
+     QLabel *title = new QLabel(QString::fromUtf8("author    title"),recent);
+     title->setGeometry(QRect(20,35,261,20));
+     title->setAlignment(Qt::AlignCenter);
+
+     QPushButton *button;
+
+     for (auto p : client_->files){
+         //std::string s = iter1.next();
+         std::cout <<"\nentrato nel while dei file ";
+         button = new QPushButton(scrollAreaWidgets);
+         button->setContextMenuPolicy(Qt::CustomContextMenu);
+         std::cout << "\n" << p.first << ": " << p.second << "\n";
+         button->setObjectName(QString::fromStdString(p.first) + "_|_" + QString::fromStdString(p.second));
+         button->setText(QString::fromStdString(p.first)+":   "+QString::fromStdString(p.second));
+         button->setFlat(true);
+         //button->setContentsMargins(10,0,0,0);
+         verticalLayout->addWidget(button);
+
+         connect(button,SIGNAL(clicked()),SLOT(on_fileName_clicked()));
+         connect(button, SIGNAL(customContextMenuRequested(QPoint)),
+                 SLOT(customMenuRequested(QPoint)));
+     }
+
+
+     scrollAreaWidgets->setLayout(verticalLayout);
+     scrollArea->setWidget(scrollAreaWidgets);
+
+
+     hLayout->addWidget(recent);
+    /*
     recent = new QWidget();
     recent->setObjectName(QString::fromUtf8("recent_files"));
 
@@ -43,10 +95,12 @@ void Userpage::setupRecentFiles(){
     QScrollArea *scrollArea = new QScrollArea(recent);
     /*QDialog *title = new QDialog();
     title->setGeometry(QRect(30,90,100,130));
-    title->setWindowIconText("titolo");*/
+    title->setWindowIconText("titolo");//
     scrollArea->setGeometry(QRect(10,60,300,300));
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     scrollArea->setWidgetResizable(true);
+    scrollArea->setFrameShape(QFrame::NoFrame);
+    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scrollArea->setStyleSheet(QString::fromUtf8("QPushButton {border: 0px;}"
                                                 "QPushButton:hover {background-color: rgb(32, 74, 135)}"));
     QWidget *scrollAreaWidgets = new QWidget(scrollArea);
@@ -80,18 +134,76 @@ void Userpage::setupRecentFiles(){
 
 
     hLayout->addWidget(recent);
-
+*/
 }
 
 void Userpage::setupUserinfo(){
+
+     QVBoxLayout *userLayout = new QVBoxLayout();
+     userLayout->setSpacing(0);
+     userinfo = new QWidget(page);
+     userinfo->setObjectName(QString::fromUtf8("user_info"));
+     userinfo->setStyleSheet(QString::fromUtf8("background-color:rgb(255,255,255); "));
+
+     QWidget *myIcon = new QWidget(userinfo);
+     myIcon->setObjectName(QString::fromUtf8("myIcon"));
+     myIcon->setGeometry(QRect(10,120,101,91));
+     myIcon->setStyleSheet(QString::fromUtf8("background-color:rgb(0,0,255)"));
+     QPushButton *modifyIcon = new QPushButton(myIcon);
+     modifyIcon->setObjectName(QString::fromUtf8("modifyIcon"));
+     modifyIcon->setGeometry(QRect(80,70,21,21));
+     modifyIcon->setFlat(true);
+
+     QLabel *userpageLabel = new QLabel("Userpage",userinfo);
+     userpageLabel->setObjectName(QString::fromUtf8("userpageLabel"));
+     userpageLabel->setGeometry(QRect(80, 10, 221, 61));
+     userpageLabel->setStyleSheet(QString::fromUtf8("font: 75 36pt \"Sawasdee\";"));
+     userpageLabel->setAlignment(Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft);
+
+     QWidget *user_image = new QWidget(userinfo);
+     user_image->setGeometry(QRect(10, 10, 61, 51));
+     user_image->setStyleSheet(QString::fromUtf8("image: url(:/images/photo_2020-09-22_17-58-05.jpg);"));
+
+     QPushButton *usernameButton = new QPushButton(client_->getUser(),userinfo);
+     usernameButton->setObjectName(QString::fromUtf8("usernameButton"));
+     usernameButton->setGeometry(QRect(110, 110, 171, 71));
+     usernameButton->setStyleSheet(QString::fromUtf8("font: 75 25pt \"Sawasdee\";"));
+     usernameButton->setFlat(true);
+
+     QLabel *email_lab = new QLabel("email",userinfo);
+     email_lab->setObjectName(QString::fromUtf8("email_lab"));
+     email_lab->setGeometry(QRect(150, 180, 91, 31));
+     email_lab->setStyleSheet(QString::fromUtf8("font: 14pt \"Sawasdee\";"));
+     email_lab->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+
+     QPushButton *newFileButton = new QPushButton("New File",userinfo);
+     newFileButton->setObjectName(QString::fromUtf8("newFileButton"));
+     newFileButton->setGeometry(QRect(150, 380, 121, 31));
+     newFileButton->setStyleSheet(QString::fromUtf8("QPushButton#newFileButton{\n"
+        "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgba(0, 0, 255, 255), stop:1 rgba(255, 255, 255, 255));\n"
+        "border: 1px;\n"
+     "}\n"
+     "QPushButton#newFileButton:hover{\n"
+     "background-color: rgb(255,0,0);\n"
+     "}"));
+
+     QIcon icon;
+     icon.addFile(QString::fromUtf8(":/images/Science-Plus2-Math-icon.png"), QSize(), QIcon::Normal, QIcon::On);
+     newFileButton->setIcon(icon);
+     newFileButton->setIconSize(QSize(32, 32));
+     newFileButton->setFlat(false);
+
+     userLayout->addWidget(userinfo);
+     hLayout->addLayout(userLayout);
+     /*
     userinfo=new QWidget();
     userinfo->setObjectName(QString::fromUtf8("user_info"));
-    userinfo->setStyleSheet(QString::fromUtf8("background-color: rgb(252, 233, 79); "));
+    userinfo->setStyleSheet(QString::fromUtf8("background-color: rgb(255,255,255); "));
 
     QVBoxLayout *userLayout = new QVBoxLayout(userinfo);
     userLayout->setContentsMargins(0,50,0,200);
 
-    /* will be changed for icon */
+    //will be changed for icon
     QLabel *label_2 = new QLabel(userinfo);
     label_2->setGeometry(QRect(113,70,67,17));
     label_2->setText(QString::fromUtf8("Icon"));
@@ -100,7 +212,7 @@ void Userpage::setupUserinfo(){
 
     QLabel *label_3 = new QLabel(userinfo);
     label_3->setGeometry(QRect(113,120,111,17));
-    label_3->setText(QString::fromUtf8("Connected User"));
+    label_3->setText(client_->getUser());
     label_3->setAlignment(Qt::AlignHCenter);
     userLayout->addWidget(label_3,Qt::AlignHCenter);
 
@@ -117,8 +229,9 @@ void Userpage::setupUserinfo(){
     userinfo->setLayout(userLayout);
 
     hLayout->addWidget(userinfo);
+*/
 
-    connect(newFileButton, SIGNAL (released()), this, SLOT (handleNewFileButton()));
+     connect(newFileButton, SIGNAL (released()), this, SLOT (handleNewFileButton()));
 }
 
 void Userpage::handleNewFileButton()
@@ -215,6 +328,7 @@ void Userpage::handleNewFileButton()
         }
 
         QString testo = modalWindow.textValue();
+        client_->setFileName(testo);
         std::cout << "CLICK SUL PULSANTE CREATE " << testo.toStdString() ;
     }
     //modalWindow.exec()
@@ -278,7 +392,8 @@ void Userpage::on_fileName_clicked(int i){
                 {"name",name},
                 {"username",username}
         };
-
+        client_->setFileName(QString::fromStdString(name));
+        std::cout<< "\nFle Name Attuale: "<<client_->getFileName().toStdString()<<std::endl;
         //PRENDI I DATI E INVIA A SERVER
         std::cout << "\ninvio richiesta apertura file: " << s << " \n username inviato per la creazione del file: " << client_->getUser().toStdString();
         std::string mess = j.dump().c_str();
