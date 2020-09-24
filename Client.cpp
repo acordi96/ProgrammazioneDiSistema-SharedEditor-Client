@@ -68,10 +68,25 @@ void Client::do_read_body()
         if (!ec)
         {
             std::cout << "\n Messaggio ricevuto dal server: " << read_msg_.body() << std::endl;
-            json messageFromClient = json::parse(read_msg_.body());
+            json messageFromClient;
+            try {
+                std::string message = read_msg_.body();
+                if(message.find_last_of('}') < (message.size() + 1))
+                    message[message.find_last_of('}') + 1] = '\0';
+                messageFromClient = json::parse(message);
+            } catch(...) {
+                std::cout<<"parse error: "<<messageFromClient<<std::endl;
+                do_read_header();
+            }
             std::string requestType = messageFromClient.at("response").get<std::string>();
             std::cout << "\n requestType : " + requestType;
-            std::string response = handleRequestType(messageFromClient, requestType);
+            std::string response;
+            try {
+                response = handleRequestType(messageFromClient, requestType);
+            } catch(...) {
+                std::cout<<"GENERIC ERROR HandleRequest of: "<<messageFromClient<<std::endl;
+                do_read_header();
+            }
 
             do_read_header();
         }
