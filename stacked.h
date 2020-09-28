@@ -21,6 +21,8 @@ private:
     Client *client_;
     void sendmessage(message mess);
     std::string readMessage();
+protected:
+    void closeEvent(QCloseEvent *e) override;
 public slots:
     void showPopupSuccess(QString result);
 private slots:

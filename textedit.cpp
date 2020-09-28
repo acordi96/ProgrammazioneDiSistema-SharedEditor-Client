@@ -855,10 +855,10 @@ void TextEdit::showSymbol(int pos, QChar c) {
 
 void TextEdit::clipboardDataChanged()
 {
-#ifndef QT_NO_CLIPBOARD
+/*#ifndef QT_NO_CLIPBOARD
     if (const QMimeData *md = QApplication::clipboard()->mimeData())
         actionPaste->setEnabled(md->hasText());
-#endif
+#endif*/
 }
 
 void TextEdit::about()
