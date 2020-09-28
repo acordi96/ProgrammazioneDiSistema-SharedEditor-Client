@@ -14,8 +14,17 @@
 #include <iostream>
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QDialogButtonBox>
+#include <QBuffer>
+#include <QFileDialog>
 #include <QMenu>
+#include <QPixmap>
 #include <QtCore/QModelIndex>
+
+#ifdef Q_OS_MAC
+const QString rsrcPath = ":/images/mac";
+#else
+const QString rsrcPath = ":/images/win";
+#endif
 
 Userpage::Userpage(QWidget *parent,Client *c):
         QMainWindow(parent),client_(c)
@@ -145,13 +154,17 @@ void Userpage::setupUserinfo(){
      userinfo->setObjectName(QString::fromUtf8("user_info"));
      userinfo->setStyleSheet(QString::fromUtf8("background-color:rgb(255,255,255); "));
 
-     QWidget *myIcon = new QWidget(userinfo);
+     myIcon = new QWidget(userinfo);
      myIcon->setObjectName(QString::fromUtf8("myIcon"));
      myIcon->setGeometry(QRect(10,120,101,91));
      myIcon->setStyleSheet(QString::fromUtf8("background-color:rgb(0,0,255)"));
      QPushButton *modifyIcon = new QPushButton(myIcon);
      modifyIcon->setObjectName(QString::fromUtf8("modifyIcon"));
      modifyIcon->setGeometry(QRect(80,70,21,21));
+     modifyIcon->setStyleSheet(QString::fromUtf8("QPushButton#modifyIcon:hover{background-color:rgb(82,82,171);border:1px;}"));
+     QIcon gearIcon;
+     gearIcon.addFile(rsrcPath+QString::fromUtf8("/mechanical-gears-.png"),QSize(),QIcon::Normal,QIcon::On);
+     modifyIcon->setIcon(gearIcon);
      modifyIcon->setFlat(true);
 
      QLabel *userpageLabel = new QLabel("Userpage",userinfo);
@@ -232,6 +245,56 @@ void Userpage::setupUserinfo(){
 */
 
      connect(newFileButton, SIGNAL (released()), this, SLOT (handleNewFileButton()));
+     connect(modifyIcon,&QPushButton::clicked,this,&Userpage::iconSelector);
+}
+void Userpage::iconSelector(){
+    /*
+    selector = new QWidget();
+    QWidget *widget;
+    QPushButton *button;
+    selector->setFixedSize(600,400);
+    selector->move(200,100);
+    int offY = 20, startY=80;
+    int offX = 30, startX=70;
+    int dim = 80;
+
+    for(int i=0; i<3;i++){
+        widget = new QWidget(selector);
+        widget->setGeometry(QRect(startX+i*(offX+dim),startY,dim,dim));
+        widget->setStyleSheet(QString::fromUtf8("image:url(")+rsrcPath+QString::fromUtf8("/beach.png")+QString::fromUtf8(");"));
+        button = new QPushButton(widget);
+        //button->setObjectName(QString::fromUtf8("icon_")+i);
+        std::cout<<"\n"<<button->objectName().toStdString()<<std::endl;
+        button->setGeometry(QRect(0,0,80,80));
+        button->setFlat(true);
+
+    }
+
+    connect(button,&QPushButton::clicked,this,&Userpage::changeIcon);
+    selector->show();
+    */
+
+    /******** QFileDialog -> open from my own PC ********/
+
+    QFileDialog fileDialog(this,tr("Choose Icon..."));
+    fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
+    fileDialog.setFileMode(QFileDialog::ExistingFile);
+    fileDialog.setMimeTypeFilters(QStringList()<<"image/jpg"<<"image/png");
+
+    if(fileDialog.exec() != QDialog::Accepted){
+        return;
+    }
+    const QString selected = fileDialog.selectedFiles().first();
+    std::cout<<"\nSelected file:  "<<selected.toStdString()<<std::endl;
+
+    // inviare al server?
+
+    myIcon->setStyleSheet(QString::fromUtf8("image:url(")+selected+QString::fromUtf8(");"));
+
+}
+void Userpage::changeIcon(){
+  myIcon->setStyleSheet(QString::fromUtf8("image:url(")+rsrcPath+QString::fromUtf8("/beach.png")+QString::fromUtf8(");"));
+
 }
 
 void Userpage::handleNewFileButton()

@@ -51,5 +51,9 @@
         <file>images/mac/left-arrow.png</file>
         <file>images/win/user.png</file>
         <file>images/mac/user.png</file>
+        <file>images/win/mechanical-gears-.png</file>
+        <file>images/mac/mechanical-gears-.png</file>
+        <file>images/win/beach.png</file>
+        <file>images/mac/beach.png</file>
     </qresource>
 </RCC>

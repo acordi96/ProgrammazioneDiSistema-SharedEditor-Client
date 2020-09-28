@@ -50,6 +50,7 @@ signals:
     void insertSymbol(int pos, QChar c);
     void eraseSymbols(int startIndex, int endIndex);
     void showSymbol(std::pair<int,char> tuple);
+    void clearEditor();
     //void addCollaborator(int id,QColor color);// aggiunge collaboratore e crea customcursor
     //void updateCollaborator(int id, int pos); //aggiorna posizione cursore con quel id
 private:

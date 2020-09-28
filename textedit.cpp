@@ -47,7 +47,7 @@
 
 #include "textedit.h"
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
 const QString rsrcPath = ":/images/mac";
 #else
 const QString rsrcPath = ":/images/win";
@@ -56,10 +56,10 @@ const QString rsrcPath = ":/images/win";
 TextEdit::TextEdit(Client* c, QWidget *parent)
         : QMainWindow(parent), client_(c)
 {
-#ifdef Q_OS_OSX
+#ifdef Q_OS_MACOS
     setUnifiedTitleAndToolBarOnMac(true);
 #endif
-    setWindowTitle(QCoreApplication::applicationName());
+    //setWindowTitle(QCoreApplication::applicationName());
     textEdit = new QTextEdit(this);
     /*
     connect(textEdit, &QTextEdit::currentCharFormatChanged,
@@ -71,6 +71,7 @@ TextEdit::TextEdit(Client* c, QWidget *parent)
     //CAPIRE PERCHE NON FUNZIONA
     connect(client_, &Client::insertSymbol, this, &TextEdit::showSymbol);
     connect(client_,&Client::eraseSymbols,this, &TextEdit::eraseSymbols);
+    connect(client_,&Client::clearEditor,textEdit,&QTextEdit::clear);
 
    // connect(client_,&Client::addCollaborator,this,&TextEdit::initRemoteCursors);
    // connect(client_,&Client::updateCollaborator,this,&TextEdit::updateRemoteCursors);

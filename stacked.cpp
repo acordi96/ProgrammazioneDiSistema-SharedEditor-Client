@@ -203,9 +203,11 @@ void stacked::on_form_regButton_clicked(){
  *
  * */
 void stacked::showPopupSuccess(QString result) {
+    Userpage *up;
+    TextEdit *te;
     if(result == "LOGIN_SUCCESS" || result == "SIGNUP_SUCCESS") {
-        Userpage *up = new Userpage(this,client_);
-        TextEdit *te = new TextEdit(client_);
+        up = new Userpage(this,client_);
+        te = new TextEdit(client_);
         connect(te,&TextEdit::logout,this,&stacked::logout);
         connect(te,&TextEdit::closeFile,this,&stacked::closeFile);
         connect(te,&TextEdit::closeAll,this,&stacked::closeAll);

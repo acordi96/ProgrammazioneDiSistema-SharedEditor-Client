@@ -26,15 +26,18 @@ private:
     QWidget *page;
     QWidget *recent;
     QWidget *userinfo;
+    QWidget *selector;
     std::string fileName;
 
-
+    QWidget *myIcon;
 
 private slots:
     void handleNewFileButton();
     void openFile();
     void renameFile();
     void deleteFile();
+    void iconSelector();
+    void changeIcon();
     //void onRightClicked();
 
 

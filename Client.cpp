@@ -158,6 +158,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::cout << "file aperto correttamente ";
         QString res = QString::fromStdString("file_opened");
         emit formResultSuccess(res);
+        emit clearEditor();
         std::string toWrite = js.at("toWrite");
         for(int i = 0; i < toWrite.length(); i++)
             emit insertSymbol(i,toWrite[i]);
@@ -173,6 +174,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         while(this->writing != part) {
             this->cv.wait(lk);
         }
+        emit clearEditor();
         for(int i = 0; i < toWrite.length(); i++) {
             emit insertSymbol((maxBuffer * part) + i, toWrite[i]);
         }
