@@ -91,6 +91,54 @@ void Userpage::setupRecentFiles(){
      scrollAreaWidgets->setLayout(verticalLayout);
      scrollArea->setWidget(scrollAreaWidgets);
 
+     QPushButton *openButton = new QPushButton("Open",recent);
+     QPushButton *renameButton = new QPushButton("Rename",recent);
+     QPushButton *deleteButton = new QPushButton("Delete",recent);
+     QPushButton *inviteButton = new QPushButton("Invite",recent);
+
+     openButton->setObjectName(QString::fromUtf8("openButton"));
+     openButton->setGeometry(QRect(40,380,89,25));
+     openButton->setGeometry(QRect(40, 380, 89, 25));
+     openButton->setStyleSheet(QString::fromUtf8("QPushButton#openButton{\n"
+     "border:1px;\n"
+     "}\n"
+     "QPushButton#openButton:hover{\n"
+     "background-color: rgb(255,0,0);\n"
+     "}"));
+     openButton->setFlat(true);
+
+
+     renameButton->setObjectName(QString::fromUtf8("renameButton"));
+     renameButton->setGeometry(QRect(160, 380, 89, 25));
+     renameButton->setStyleSheet(QString::fromUtf8("QPushButton#renameButton{\n"
+     "border:1px;\n"
+     "}\n"
+     "QPushButton#renameButton:hover{\n"
+     "background-color: rgb(255,0,0);\n"
+     "}"));
+     renameButton->setFlat(true);
+
+
+     inviteButton->setObjectName(QString::fromUtf8("inviteButton"));
+     inviteButton->setGeometry(QRect(40, 430, 89, 25));
+     inviteButton->setStyleSheet(QString::fromUtf8("QPushButton#inviteButton{\n"
+     "border:1px;\n"
+     "}\n"
+     "QPushButton#inviteButton:hover{\n"
+     "background-color: rgb(255,0,0);\n"
+     "}"));
+     inviteButton->setFlat(true);
+
+     deleteButton->setObjectName(QString::fromUtf8("deleteButton"));
+     deleteButton->setGeometry(QRect(160, 430, 89, 25));
+     deleteButton->setStyleSheet(QString::fromUtf8("QPushButton#deleteButton{\n"
+     "border:1px;\n"
+     "}\n"
+     "QPushButton#deleteButton:hover{\n"
+     "background-color: rgb(255,0,0);\n"
+     "}"));
+     deleteButton->setFlat(true);
+
 
      hLayout->addWidget(recent);
     /*
@@ -191,7 +239,7 @@ void Userpage::setupUserinfo(){
 
      QPushButton *newFileButton = new QPushButton("New File",userinfo);
      newFileButton->setObjectName(QString::fromUtf8("newFileButton"));
-     newFileButton->setGeometry(QRect(150, 380, 121, 31));
+     newFileButton->setGeometry(QRect(90, 320, 121, 31));
      newFileButton->setStyleSheet(QString::fromUtf8("QPushButton#newFileButton{\n"
         "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgba(0, 0, 255, 255), stop:1 rgba(255, 255, 255, 255));\n"
         "border: 1px;\n"
@@ -205,6 +253,22 @@ void Userpage::setupUserinfo(){
      newFileButton->setIcon(icon);
      newFileButton->setIconSize(QSize(32, 32));
      newFileButton->setFlat(false);
+
+     QLineEdit *lineURL= new QLineEdit(userinfo);
+     lineURL->setObjectName(QString::fromUtf8("lineURL"));
+     lineURL->setGeometry(QRect(10,400,211,25));
+     lineURL->setPlaceholderText(QString::fromUtf8("Insert URL here..."));
+
+     QPushButton *openURLbutton = new QPushButton("Open URL",userinfo);
+     openURLbutton->setObjectName(QString::fromUtf8("openURLbutton"));
+     openURLbutton->setGeometry(QRect(230,400,71,25));
+     openURLbutton->setStyleSheet(QString::fromUtf8("QPushButton#openURLbutton{\n"
+     "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgba(0, 0, 255, 255), stop:1 rgba(255, 255, 255, 255));\n"
+     "border: 0px;\n"
+     "}\n"
+     "QPushButton#openURLbutton:hover{\n"
+     "background-color: rgb(255,0,0);\n"
+     "}"));
 
      userLayout->addWidget(userinfo);
      hLayout->addLayout(userLayout);
@@ -287,9 +351,30 @@ void Userpage::iconSelector(){
     const QString selected = fileDialog.selectedFiles().first();
     std::cout<<"\nSelected file:  "<<selected.toStdString()<<std::endl;
 
-    // inviare al server?
-
     myIcon->setStyleSheet(QString::fromUtf8("image:url(")+selected+QString::fromUtf8(");"));
+
+    // inviare al server
+
+    const QImage image = QImage(selected);
+    QByteArray ban;
+
+    QDataStream out(&ban,QIODevice::ReadWrite);
+    out<<image; //serialize image
+    json j = json{
+             {"operation","send-icon"},
+             {"username",client_->getUser().toStdString()},
+             {"icon",ban.toBase64().data()},
+    };
+
+    std::string mess = j.dump().c_str();
+    message msg;
+    msg.body_length(mess.size());
+    std::memcpy(msg.body(), mess.data(), msg.body_length());
+    msg.body()[msg.body_length()] = '\0';
+    msg.encode_header();
+    std::cout <<"Richiesta da inviare al server "<< msg.body() << std::endl;
+    sendmessage(msg);
+
 
 }
 void Userpage::changeIcon(){

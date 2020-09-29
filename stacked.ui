@@ -140,6 +140,9 @@
               </item>
               <item>
                <widget class="QLineEdit" name="psw_log_line">
+                <property name="styleSheet">
+                 <string notr="true">lineedit-password-mask-delay:0.1;</string>
+                </property>
                 <property name="echoMode">
                  <enum>QLineEdit::Password</enum>
                 </property>
@@ -534,8 +537,11 @@ QPushButton#reglogButton:hover{
                   </item>
                   <item>
                    <widget class="QLineEdit" name="psw_line_form">
+                    <property name="styleSheet">
+                     <string notr="true">lineedit-password-mask-delay:0.1;</string>
+                    </property>
                     <property name="echoMode">
-                     <enum>QLineEdit::PasswordEchoOnEdit</enum>
+                     <enum>QLineEdit::Password</enum>
                     </property>
                    </widget>
                   </item>
@@ -551,8 +557,11 @@ QPushButton#reglogButton:hover{
                   </item>
                   <item>
                    <widget class="QLineEdit" name="confirm_psw_line">
+                    <property name="styleSheet">
+                     <string notr="true">lineedit-password-mask-delay:0.1;</string>
+                    </property>
                     <property name="echoMode">
-                     <enum>QLineEdit::PasswordEchoOnEdit</enum>
+                     <enum>QLineEdit::Password</enum>
                     </property>
                    </widget>
                   </item>
