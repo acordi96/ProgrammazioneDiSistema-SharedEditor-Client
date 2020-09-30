@@ -38,6 +38,8 @@ public:
 public slots:
     void fileNew();
     void showSymbol(int pos, QChar c);
+    void showSymbolWithId(int id, int pos, QChar c);
+
     void eraseSymbols(int start,int end);
     //void show_Symbol(std::pair<int,char> tuple);
 protected:
@@ -73,6 +75,8 @@ private slots:
     void about();
     void printPreview(QPrinter *);
     void drawRemoteCursors();
+    void initRemoteCursors(int participantId, QString color);
+    void initListParticipant(int participantId, QString username);
     //void initRemoteCursors(int id_client, QColor remoteColor);
     //void updateRemoteCursors(int id_client,int pos);
 private:
@@ -91,6 +95,7 @@ private:
     void resetText();
     void resetCursors();
     void updateCursors(const CustomCursor &cursor);
+    void updateConnectedUsers(QString user, QString color);
     void updateCursors();
     //for debug
     void setupConnectedUsers();
@@ -129,6 +134,7 @@ private:
     QString _currentText = QString{};
     std::map<unsigned int, CustomCursor> _cursorsVector;
     std::map<unsigned int, QColor> _cursorColors;
+    std::map<unsigned int, QString> _listParticipant;
 };
 
 

@@ -71,7 +71,6 @@ void Client::do_read_body() {
                                         do_read_header();
                                     }
                                     std::string requestType = messageFromClient.at("response").get<std::string>();
-                                    std::cout << "\n requestType : " + requestType;
                                     std::string response;
                                     try {
                                         response = handleRequestType(messageFromClient, requestType);
@@ -100,10 +99,11 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
 
         if (type_request == "LOGIN_SUCCESS") {
             std::list<std::string> files = js.at("files").get<std::list<std::string>>();
+            /*
             std::cout << "User " << this->getUser().toStdString() << " loggato! File disponibili:" << std::endl;
             for (auto p : files) {
                 std::cout << p << std::endl;
-            }
+            }*/
             this->setFiles(files);
 
         }
@@ -118,9 +118,12 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
     } else if (type_request == "insert_res") {
         std::pair<int, char> corpo;
         corpo = js.at("corpo").get<std::pair<int, char>>();
+        int participantId;
+        participantId = js.at("participant").get<int>();
+
         std::pair<int, QChar> corpo2(corpo.first, static_cast<QChar>(corpo.second));
         //non funziona
-        emit insertSymbol(corpo.first, static_cast<QChar>(corpo.second));
+        emit insertSymbolWithId(participantId, corpo.first, static_cast<QChar>(corpo.second));
         //emit showSymbol(corpo);
         return type_request;
     } else if (type_request == "remove_res") {
@@ -152,7 +155,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         return type_request;
     } else if (type_request == "file_opened") {
         //file aperto con successo
-        std::cout << "file aperto correttamente ";
+        //std::cout << "file aperto correttamente ";
         QString res = QString::fromStdString("file_opened");
         emit formResultSuccess(res);
         emit clearEditor();
@@ -202,6 +205,27 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         QString res = QString::fromStdString("file_renamed");
         emit formResultSuccess(res);
         // chiamare funzione che aggiorna interfaccia grafica di userPage, con nuovo nome file
+
+    }else if(type_request == "update_participants"){
+        std::vector<int> othersOnFile;
+        std::vector<std::string> colors;
+        std::vector<std::string> usernames;
+        othersOnFile = js.at("idList").get<std::vector<int>>();
+        colors = js.at("colorsList").get<std::vector<std::string>>();
+        usernames = js.at("usernames").get<std::vector<std::string>>();
+        int j = 0;
+        for(auto u:usernames) {
+            QString username = QString::fromStdString(u);
+            emit insertParticipant(othersOnFile[j], username);
+            j++;
+        }
+
+        int i = 0;
+        for(auto c:colors) {
+            QString color = QString::fromStdString(c);
+            emit updateCursorParticipant(othersOnFile[i], color);
+            i++;
+        }
 
     }
     return type_request;
