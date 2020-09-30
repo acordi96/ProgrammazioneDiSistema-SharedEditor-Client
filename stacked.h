@@ -35,7 +35,8 @@ private slots:
    void logout();
    void closeAll();
    void closeFile();
-
+/*signals:
+    void updateRecentFiles();*/
 };
 
 #endif // STACKED_H
