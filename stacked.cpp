@@ -23,6 +23,7 @@ stacked::stacked(QWidget *parent) :
     //connect(te,&TextEdit::logout,this,&stacked::logout);
     //connect(te,&TextEdit::closeAll,this,&stacked::closeAll);
     QObject::connect(client_, &Client::formResultSuccess, this, &stacked::showPopupSuccess);
+
     //Userpage *up = new Userpage(this,client_);
     //setFixedSize(1000,600);
     ui->setupUi(this);
@@ -268,6 +269,18 @@ void stacked::showPopupSuccess(QString result) {
             setWindowTitle(client_->getFileName());
             ui->stackedWidget->setCurrentIndex(2);
 
+        }else if(result == "errore_rinomina_file"){
+            layout->addWidget(new QLabel("Error in renaming the file"));
+        }else if (result == "file_renamed"){
+            //inviamo signal per aggiornare recent files
+            //emit updateRecentFiles();
+            layout->addWidget(new QLabel("File correctly renamed"));
+        }else if(result == "new_name_already_exist"){
+            layout->addWidget(new QLabel("New name already exist"));
+        }else if(result == "file_deleted"){
+            layout->addWidget(new QLabel("File correctly deleted"));
+        }else if(result == "error_file_deleted"){
+            layout->addWidget(new QLabel("Error in file elimination"));
         }
 
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);

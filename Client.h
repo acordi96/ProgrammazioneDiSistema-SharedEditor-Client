@@ -47,6 +47,7 @@ public:
 
 signals:
     void formResultSuccess(QString result);
+    void updateFile(QString old,QString newN);
     void insertSymbol(int pos, QChar c);
     void eraseSymbols(int startIndex, int endIndex);
     void showSymbol(std::pair<int,char> tuple);
