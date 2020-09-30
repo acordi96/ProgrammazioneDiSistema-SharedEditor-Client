@@ -132,6 +132,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
     } else if (type_request == "new_file_created") {
         std::cout << "richiesta file tornata ";
         QString res = QString::fromStdString("new_file_created");
+        emit clearEditor();
         emit formResultSuccess(res);
         return type_request;
     } else if (type_request == "new_file_already_exist") {

@@ -357,9 +357,10 @@ void Userpage::iconSelector(){
 
     const QImage image = QImage(selected);
     QByteArray ban;
-
     QDataStream out(&ban,QIODevice::ReadWrite);
+    out.setVersion(QDataStream::Qt_5_12);
     out<<image; //serialize image
+
     json j = json{
              {"operation","send-icon"},
              {"username",client_->getUser().toStdString()},

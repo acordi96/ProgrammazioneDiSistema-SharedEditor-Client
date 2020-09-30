@@ -234,11 +234,16 @@ void stacked::showPopupSuccess(QString result) {
         //ui->setupUi(this);
         ui->stackedWidget->addWidget(te);
         ui->stackedWidget->addWidget(up);
-        setWindowTitle("Userpage");
-        ui->stackedWidget->setCurrentIndex(3);
+        if(result == "SIGNUP_SUCCESS"){
+            ui->stackedWidget->setCurrentIndex(0);
+        }else{
+            setWindowTitle("Userpage");
+            ui->stackedWidget->setCurrentIndex(3);
+        }
         //ui->stackedWidget->setCurrentIndex(2);
         std::cout << "Il colore e' " << client_->getColor().toStdString() << std::endl;
-    } else  {
+    }
+    else  {
         QDialog *dialog = new QDialog();
         QVBoxLayout *layout = new QVBoxLayout();
         dialog->setLayout(layout);
