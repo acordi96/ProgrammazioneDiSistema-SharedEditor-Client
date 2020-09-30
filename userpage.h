@@ -50,7 +50,7 @@ public slots:
     void customMenuRequested(QPoint pos);
     void on_fileName_clicked(int i = 0);
     void updateRecentFiles(QString old,QString newN);
-    void on_renameButton_clicked();
+
     //void updateFiles();
 
 
