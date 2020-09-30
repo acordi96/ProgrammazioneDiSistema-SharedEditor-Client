@@ -71,6 +71,7 @@ void Client::do_read_body() {
                                         do_read_header();
                                     }
                                     std::string requestType = messageFromClient.at("response").get<std::string>();
+                                    std::cout << "\n requestType : " + requestType;
                                     std::string response;
                                     try {
                                         response = handleRequestType(messageFromClient, requestType);
@@ -99,11 +100,10 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
 
         if (type_request == "LOGIN_SUCCESS") {
             std::list<std::string> files = js.at("files").get<std::list<std::string>>();
-            /*
             std::cout << "User " << this->getUser().toStdString() << " loggato! File disponibili:" << std::endl;
             for (auto p : files) {
                 std::cout << p << std::endl;
-            }*/
+            }
             this->setFiles(files);
 
         }
@@ -155,7 +155,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         return type_request;
     } else if (type_request == "file_opened") {
         //file aperto con successo
-        //std::cout << "file aperto correttamente ";
+        std::cout << "file aperto correttamente ";
         QString res = QString::fromStdString("file_opened");
         emit formResultSuccess(res);
         emit clearEditor();
@@ -205,7 +205,40 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         QString res = QString::fromStdString("file_renamed");
         emit formResultSuccess(res);
         // chiamare funzione che aggiorna interfaccia grafica di userPage, con nuovo nome file
+        emit updateFile(QString::fromStdString(js.at("oldName").get<std::string>()),QString::fromStdString(js.at("newName").get<std::string>()));
+    }else if(type_request == "NEW_NAME_ALREADY_EXIST"){
+        std::cout <<"\n il nuovo nome esiste già";
+        QString res = QString::fromStdString("new_name_already_exist");
+        emit formResultSuccess(res);
 
+    }else if(type_request == "FILE_DELETED"){
+        QString res = QString::fromStdString("file_deleted");
+
+        std::multimap<std::string,std::string> :: iterator iter;
+        int i = 0;
+
+        for (iter = files.begin(); iter != files.end() && i == 0 ; iter++){
+            std::cout << "\n\n file:  " << iter->first << "  " << iter->second;
+            if(iter->first == this->user.toStdString() && iter->second == js.at("name").get<std::string>()){
+                // elimino il file
+                files.erase(iter);
+                i=1;
+            }
+        }
+
+        emit formResultSuccess(res);
+        QString name = QString::fromStdString(js.at("name").get<std::string>());
+        QString del = "";
+        emit updateFile(name,del);
+    }else if(type_request == "ERRORE_ELIMINAZIONE_FILE"){
+        QString res = QString::fromStdString("error_file_deleted");
+        emit formResultSuccess(res);
+    }else if(type_request == "FILE_IN_USE"){
+        QString res = QString::fromStdString("error_file_in_use");
+        emit formResultSuccess(res);
+    }else if(type_request == "FILE_IN_USE_D"){
+        QString res = QString::fromStdString("error_file_in_use_d");
+        emit formResultSuccess(res);
     }else if(type_request == "update_participants"){
         std::vector<int> othersOnFile;
         std::vector<std::string> colors;
