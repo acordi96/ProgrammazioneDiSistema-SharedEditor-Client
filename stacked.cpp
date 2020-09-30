@@ -418,3 +418,6 @@ void stacked::closeAll(){
     this->close();
 }
 
+void stacked::on_psw_log_line_returnPressed(){
+    on_loginButton_clicked();
+}

@@ -59,46 +59,21 @@ TextEdit::TextEdit(Client* c, QWidget *parent)
 #ifdef Q_OS_MACOS
     setUnifiedTitleAndToolBarOnMac(true);
 #endif
-    //setWindowTitle(QCoreApplication::applicationName());
     textEdit = new QTextEdit(this);
-    /*
-    connect(textEdit, &QTextEdit::currentCharFormatChanged,
-            this, &TextEdit::currentCharFormatChanged);
-    connect(textEdit, &QTextEdit::cursorPositionChanged,
-            this, &TextEdit::cursorPositionChanged);
-    */
+
     connect(this,&TextEdit::updateCursor,this,&TextEdit::drawRemoteCursors);
-    //CAPIRE PERCHE NON FUNZIONA
+
     connect(client_, &Client::insertSymbol, this, &TextEdit::showSymbol);
     connect(client_,&Client::eraseSymbols,this, &TextEdit::eraseSymbols);
     connect(client_,&Client::clearEditor,textEdit,&QTextEdit::clear);
 
-   // connect(client_,&Client::addCollaborator,this,&TextEdit::initRemoteCursors);
-   // connect(client_,&Client::updateCollaborator,this,&TextEdit::updateRemoteCursors);
     textEdit->installEventFilter(this);
 
     setCentralWidget(textEdit);
 
-    //setToolButtonStyle(Qt::ToolButtonFollowStyle);
     setupFileActions();
-    //setupEditActions();
-    //setupTextActions();
     setupConnectedUsers();
-/*
-    {
-        QMenu *helpMenu = menuBar()->addMenu(tr("Help"));
-        helpMenu->addAction(tr("About"), this, &TextEdit::about);
-        helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
-    }
 
-    QMenuBar *bar = new QMenuBar(menuBar());
-    QMenu *myMenu = new QMenu(client_->getUser(),bar);
-    bar->addMenu(myMenu);
-
-    myMenu->addAction(tr("Logout"),this,[=](){emit this->logout();});
-
-    menuBar()->setCornerWidget(bar);
-*/
     {
         QMenu *userMenu = menuBar()->addMenu(client_->getUser());
         userMenu->addAction(tr("Logout"),this,[=](){
@@ -109,27 +84,14 @@ TextEdit::TextEdit(Client* c, QWidget *parent)
     QFont textFont("Helvetica");
     textFont.setStyleHint(QFont::SansSerif);
     textEdit->setFont(textFont);
-//    fontChanged(textEdit->font());
-//    colorChanged(textEdit->textColor());
-//    alignmentChanged(textEdit->alignment());
 
-//    connect(textEdit->document(), &QTextDocument::modificationChanged,actionSave, &QAction::setEnabled);
     connect(textEdit->document(), &QTextDocument::modificationChanged,this, &QWidget::setWindowModified);
-//    connect(textEdit->document(), &QTextDocument::undoAvailable,actionUndo, &QAction::setEnabled);
-//    connect(textEdit->document(), &QTextDocument::redoAvailable,actionRedo, &QAction::setEnabled);
+
 
     setWindowModified(textEdit->document()->isModified());
-//    actionSave->setEnabled(textEdit->document()->isModified());
-//    actionUndo->setEnabled(textEdit->document()->isUndoAvailable());
-//    actionRedo->setEnabled(textEdit->document()->isRedoAvailable());
 
 #ifndef QT_NO_CLIPBOARD
-/*
-    actionCut->setEnabled(false);
-    connect(textEdit, &QTextEdit::copyAvailable, actionCut, &QAction::setEnabled);
-    actionCopy->setEnabled(false);
-    connect(textEdit, &QTextEdit::copyAvailable, actionCopy, &QAction::setEnabled);
-*/
+
     connect(QApplication::clipboard(), &QClipboard::dataChanged, this, &TextEdit::clipboardDataChanged);
 
 #endif
@@ -145,7 +107,6 @@ TextEdit::TextEdit(Client* c, QWidget *parent)
     textEdit->setPalette(pal);
 #endif
     resetCursors();
-    //initRemoteCursors();
     resetText();
 }
 
@@ -191,11 +152,10 @@ void TextEdit::closingFile(){
 void TextEdit::setupFileActions()
 {
 
-    //QToolBar *tb = addToolBar(tr("File Actions"));
+
 
         const QIcon backIcon = QIcon::fromTheme("go-back",QIcon(rsrcPath+"/left-arrow.png"));
-        //QMenu *menu1 = menuBar()->addMenu(tr("Back"));
-        //menu1->setIcon(backIcon);
+
         QPushButton *goback = new QPushButton(menuBar());
         goback->setIcon(backIcon);
         goback->setFlat(true);
@@ -213,46 +173,21 @@ void TextEdit::setupFileActions()
 
     const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(rsrcPath + "/filenew.png"));
     QAction *a = menu->addAction(newIcon,  tr("&New"), this, &TextEdit::fileNew);
-    //tb->addAction(a);
+
     a->setPriority(QAction::LowPriority);
     a->setShortcut(QKeySequence::New);
 
     const QIcon openIcon = QIcon::fromTheme("document-open", QIcon(rsrcPath + "/fileopen.png"));
     a = menu->addAction(openIcon, tr("&Open..."), this, &TextEdit::fileOpen);
     a->setShortcut(QKeySequence::Open);
-    //tb->addAction(a);
+
 
     menu->addSeparator();
-/*
-    const QIcon saveIcon = QIcon::fromTheme("document-save", QIcon(rsrcPath + "/filesave.png"));
-    actionSave = menu->addAction(saveIcon, tr("&Save"), this, &TextEdit::fileSave);
-    actionSave->setShortcut(QKeySequence::Save);
-    actionSave->setEnabled(false);
-    tb->addAction(actionSave);
 
-    a = menu->addAction(tr("Save &As..."), this, &TextEdit::fileSaveAs);
-    a->setPriority(QAction::LowPriority);
-
-    const QIcon cancelIcon = QIcon::fromTheme("back",QIcon(rsrcPath + "/left-arrow.png"));
-    a = menu->addAction(cancelIcon,tr("Close this file"),this,[=](){
-        closingFile();
-        emit this->closeFile();
-    });
-    */
     menu->addSeparator();
 
 #ifndef QT_NO_PRINTER
-    /*
-    const QIcon printIcon = QIcon::fromTheme("document-print", QIcon(rsrcPath + "/fileprint.png"));
-    a = menu->addAction(printIcon, tr("&Print..."), this, &TextEdit::filePrint);
-    a->setPriority(QAction::LowPriority);
-    a->setShortcut(QKeySequence::Print);
-    tb->addAction(a);
 
-    const QIcon filePrintIcon = QIcon::fromTheme("fileprint", QIcon(rsrcPath + "/fileprint.png"));
-    menu->addAction(filePrintIcon, tr("Print Preview..."), this, &TextEdit::filePrintPreview);
-
-*/
     const QIcon exportPdfIcon = QIcon::fromTheme("exportpdf", QIcon(rsrcPath + "/exportpdf.png"));
     a = menu->addAction(exportPdfIcon, tr("&Export PDF..."), this, &TextEdit::filePrintPdf);
     a->setPriority(QAction::LowPriority);
@@ -267,11 +202,11 @@ void TextEdit::setupFileActions()
         emit this->closeAll();
     });
     a->setShortcut(Qt::CTRL + Qt::Key_Q);
-    //tb->addAction(a);
+
 
     const QIcon profileIcon = QIcon::fromTheme("profile",QIcon(rsrcPath + "/user.png"));
     a = menu->addAction(profileIcon,tr("&Userpage"),this,[=](){emit this->closeFile();});
-    //tb->addAction(a);
+
 }
 
 void TextEdit::setupEditActions()
@@ -1296,38 +1231,7 @@ void TextEdit::drawRemoteCursors(){
     */
     //draw2(3);
 }
-/*
-void  TextEdit::updateRemoteCursors(int id_client,int pos){
-  _cursorsVector[id_client].setPosition(pos);
 
- }
-
-
-void TextEdit::initRemoteCursors(int id_client, QColor remoteColor){
-
-     * aggiunta cursore al vettore
-     *
-     *
-     * colore mandato dal server oppure generato random qui
-     * */
-
-    //solo per provare a stampare più cursori
-    //CustomCursor remoteCursor = CustomCursor();
-    //aggiungo al vettore cursore e colore del client id_Client
-   // _cursorsVector.insert(std::pair<unsigned int,CustomCursor>(id_client,remoteCursor));
-   // _cursorColors.insert(std::pair<unsigned int,QColor>(id_client,remoteColor));
-    /*
-    CustomCursor cur2 = CustomCursor();
-
-    _cursorsVector[0]=myCur;
-    _cursorColors[0]=Qt::blue;
-
-    cur2.setPosition(5);
-    _cursorsVector[1]=cur2;
-    _cursorColors[1]=Qt::red;
-
-}
-*/
 void TextEdit::resetText(){
       _currentText = QString(textEdit->toPlainText());
 }

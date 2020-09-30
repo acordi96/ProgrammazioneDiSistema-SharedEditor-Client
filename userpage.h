@@ -1,6 +1,7 @@
 #ifndef USERPAGE_H
 #define USERPAGE_H
 
+#include <QLineEdit>
 #include <QMainWindow>
 #include "Client.h"
 
@@ -21,6 +22,8 @@ private:
     void setupRecentFiles();
     void setupUserinfo();
     void sendmessage(message mess);
+    void requestLogout();
+
     Client *client_;
     QHBoxLayout *hLayout;
     QWidget *page;
@@ -40,18 +43,20 @@ private slots:
     void changeIcon();
     //void onRightClicked();
 
+signals:
+    void upLogout();
 
 public slots:
     void customMenuRequested(QPoint pos);
     void on_fileName_clicked(int i = 0);
     void updateRecentFiles(QString old,QString newN);
+    void on_renameButton_clicked();
     //void updateFiles();
 
 
 private:
     QPushButton *newFileButton;
-
-
+    QLineEdit *lineURL;
 };
 
 #endif // USERPAGE_H

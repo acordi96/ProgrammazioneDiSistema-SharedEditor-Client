@@ -30,6 +30,7 @@ private slots:
    void on_form_regButton_clicked();
    void on_reglogButton_clicked();
    void on_form_cancButton_clicked();
+   void on_psw_log_line_returnPressed();
    //void on_fileButton_clicked();
    //void on_newFileButton_clicked();
    void logout();
