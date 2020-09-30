@@ -121,7 +121,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         return type_request;
     }else if (type_request=="LOGIN_ERROR" || type_request=="QUERY_ERROR" || type_request=="CONNESSION_ERROR"
     || type_request=="SIGNUP_ERROR_DUPLICATE_USERNAME" || type_request=="SIGNUP_ERROR_INSERT_FAILED" || type_request == "FILE_OPEN_FAILED"
-    || type_request=="ERRORE_RINOMINA_FILE"){
+    || type_request=="ERRORE_RINOMINA_FILE" || type_request=="ERRORE_ELIMINAZIONE_FILE"){
         QString res = QString::fromStdString(type_request);
         emit formResultSuccess(res);
     }else if(type_request=="insert_res"){
@@ -194,19 +194,52 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         //file rinominato correttamente
         //aggiorno nome file nella lista dei file
         std::cout << "\n nuovo nome: " << js.at("newName").get<std::string>();
-        /*QMutableListIterator<std::string> iter1(files);
-        while(iter1.hasNext() ){
-            std::string s = iter1.next();
-            std::cout <<"\nentrato nel while dei file ";
-            if (s==js.at("oldName").get<std::string>()){
-                iter1.setValue(js.at("newName").get<std::string>());
-                break;
+        std::multimap<std::string,std::string> :: iterator iter;
+        int i = 0;
+        for (iter = files.begin(); iter != files.end() && i == 0 ; ++iter){
+            if(iter->first == this->user.toStdString() && iter->second == js.at("oldName").get<std::string>()){
+                // modifico il nome
+                iter->second = js.at("oldName").get<std::string>();
+                i=1;
             }
-        }*/
+        }
         QString res = QString::fromStdString("file_renamed");
         emit formResultSuccess(res);
         // chiamare funzione che aggiorna interfaccia grafica di userPage, con nuovo nome file
+        emit updateFile(QString::fromStdString(js.at("oldName").get<std::string>()),QString::fromStdString(js.at("newName").get<std::string>()));
+    }else if(type_request == "NEW_NAME_ALREADY_EXIST"){
+        std::cout <<"\n il nuovo nome esiste già";
+        QString res = QString::fromStdString("new_name_already_exist");
+        emit formResultSuccess(res);
 
+    }else if(type_request == "FILE_DELETED"){
+        QString res = QString::fromStdString("file_deleted");
+
+        std::multimap<std::string,std::string> :: iterator iter;
+        int i = 0;
+
+        for (iter = files.begin(); iter != files.end() && i == 0 ; iter++){
+            std::cout << "\n\n file:  " << iter->first << "  " << iter->second;
+            if(iter->first == this->user.toStdString() && iter->second == js.at("name").get<std::string>()){
+                // elimino il file
+                files.erase(iter);
+                i=1;
+            }
+        }
+
+        emit formResultSuccess(res);
+        QString name = QString::fromStdString(js.at("name").get<std::string>());
+        QString del = "";
+        emit updateFile(name,del);
+    }else if(type_request == "ERRORE_ELIMINAZIONE_FILE"){
+        QString res = QString::fromStdString("error_file_deleted");
+        emit formResultSuccess(res);
+    }else if(type_request == "FILE_IN_USE"){
+        QString res = QString::fromStdString("error_file_in_use");
+        emit formResultSuccess(res);
+    }else if(type_request == "FILE_IN_USE_D"){
+        QString res = QString::fromStdString("error_file_in_use_d");
+        emit formResultSuccess(res);
     }
     return type_request;
 }
