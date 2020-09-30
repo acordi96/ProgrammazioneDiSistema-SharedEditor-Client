@@ -63,7 +63,6 @@ void Userpage::setupRecentFiles(){
      scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
      scrollArea->setWidgetResizable(true);
 
-
      QWidget *scrollAreaWidgets = new QWidget(scrollArea);
      scrollAreaWidgets->setObjectName(QString::fromUtf8("scrollAreaWidgets"));
      QVBoxLayout *verticalLayout = new QVBoxLayout(scrollAreaWidgets);
@@ -303,6 +302,7 @@ void Userpage::iconSelector(){
 
     const QImage image = QImage(selected);
     QByteArray ban;
+
     QDataStream out(&ban,QIODevice::ReadWrite);
     out.setVersion(QDataStream::Qt_5_12);
     out<<image; //serialize image

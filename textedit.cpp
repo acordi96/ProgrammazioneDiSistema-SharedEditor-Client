@@ -64,6 +64,9 @@ TextEdit::TextEdit(Client* c, QWidget *parent)
     connect(this,&TextEdit::updateCursor,this,&TextEdit::drawRemoteCursors);
 
     connect(client_, &Client::insertSymbol, this, &TextEdit::showSymbol);
+    connect(client_, &Client::insertSymbolWithId, this, &TextEdit::showSymbolWithId);
+    connect(client_, &Client::updateCursorParticipant, this, &TextEdit::initRemoteCursors);
+    connect(client_, &Client::insertParticipant, this, &TextEdit::initListParticipant);
     connect(client_,&Client::eraseSymbols,this, &TextEdit::eraseSymbols);
     connect(client_,&Client::clearEditor,textEdit,&QTextEdit::clear);
 
@@ -374,10 +377,23 @@ void TextEdit::setupTextActions()
     connect(comboSize, QOverload<const QString &>::of(&QComboBox::activated), this, &TextEdit::textSize);
 }
 
+
+void TextEdit::updateConnectedUsers(QString user, QString color){
+    QLabel * label = new QLabel(user);
+    label->setStyleSheet("color:"+color);
+    QListWidgetItem * item = new QListWidgetItem();
+    connectedUsers->addItem(item);
+    connectedUsers->setItemWidget(item, label);
+}
 void TextEdit::setupConnectedUsers(){
     QDockWidget *dock = new QDockWidget(tr("Connected Users"),this);
     dock->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
     connectedUsers = new QListWidget(dock);
+    QLabel * label = new QLabel(client_->getUser());
+    label->setStyleSheet("font-weight: bold; color: "+client_->getColor());
+    QListWidgetItem * item = new QListWidgetItem();
+    connectedUsers->addItem(item);
+    connectedUsers->setItemWidget(item, label);
     /*for(auto u : users){
      *  label = new QLabel(username);
      *  label->setStyleSheet(QString::fromUtf8("color:#"));
@@ -386,6 +402,9 @@ void TextEdit::setupConnectedUsers(){
      *  connectedUsers->setItemWidget(item,label);
      *  }
      * */
+
+/*
+
     QLabel *label = new QLabel(client_->getUser());
     std::cout<< client_->getColor().toStdString() <<std::endl;
     label->setStyleSheet(QString::fromUtf8("color:#463745"));
@@ -395,6 +414,7 @@ void TextEdit::setupConnectedUsers(){
                             << "nick1");
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item,label);
+    */
     dock->setWidget(connectedUsers);
     addDockWidget(Qt::RightDockWidgetArea,dock);
 }
@@ -747,6 +767,50 @@ void TextEdit::cursorPositionChanged()
         comboStyle->setCurrentIndex(headingLevel ? headingLevel + 8 : 0);
     }
 }
+
+void TextEdit::showSymbolWithId(int id, int pos, QChar c) {
+    QTextCharFormat format;
+    format.setFontWeight(QFont::Normal);
+    format.setFontFamily("Helvetica");
+
+    QTextCursor cur = textEdit->textCursor();
+
+    cur.beginEditBlock();
+
+    int endIndex;
+    cur.hasSelection() ? endIndex = cur.selectionEnd() : endIndex = -90;
+    int oldPos = pos < cur.position() ? cur.position()+1 : cur.position();
+
+    if(cur.hasSelection() && pos==endIndex){
+        qDebug()<<cur.selectedText();
+
+        int startIndex = cur.selectionStart();
+
+        cur.setPosition(pos);
+        cur.setCharFormat(format);
+        cur.insertText(static_cast<QString>(c));
+
+        cur.setPosition(oldPos == startIndex ? endIndex : startIndex, QTextCursor::MoveAnchor);
+        cur.setPosition(oldPos == startIndex ? endIndex : startIndex, QTextCursor::KeepAnchor);
+    }
+    else{
+        cur.setPosition(pos);
+        cur.setCharFormat(format);
+        cur.insertText(static_cast<QString>(c));
+        cur.setPosition(oldPos);
+    }
+    cur.endEditBlock();
+
+    //textEdit->setText(textEdit->toPlainText().insert(pos,c));
+
+    textEdit->setTextCursor(cur);
+    _cursorsVector[id].setPosition(pos+1);
+    // textEdit->setTextBackgroundColor(Qt::red);
+    drawRemoteCursors();
+    //qDebug()<< "Written in pos: "<< pos << endl;
+    textEdit->setFocus();
+}
+
 
 void TextEdit::showSymbol(int pos, QChar c) {
     QTextCharFormat format;
@@ -1179,62 +1243,64 @@ QString TextEdit::getFileName() const
 }
 void TextEdit::drawRemoteCursors(){
     QTextCursor cursor= QTextCursor(textEdit->textCursor());
-    std::cout<<" Preso cursor "<<cursor.position()<<std::endl;
     QTextCursor tempCursor = QTextCursor(cursor);
-    std::cout<<" Preso tempCursor "<<tempCursor.position()<<std::endl;
-    std::cout<<"Testo prima : "<<tempCursor.selectedText().toStdString();
     tempCursor.clearSelection();
-    std::cout<<"Testo dopo : "<<tempCursor.selectedText().toStdString();
-    std::cout<<" Preso tempCursor clear "<<tempCursor.position()<<std::endl;
-
     tempCursor.movePosition(QTextCursor::Start,QTextCursor::MoveAnchor,1);
-    std::cout<<" Preso tempCursor move1 "<<tempCursor.position()<<", "<< tempCursor.selectionStart()<<std::endl;
-
     tempCursor.movePosition(QTextCursor::End,QTextCursor::KeepAnchor,1);
-    std::cout<<" Preso tempCursor move2 "<<tempCursor.position()<<", "<<tempCursor.selectionEnd()<<std::endl;
-
     textEdit->setTextCursor(tempCursor);
     textEdit->setTextBackgroundColor(QColor(255,255,255,255));
     textEdit->setTextCursor(cursor);
-    //textEdit->setTextBackgroundColor(client_->getColor());
-    //textEdit->setTextBackgroundColor(Qt::blue);
-     textEdit->setTextBackgroundColor(QColor(255,255,255,255));
+//    textEdit->setTextBackgroundColor(client_->getColor());
+    textEdit->setTextBackgroundColor(QColor(255,255,255,255));
     for(std::pair<unsigned int, CustomCursor> cPair : _cursorsVector){
-            tempCursor.movePosition(QTextCursor::MoveOperation::Start, QTextCursor::MoveMode::MoveAnchor, 1);
-            CustomCursor cCursor = cPair.second;
-            if(cCursor.hasSelection){
-                tempCursor.movePosition(QTextCursor::MoveOperation::Right, QTextCursor::MoveMode::MoveAnchor, (int)cCursor.selectionStart);
-                tempCursor.movePosition(QTextCursor::MoveOperation::Right, QTextCursor::MoveMode::KeepAnchor, (int)cCursor.selectionEnd-(int)cCursor.selectionStart);
+        tempCursor.movePosition(QTextCursor::MoveOperation::Start, QTextCursor::MoveMode::MoveAnchor, 1);
+        CustomCursor cCursor = cPair.second;
+        if(cCursor.hasSelection){
+            tempCursor.movePosition(QTextCursor::MoveOperation::Right, QTextCursor::MoveMode::MoveAnchor, (int)cCursor.selectionStart);
+            tempCursor.movePosition(QTextCursor::MoveOperation::Right, QTextCursor::MoveMode::KeepAnchor, (int)cCursor.selectionEnd-(int)cCursor.selectionStart);
+        }else{
+            tempCursor.movePosition(QTextCursor::MoveOperation::Right, QTextCursor::MoveMode::MoveAnchor, (int)cCursor.position);
+            if(cCursor.position==0){
+                tempCursor.movePosition(QTextCursor::MoveOperation::Right, QTextCursor::MoveMode::KeepAnchor, 1);
             }else{
-                tempCursor.movePosition(QTextCursor::MoveOperation::Right, QTextCursor::MoveMode::MoveAnchor, (int)cCursor.position);
-                if(cCursor.position==0){
-                    tempCursor.movePosition(QTextCursor::MoveOperation::Right, QTextCursor::MoveMode::KeepAnchor, 1);
-                }else{
-                    tempCursor.movePosition(QTextCursor::MoveOperation::Left, QTextCursor::MoveMode::KeepAnchor, 1);
-                }
+                tempCursor.movePosition(QTextCursor::MoveOperation::Left, QTextCursor::MoveMode::KeepAnchor, 1);
             }
-            textEdit->setTextCursor(tempCursor);
-            textEdit->setTextBackgroundColor(_cursorColors[cPair.first]);
-            //_ui->textEdit->setTextCursor(myCursor);
-            tempCursor.clearSelection();
-            tempCursor.movePosition(QTextCursor::MoveOperation::Start, QTextCursor::MoveMode::MoveAnchor, 1);
         }
-
-        textEdit->setTextCursor(cursor);
-        textEdit->setTextBackgroundColor(/*QColor{255,255,255, 255}*/Qt::green);
-
- /*
-    QTextCharFormat form;
-    form.setBackground(Qt::blue);
-    cursor.setCharFormat(form);
+        textEdit->setTextCursor(tempCursor);
+        textEdit->setTextBackgroundColor(_cursorColors[cPair.first]);
+        //_ui->textEdit->setTextCursor(myCursor);
+        tempCursor.clearSelection();
+        tempCursor.movePosition(QTextCursor::MoveOperation::Start, QTextCursor::MoveMode::MoveAnchor, 1);
+    }
     textEdit->setTextCursor(cursor);
-    */
-    //draw2(3);
+    textEdit->setTextBackgroundColor(QColor{255,255,255, 255});
+
+}
+
+
+void TextEdit::initListParticipant(int participantId, QString username) {
+    if(_listParticipant.insert(std::pair<int, QString>(participantId, username)).second){
+        std::cout << "Inserisco user con id " << participantId << " ,user " << username.toStdString()<< std::endl;
+    }
+}
+
+
+void TextEdit::initRemoteCursors(int participantId, QString color) {
+    std::cout << "Id " << participantId << " == " << client_->getUser().toStdString() << std::endl;
+    if(_listParticipant[participantId] != client_->getUser()) {
+        CustomCursor remoteCursor = CustomCursor();
+        _cursorsVector.insert(std::pair<int, CustomCursor>(participantId, remoteCursor));
+        if (_cursorColors.insert(std::pair<int, QColor>(participantId, color)).second) {
+            updateConnectedUsers(_listParticipant[participantId], color);
+        }
+    }
+
 }
 
 void TextEdit::resetText(){
       _currentText = QString(textEdit->toPlainText());
 }
+
 void TextEdit::resetCursors(){
 
     _oldCursor = CustomCursor(QTextCursor(textEdit->textCursor()));

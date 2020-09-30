@@ -279,8 +279,12 @@ void stacked::showPopupSuccess(QString result) {
             layout->addWidget(new QLabel("New name already exist"));
         }else if(result == "file_deleted"){
             layout->addWidget(new QLabel("File correctly deleted"));
-        }else if(result == "error_file_deleted"){
+        }else if(result == "ERRORE_ELIMINAZIONE_FILE"){
             layout->addWidget(new QLabel("Error in file elimination"));
+        }else if (result == "error_file_in_use"){
+            layout->addWidget(new QLabel("Impossibile rinominare file perchè in uso "));
+        }else if (result == "error_file_in_use"){
+            layout->addWidget(new QLabel("Impossibile eliminare file perchè in uso "));
         }
 
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
