@@ -2,8 +2,8 @@
 // Created by Sam on 22/apr/2020.
 //
 
-#define serverRoute "93.43.250.236"
-//#define serverRoute "127.0.0.1"
+//#define serverRoute "93.43.250.236"
+#define serverRoute "127.0.0.1"
 
 #include "Client.h"
 
@@ -188,6 +188,11 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         }
         this->cv.notify_one();
 
+        return type_request;
+    } else if (type_request == "invitation_success") {
+        //TODO: aggiungere alla lista file: js.at("owner") js.at("filename")
+        QString res = QString::fromStdString("Invitation accepted");
+        emit formResultSuccess(res);
         return type_request;
     } else if (type_request == "file_renamed") {
         //file rinominato correttamente

@@ -234,12 +234,12 @@ void Userpage::setupUserinfo(){
      newFileButton->setIconSize(QSize(32, 32));
      newFileButton->setFlat(false);
 
-     lineURL= new QLineEdit(userinfo);
+     this->lineURL = new QLineEdit(userinfo);
      lineURL->setObjectName(QString::fromUtf8("lineURL"));
      lineURL->setGeometry(QRect(10,400,211,25));
-     lineURL->setPlaceholderText(QString::fromUtf8("Insert URL here..."));
+     lineURL->setPlaceholderText(QString::fromUtf8("Insert Invitation Code"));
 
-     QPushButton *openURLbutton = new QPushButton("Open URL",userinfo);
+     QPushButton *openURLbutton = new QPushButton("Accept",userinfo);
      openURLbutton->setObjectName(QString::fromUtf8("openURLbutton"));
      openURLbutton->setGeometry(QRect(230,400,71,25));
      openURLbutton->setStyleSheet(QString::fromUtf8("QPushButton#openURLbutton{\n"
@@ -255,6 +255,7 @@ void Userpage::setupUserinfo(){
 
      connect(newFileButton, SIGNAL (released()), this, SLOT (handleNewFileButton()));
      connect(modifyIcon,&QPushButton::clicked,this,&Userpage::iconSelector);
+     connect(openURLbutton, SIGNAL (released()), this, SLOT (handleOpenURLbutton()));
 }
 void Userpage::iconSelector(){
     /*
@@ -702,6 +703,25 @@ void Userpage::updateRecentFiles(QString old, QString newN) {
         recent->findChild<QPushButton *>(client_->getUser() + "_|_" + old)->setObjectName(client_->getUser() + "_|_" + newN);
     }
 
+}
+
+void Userpage::handleOpenURLbutton() {
+    if(!this->lineURL->text().isEmpty()) {
+        json j = json{
+                {"operation", "validate_invitation"},
+                {"invitation_code",  this->lineURL->text().toStdString()}
+        };
+
+        //PRENDI I DATI E INVIA A SERVER
+        std::string mess = j.dump().c_str();
+        message msg;
+        msg.body_length(mess.size());
+        std::memcpy(msg.body(), mess.data(), msg.body_length());
+        msg.body()[msg.body_length()] = '\0';
+        msg.encode_header();
+        std::cout << "\n Richiesta da inviare al server " << msg.body() << std::endl;
+        sendmessage(msg);
+    }
 }
 
 /*void Userpage::updateFiles() {

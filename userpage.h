@@ -31,6 +31,7 @@ private:
     QWidget *userinfo;
     QWidget *selector;
     std::string fileName;
+    QLineEdit * urlLine;
 
     QWidget *myIcon;
 
@@ -50,6 +51,7 @@ public slots:
     void customMenuRequested(QPoint pos);
     void on_fileName_clicked(int i = 0);
     void updateRecentFiles(QString old,QString newN);
+    void handleOpenURLbutton();
 
     //void updateFiles();
 
