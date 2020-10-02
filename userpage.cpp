@@ -80,7 +80,7 @@ void Userpage::setupRecentFiles(){
          //button->setContextMenuPolicy(Qt::CustomContextMenu);
          //std::cout << "\n" << p.first << ": " << p.second << "\n";
          button->setObjectName(QString::fromStdString(p.first) + "_|_" + QString::fromStdString(p.second.first));
-         button->setText("("+QString::fromStdString(p.first)+"):   "+QString::fromStdString(p.second.first));
+         button->setText("("+QString::fromStdString(p.first)+"): "+QString::fromStdString(p.second.first));
          button->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                                  "border:1px;\n"
                                                  "background-color: blue;\n"
@@ -488,6 +488,10 @@ void Userpage::on_fileName_clicked(int i){
                                                 "border:1px;\n"
                                                 "background-color: blue;\n"
                                                 "}"));
+        if(selectedFile == s) {
+            selectedFile = "";
+            return;
+        }
     }
     selectedFile = s;
     QPushButton *b = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
@@ -786,6 +790,35 @@ void Userpage::on_deleteButton_clicked() {
 }
 
 void Userpage::updateRecentFiles(QString old, QString newN) {
+    if(old == "") {
+        std::string newq = newN.toStdString();
+        std::string username;
+        std::string name;
+        for(int i = 0; i < newq.length(); i++) {
+            if(newq[i] == '_' && newq[i+1] == '|' && newq[i+2] == '_') { //parse button name (username+"_|_"+name)
+                i += 3;
+                while(newq[i] != '\0')
+                    name += newq[i++];
+                break;
+            }
+            username += newq[i];
+        }
+        QPushButton *button;
+        auto scrollAreaWidgets = page->findChild<QWidget *>("scrollAreaWidgets");
+        button = new QPushButton(scrollAreaWidgets);
+        //button->setContextMenuPolicy(Qt::CustomContextMenu);
+        //std::cout << "\n" << p.first << ": " << p.second << "\n";
+        button->setObjectName(newN);
+        button->setText("("+QString::fromStdString(name)+"): "+QString::fromStdString(username));
+        button->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                                "border:1px;\n"
+                                                "background-color: blue;\n"
+                                                "}"));
+        button->setFlat(true);
+        page->findChild<QVBoxLayout *>("verticalLayout")->addWidget(button);
+        connect(button,SIGNAL(clicked()),SLOT(on_fileName_clicked()));
+        return;
+    }
     if(newN == ""){
         //aggiorniamo dopo una delete
 
@@ -798,6 +831,10 @@ void Userpage::updateRecentFiles(QString old, QString newN) {
         //aggiorniamo dopo rename
         recent->findChild<QPushButton *>(client_->getUser() + "_|_" + old)->setText(client_->getUser() +":   "+newN);
         recent->findChild<QPushButton *>(client_->getUser() + "_|_" + old)->setObjectName(client_->getUser() + "_|_" + newN);
+        for(auto &iter : client_->files) {
+            if(iter.first == client_->getUser().toStdString() && iter.second.first == old.toStdString())
+                iter.second.first = newN.toStdString();
+        }
     }
 
 }

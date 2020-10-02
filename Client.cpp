@@ -191,11 +191,10 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
 
         return type_request;
     } else if (type_request == "invitation_success") {
-        //TODO: aggiungere alla lista file: js.at("owner") js.at("filename")
-        QString res = QString::fromStdString("Invitation accepted");
-        emit formResultSuccess(res);
+        std::string name = js.at("owner").get<std::string>() + "_|_" + js.at("filename").get<std::string>();
+        emit updateFile("", QString::fromStdString(name));
         return type_request;
-    } else if (type_request == "file_renamed") {
+    } else if (type_request == "FILE_RENAMED") {
         //file rinominato correttamente
         //aggiorno nome file nella lista dei file
         std::cout << "\n nuovo nome: " << js.at("newName").get<std::string>();
