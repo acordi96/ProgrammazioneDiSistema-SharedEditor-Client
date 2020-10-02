@@ -15,11 +15,10 @@ using boost::asio::ip::tcp;
 
 
 stacked::stacked(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::stacked),
-    client_(new Client)
-{
-   // TextEdit *te = new TextEdit(client_);
+        QMainWindow(parent),
+        ui(new Ui::stacked),
+        client_(new Client) {
+    // TextEdit *te = new TextEdit(client_);
     //connect(te,&TextEdit::logout,this,&stacked::logout);
     //connect(te,&TextEdit::closeAll,this,&stacked::closeAll);
     QObject::connect(client_, &Client::formResultSuccess, this, &stacked::showPopupSuccess);
@@ -34,29 +33,26 @@ stacked::stacked(QWidget *parent) :
     //ui->stackedWidget->addWidget(up);
 }
 
-stacked::~stacked()
-{
+stacked::~stacked() {
     delete ui;
 }
 
-void stacked::closeEvent(QCloseEvent *e)
-{
+void stacked::closeEvent(QCloseEvent *e) {
     //comunica logout al server
-    if(client_->getUser() != "") {
-        json j = json{
-                {"operation","req_logout"},
-                {"username",client_->getUser().toStdString()},
-        };
-        std::string mess = j.dump().c_str();
-        message msg;
-        msg.body_length(mess.size());
-        std::memcpy(msg.body(),mess.data(),msg.body_length());
-        msg.body()[msg.body_length()]='\0';
-        msg.encode_header();
-        std::cout<<"Messaggio da inviare al server "<< msg.body() << std::endl;
-        client_->write(msg);
-    }
+    json j = json{
+            {"operation", "req_logout"},
+            {"username",  ""}
+    };
+    std::string mess = j.dump().c_str();
+    message msg;
+    msg.body_length(mess.size());
+    std::memcpy(msg.body(), mess.data(), msg.body_length());
+    msg.body()[msg.body_length()] = '\0';
+    msg.encode_header();
+    std::cout << "Messaggio da inviare al server " << msg.body() << std::endl;
+    client_->write(msg);
 }
+
 /*
  *  indici
  *  0 = loginpage
@@ -65,17 +61,17 @@ void stacked::closeEvent(QCloseEvent *e)
  *  3 = userpage
  *
  * */
-void stacked::on_loginButton_clicked(){
+void stacked::on_loginButton_clicked() {
     QString user = ui->user_log_line->text();
     QString psw = ui->psw_log_line->text();
-   /* QPushButton *b1 = new QPushButton();
-    QPushButton *b2 = new QPushButton();
-    b2->setObjectName("button2");
-    b1->setObjectName("button1");
-    ui->listaProva->*/
+    /* QPushButton *b1 = new QPushButton();
+     QPushButton *b2 = new QPushButton();
+     b2->setObjectName("button2");
+     b1->setObjectName("button1");
+     ui->listaProva->*/
 
 
-    if(user.isEmpty() || psw.isEmpty()){
+    if (user.isEmpty() || psw.isEmpty()) {
         QDialog *dialog = new QDialog();
         QVBoxLayout *layout = new QVBoxLayout();
         dialog->setLayout(layout);
@@ -83,42 +79,42 @@ void stacked::on_loginButton_clicked(){
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
         layout->addWidget(buttonBox);
 
-        connect(buttonBox,&QDialogButtonBox::accepted,dialog,&QDialog::accept);
-        connect(buttonBox,&QDialogButtonBox::rejected,dialog,&QDialog::reject);
+        connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+        connect(buttonBox, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
 
         dialog->show();
-    }
-    else{
+    } else {
         try {
-               /*
-                *  PRENDI I DATI E INVIA A SERVER
-                * */
+            /*
+             *  PRENDI I DATI E INVIA A SERVER
+             * */
 
-               json j = json{
-                   {"operation", "request_login"},
-                   {"username",user.toStdString()},
-                   {"password", md5(psw.toUtf8().constData())
-                   }
-                   };
-               std::string mess = j.dump().c_str();
-                message msg;
-                msg.body_length(mess.size());
-                std::memcpy(msg.body(), mess.data(), msg.body_length());
-                msg.body()[msg.body_length()] = '\0';
-                msg.encode_header();
-                std::cout <<"Richiesta da inviare al server "<< msg.body() << std::endl;
-                sendmessage(msg);
-           }//try
-           catch (std::exception& e){
-               std::cerr << "Exception: " << e.what() << "\n";
-           };
+            json j = json{
+                    {"operation", "request_login"},
+                    {"username",  user.toStdString()},
+                    {"password",  md5(psw.toUtf8().constData())
+                    }
+            };
+            std::string mess = j.dump().c_str();
+            message msg;
+            msg.body_length(mess.size());
+            std::memcpy(msg.body(), mess.data(), msg.body_length());
+            msg.body()[msg.body_length()] = '\0';
+            msg.encode_header();
+            std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
+            sendmessage(msg);
+        }//try
+        catch (std::exception &e) {
+            std::cerr << "Exception: " << e.what() << "\n";
+        };
     }//else esterno
 }
+
 void stacked::sendmessage(message mess) {
     client_->write(mess);
 }
 
-void stacked::on_form_regButton_clicked(){
+void stacked::on_form_regButton_clicked() {
     //qui creare richiesta e inviarla al server
     //^[0-9a-zA-Z]+([0-9a-zA-Z][-._+])[0-9a-zA-Z]+@[0-9a-zA-Z]+([-.][0-9a-zA-Z]+)([0-9a-zA-Z][.])[a-zA-Z]{2,6}$
     QRegularExpression email_regex("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$");
@@ -129,7 +125,7 @@ void stacked::on_form_regButton_clicked(){
     QString psw1 = ui->psw_line_form->text();
     QString psw2 = ui->confirm_psw_line->text();
 
-    if(!email_regex.match(email).hasMatch()){
+    if (!email_regex.match(email).hasMatch()) {
         QDialog *dialog = new QDialog();
         QVBoxLayout *layout = new QVBoxLayout();
         dialog->setLayout(layout);
@@ -137,12 +133,11 @@ void stacked::on_form_regButton_clicked(){
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
         layout->addWidget(buttonBox);
 
-        connect(buttonBox,&QDialogButtonBox::accepted,dialog,&QDialog::accept);
+        connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
 
         dialog->show();
-    }
-    else if(!psw_regex.match(psw1).hasMatch()){
-     // check password
+    } else if (!psw_regex.match(psw1).hasMatch()) {
+        // check password
         QDialog *dialog = new QDialog();
         QVBoxLayout *layout = new QVBoxLayout();
         dialog->setLayout(layout);
@@ -152,11 +147,11 @@ void stacked::on_form_regButton_clicked(){
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
         layout->addWidget(buttonBox);
 
-        connect(buttonBox,&QDialogButtonBox::accepted,dialog,&QDialog::accept);
+        connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
 
         dialog->show();
-     //ui->stackedWidget->setCurrentIndex(3);
-    }else if(!(psw1==psw2)){
+        //ui->stackedWidget->setCurrentIndex(3);
+    } else if (!(psw1 == psw2)) {
         QDialog *dialog = new QDialog();
         QVBoxLayout *layout = new QVBoxLayout();
         dialog->setLayout(layout);
@@ -164,30 +159,29 @@ void stacked::on_form_regButton_clicked(){
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
         layout->addWidget(buttonBox);
 
-        connect(buttonBox,&QDialogButtonBox::accepted,dialog,&QDialog::accept);
+        connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
 
         dialog->show();
-    }
-    else{
+    } else {
         try {
 
-             json j = json{
-                    {"operation","request_signup"},
-                    {"email",email.toStdString()},
-                    {"username",user.toStdString()},
-                    {"password",md5(psw1.toUtf8().constData())}
-             };
-             /*
-              *  PRENDI I DATI E INVIA A SERVER
-              * */
-             std::cout << "\n username inviato per la registrazione: " + user.toStdString() ;
-             std::string mess = j.dump().c_str();
+            json j = json{
+                    {"operation", "request_signup"},
+                    {"email",     email.toStdString()},
+                    {"username",  user.toStdString()},
+                    {"password",  md5(psw1.toUtf8().constData())}
+            };
+            /*
+             *  PRENDI I DATI E INVIA A SERVER
+             * */
+            std::cout << "\n username inviato per la registrazione: " + user.toStdString();
+            std::string mess = j.dump().c_str();
             message msg;
             msg.body_length(mess.size());
             std::memcpy(msg.body(), mess.data(), msg.body_length());
             msg.body()[msg.body_length()] = '\0';
             msg.encode_header();
-            std::cout <<"Richiesta da inviare al server "<< msg.body() << std::endl;
+            std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
             sendmessage(msg);
             /*
              if(requestType=="SIGNUP_OK"){
@@ -206,7 +200,7 @@ void stacked::on_form_regButton_clicked(){
                  dialog->show();
              }
 */
-        } catch (std::exception& e) {
+        } catch (std::exception &e) {
             std::cerr << "Exception: " << e.what() << "\n";
         }
     }
@@ -225,79 +219,78 @@ void stacked::on_form_regButton_clicked(){
 void stacked::showPopupSuccess(QString result) {
     Userpage *up;
     TextEdit *te;
-    if(result == "LOGIN_SUCCESS" || result == "SIGNUP_SUCCESS") {
-        up = new Userpage(this,client_);
+    if (result == "LOGIN_SUCCESS" || result == "SIGNUP_SUCCESS") {
+        up = new Userpage(this, client_);
         te = new TextEdit(client_);
-        connect(te,&TextEdit::logout,this,&stacked::logout);
-        connect(te,&TextEdit::closeFile,this,&stacked::closeFile);
-        connect(te,&TextEdit::closeAll,this,&stacked::closeAll);
+        connect(te, &TextEdit::logout, this, &stacked::logout);
+        connect(te, &TextEdit::closeFile, this, &stacked::closeFile);
+        connect(te, &TextEdit::closeAll, this, &stacked::closeAll);
 
         //ui->setupUi(this);
         ui->stackedWidget->addWidget(te);
         ui->stackedWidget->addWidget(up);
-        if(result == "SIGNUP_SUCCESS"){
+        if (result == "SIGNUP_SUCCESS") {
             ui->stackedWidget->setCurrentIndex(0);
-        }else{
+        } else {
             setWindowTitle("Userpage");
             ui->stackedWidget->setCurrentIndex(3);
         }
         //ui->stackedWidget->setCurrentIndex(2);
         std::cout << "Il colore e' " << client_->getColor().toStdString() << std::endl;
-    }
-    else  {
+    } else {
         QDialog *dialog = new QDialog();
         QVBoxLayout *layout = new QVBoxLayout();
         dialog->setLayout(layout);
-        if(result == "QUERY_ERROR" || result =="CONNESSION_ERROR" || result == "SIGNUP_ERROR_INSERT_FAILED"){
+        if (result == "QUERY_ERROR" || result == "CONNESSION_ERROR" || result == "SIGNUP_ERROR_INSERT_FAILED") {
             layout->addWidget(new QLabel("Error with the DB, try again"));
-        }else if(result == "LOGIN_ERROR"){
+        } else if (result == "LOGIN_ERROR") {
             layout->addWidget(new QLabel("Error! Invalid username and/or password"));
-        }else if(result == "SIGNUP_ERROR_DUPLICATE_USERNAME"){
+        } else if (result == "SIGNUP_ERROR_DUPLICATE_USERNAME") {
             layout->addWidget(new QLabel("Error! Username already exixts"));
-        }else if(result == "new_file_created"){
+        } else if (result == "new_file_created") {
 
             layout->addWidget(new QLabel("File correclty created"));
             //index 2 = text editor
             setWindowTitle(client_->getFileName());
             ui->stackedWidget->setCurrentIndex(2);
             //ui->stackedWidget->setCurrentIndex(3);
-        }else if(result == "new_file_already_exist"){
+        } else if (result == "new_file_already_exist") {
             std::cout << "\n file già esistente ";
             layout->addWidget(new QLabel("File already exists"));
-        }else if (result == "file_opened"){
-            std::cout<<"\n file aperto \n";
+        } else if (result == "file_opened") {
+            std::cout << "\n file aperto \n";
             setWindowTitle(client_->getFileName());
             ui->stackedWidget->setCurrentIndex(2);
 
-        }else if(result == "errore_rinomina_file"){
+        } else if (result == "errore_rinomina_file") {
             layout->addWidget(new QLabel("Error in renaming the file"));
-        }else if (result == "file_renamed"){
+        } else if (result == "file_renamed") {
             //inviamo signal per aggiornare recent files
             //emit updateRecentFiles();
             layout->addWidget(new QLabel("File correctly renamed"));
-        }else if(result == "new_name_already_exist"){
+        } else if (result == "new_name_already_exist") {
             layout->addWidget(new QLabel("New name already exist"));
-        }else if(result == "file_deleted"){
+        } else if (result == "file_deleted") {
             layout->addWidget(new QLabel("File correctly deleted"));
-        }else if(result == "ERRORE_ELIMINAZIONE_FILE"){
+        } else if (result == "ERRORE_ELIMINAZIONE_FILE") {
             layout->addWidget(new QLabel("Error in file elimination"));
-        }else if (result == "error_file_in_use"){
+        } else if (result == "error_file_in_use") {
             layout->addWidget(new QLabel("Impossibile rinominare file perchè in uso "));
-        }else if (result == "error_file_in_use"){
+        } else if (result == "error_file_in_use") {
             layout->addWidget(new QLabel("Impossibile eliminare file perchè in uso "));
         }
 
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
         layout->addWidget(buttonBox);
 
-        connect(buttonBox,&QDialogButtonBox::accepted,dialog,&QDialog::accept);
-        connect(buttonBox,&QDialogButtonBox::rejected,dialog,&QDialog::reject);
+        connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+        connect(buttonBox, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
 
         dialog->show();
     }
 }
 
-void stacked::on_reglogButton_clicked(){
+void stacked::on_reglogButton_clicked() {
     setWindowTitle("Sign Up Page");
     ui->stackedWidget->setCurrentIndex(1);
 
@@ -406,22 +399,25 @@ void stacked::on_newFileButton_clicked(){
     //modalWindow.exec();
     //ui->stackedWidget->setCurrentIndex(3);
 }*/
-void stacked::on_form_cancButton_clicked(){
+void stacked::on_form_cancButton_clicked() {
     ui->stackedWidget->setCurrentIndex(0);
 }
-void stacked::logout(){
+
+void stacked::logout() {
     setWindowTitle("MainWindow");
     ui->stackedWidget->setCurrentIndex(0);
     //ui->stackedWidget->setCurrentIndex(3);
 }
-void stacked::closeFile(){
+
+void stacked::closeFile() {
     setWindowTitle("Userpage");
     ui->stackedWidget->setCurrentIndex(3);
 }
-void stacked::closeAll(){
+
+void stacked::closeAll() {
     this->close();
 }
 
-void stacked::on_psw_log_line_returnPressed(){
+void stacked::on_psw_log_line_returnPressed() {
     on_loginButton_clicked();
 }
