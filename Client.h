@@ -38,7 +38,7 @@ public:
     void setFiles(const std::list<std::string> &list);
     //void setFiles(const QList<std::string> &list);
     //                author ,  filename
-    std::multimap<std::string,std::string> files;
+    std::multimap<std::string,std::pair<std::string, std::string>> files;
     //QList<std::string > files;
 
 

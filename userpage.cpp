@@ -78,9 +78,9 @@ void Userpage::setupRecentFiles(){
          std::cout <<"\nentrato nel while dei file ";
          button = new QPushButton(scrollAreaWidgets);
          //button->setContextMenuPolicy(Qt::CustomContextMenu);
-         std::cout << "\n" << p.first << ": " << p.second << "\n";
-         button->setObjectName(QString::fromStdString(p.first) + "_|_" + QString::fromStdString(p.second));
-         button->setText(QString::fromStdString(p.first)+":   "+QString::fromStdString(p.second));
+         //std::cout << "\n" << p.first << ": " << p.second << "\n";
+         button->setObjectName(QString::fromStdString(p.first) + "_|_" + QString::fromStdString(p.second.first));
+         button->setText("("+QString::fromStdString(p.first)+"):   "+QString::fromStdString(p.second.first));
          button->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                                  "border:1px;\n"
                                                  "background-color: blue;\n"
@@ -116,8 +116,9 @@ void Userpage::setupRecentFiles(){
      openButton->setFlat(true);
 
     connect(openButton,SIGNAL(clicked()),SLOT(on_openButton_clicked()));
+    connect(inviteButton,SIGNAL(clicked()),SLOT(on_inviteButton_clicked()));
 
-     renameButton->setObjectName(QString::fromUtf8("renameButton"));
+    renameButton->setObjectName(QString::fromUtf8("renameButton"));
      renameButton->setGeometry(QRect(160, 380, 89, 25));
      renameButton->setStyleSheet(QString::fromUtf8("QPushButton#renameButton{\n"
      "border:1px;\n"
@@ -818,6 +819,38 @@ void Userpage::handleOpenURLbutton() {
         std::cout << "\n Richiesta da inviare al server " << msg.body() << std::endl;
         sendmessage(msg);
     }
+}
+
+void Userpage::on_inviteButton_clicked() {
+    std::string name;
+    std::string username;
+
+    for(int i = 0; i < selectedFile.length(); i++) {
+        if(selectedFile[i] == '_' && selectedFile[i+1] == '|' && selectedFile[i+2] == '_') { //parse button name (username+"_|_"+name)
+            i += 3;
+            while(selectedFile[i] != '\0')
+                name += selectedFile[i++];
+            break;
+        }
+        username += selectedFile[i];
+    }
+    if(selectedFile=="" || username != client_->getUser().toStdString()){
+        //nessun file selezionato
+        QMessageBox::information(
+                this,
+                tr("Attenzione!"),
+                tr("Seleziona un tuo file a cui invitare") );
+        return;
+    }
+    const char * code;
+    for(auto &iter : client_->files) {
+        if(iter.second.first == name)
+            code = iter.second.second.c_str();
+    }
+    QMessageBox::information(
+            this,
+            tr("Codice Invito:"),
+            tr(code));
 }
 
 /*void Userpage::updateFiles() {

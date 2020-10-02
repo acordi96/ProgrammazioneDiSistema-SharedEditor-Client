@@ -5,6 +5,7 @@
 //#define serverRoute "93.43.250.236"
 #define serverRoute "127.0.0.1"
 
+#include <QtWidgets/QMessageBox>
 #include "Client.h"
 
 Client::Client()
@@ -219,12 +220,12 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
     }else if(type_request == "FILE_DELETED"){
         QString res = QString::fromStdString("file_deleted");
 
-        std::multimap<std::string,std::string> :: iterator iter;
+        std::multimap<std::string,std::pair<std::string, std::string>> :: iterator iter;
         int i = 0;
 
         for (iter = files.begin(); iter != files.end() && i == 0 ; iter++){
-            std::cout << "\n\n file:  " << iter->first << "  " << iter->second;
-            if(iter->first == this->user.toStdString() && iter->second == js.at("name").get<std::string>()){
+            //std::cout << "\n\n file:  " << iter->first << "  " << iter->second;
+            if(iter->first == this->user.toStdString() && iter->second.first == js.at("name").get<std::string>()){
                 // elimino il file
                 files.erase(iter);
                 i=1;
@@ -322,11 +323,15 @@ void Client::setColor(const QString &color) {
 void Client::setFiles(const std::list<std::string> &list) {
     std::string user;
     std::string fileName;
+    std::string invitation;
     for (auto p : list) {
         //std::string token = s.substr(0, s.find(delimiter));
         user = p.substr(0, p.find("_"));
+        invitation = p.substr(p.size() - 15, p.size());
+        p.erase(p.size() - 15);
         fileName = p.substr(p.find("_") + 1, p.size());
-        files.insert({user, fileName});
+
+        files.insert({user, std::pair<std::string, std::string>(fileName, invitation)});
     }
     //Client::files = list;
 }

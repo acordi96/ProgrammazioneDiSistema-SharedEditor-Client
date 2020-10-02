@@ -54,6 +54,7 @@ public slots:
     void on_openButton_clicked();
     void on_renameButton_clicked();
     void on_deleteButton_clicked();
+    void on_inviteButton_clicked();
     void on_fileName_clicked(int i = 0);
     void updateRecentFiles(QString old,QString newN);
     void handleOpenURLbutton();
