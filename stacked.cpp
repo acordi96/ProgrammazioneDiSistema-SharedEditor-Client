@@ -19,19 +19,9 @@ stacked::stacked(QWidget *parent) :
     ui(new Ui::stacked),
     client_(new Client)
 {
-   // TextEdit *te = new TextEdit(client_);
-    //connect(te,&TextEdit::logout,this,&stacked::logout);
-    //connect(te,&TextEdit::closeAll,this,&stacked::closeAll);
     QObject::connect(client_, &Client::formResultSuccess, this, &stacked::showPopupSuccess);
 
-    //Userpage *up = new Userpage(this,client_);
-    //setFixedSize(1000,600);
     ui->setupUi(this);
-    //ui->stackedWidget->addWidget(up);
-    //ui->stackedWidget->addWidget(te);
-
-    //Userpage *up = new Userpage();
-    //ui->stackedWidget->addWidget(up);
 }
 
 stacked::~stacked()
@@ -212,8 +202,6 @@ void stacked::on_form_regButton_clicked(){
     }
 }
 
-
-
 // type_request=="QUERY_ERROR"    LOGIN_ERROR
 // || type_request=="CONNESSION_ERROR" || SIGNUP_ERROR_DUPLICATE_USERNAME || SIGNUP_ERROR_INSERT_FAILED)
 
@@ -229,6 +217,7 @@ void stacked::showPopupSuccess(QString result) {
         up = new Userpage(this,client_);
         te = new TextEdit(client_);
         connect(te,&TextEdit::logout,this,&stacked::logout);
+        connect(up,&Userpage::upLogout,this,&stacked::logout);
         connect(te,&TextEdit::closeFile,this,&stacked::closeFile);
         connect(te,&TextEdit::closeAll,this,&stacked::closeAll);
 
@@ -411,6 +400,8 @@ void stacked::on_form_cancButton_clicked(){
 }
 void stacked::logout(){
     setWindowTitle("MainWindow");
+    ui->user_log_line->clear();
+    ui->psw_log_line->clear();
     ui->stackedWidget->setCurrentIndex(0);
     //ui->stackedWidget->setCurrentIndex(3);
 }

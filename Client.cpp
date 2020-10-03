@@ -2,8 +2,8 @@
 // Created by Sam on 22/apr/2020.
 //
 
-#define serverRoute "93.43.250.236"
-//#define serverRoute "127.0.0.1"
+//#define serverRoute "93.43.250.236"
+#define serverRoute "127.0.0.1"
 
 #include "Client.h"
 
@@ -135,6 +135,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
     } else if (type_request == "new_file_created") {
         std::cout << "richiesta file tornata ";
         QString res = QString::fromStdString("new_file_created");
+        emit clearEditor();
         emit formResultSuccess(res);
         return type_request;
     } else if (type_request == "new_file_already_exist") {
@@ -288,6 +289,16 @@ void Client::do_write() {
                                      socket_.close();
                                  }
                              });
+}
+
+QString Client::getEmail() const
+{
+    return email;
+}
+
+void Client::setEmail(const QString &value)
+{
+    email = value;
 }
 
 QString Client::getFileName() const {

@@ -45,6 +45,9 @@ public:
     QString getFileName() const;
     void setFileName(const QString &value);
 
+    QString getEmail() const;
+    void setEmail(const QString &value);
+
 signals:
     void formResultSuccess(QString result);
     void updateFile(QString old,QString newN);
@@ -74,6 +77,7 @@ private:
 
     //cose da salvare
     QString user;
+    QString email;
     QString color;
     QString fileName;
     std::condition_variable cv;
