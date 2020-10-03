@@ -942,7 +942,6 @@ void TextEdit::localInsert(){
 bool TextEdit::eventFilter(QObject *obj, QEvent *ev){
     if(ev->type() == QEvent::KeyPress){
         QKeyEvent *key_ev = static_cast<QKeyEvent *>(ev);
-        qDebug()<< " You pressed "+ key_ev->text();
         int key = key_ev->key();
         if (obj == textEdit){
             if(!key_ev->text().isEmpty()){

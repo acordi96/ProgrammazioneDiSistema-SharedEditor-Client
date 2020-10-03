@@ -73,13 +73,13 @@ void Client::do_read_body() {
                                     }
                                     std::string requestType = messageFromClient.at("response").get<std::string>();
                                     std::string response;
-                                    try {
+                                    //try {
                                         response = handleRequestType(messageFromClient, requestType);
-                                    } catch (...) {
+                                    /*} catch (...) {
                                         std::cout << "GENERIC ERROR HandleRequest of: " << messageFromClient
                                                   << std::endl;
                                         do_read_header();
-                                    }
+                                    }*/
 
                                     do_read_header();
                                 } else {
@@ -223,7 +223,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
 
         emit formResultSuccess(res);
         QString name = QString::fromStdString(js.at("name").get<std::string>());
-        QString del = "";
+        QString del = QString::fromStdString(js.at("owner").get<std::string>());
         emit updateFile(name,del, QString::fromStdString("delete_file"));
     }else if(type_request == "ERRORE_ELIMINAZIONE_FILE"){
         QString res = QString::fromStdString("error_file_deleted");

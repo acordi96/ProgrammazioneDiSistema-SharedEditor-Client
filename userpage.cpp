@@ -672,40 +672,76 @@ void Userpage::on_deleteButton_clicked() {
                 tr("Selezionare un file da eliminare") );
         return;
     }
+    std::pair<std::string, std::string> parsed = parseFileButton(selectedFile);
+    std::string owner = parsed.first;
+    std::string filename = parsed.second;
 
-    QMessageBox msgBox;
-    msgBox.setText("Confirm you want to delete the selected file?");
-    //msgBox.setInformativeText("Do you want to save your changes?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::Yes);
-    int ret = msgBox.exec();
+    if(owner == client_->getUser().toStdString()) { //sei l'owner
+        QMessageBox msgBox;
+        msgBox.setText("Do you really want to delete the selected file?");
+        //msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.setDefaultButton(QMessageBox::Yes);
+        int ret = msgBox.exec();
 
-    if (ret == QMessageBox::No){
-        QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
-        deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
-                                                  "border:1px;\n"
-                                                  "background-color: blue;\n"
-                                                  "}"));
-        selectedFile = "";
-        return;
-    }else{
-        std::pair<std::string, std::string> parsed = parseFileButton(selectedFile);
-        std::string owner = parsed.first;
-        std::string filename = parsed.second;
-        if(owner != client_->getUser().toStdString()){
-            //l'utente non ha il permesso di eliminare il file
+        if (ret == QMessageBox::No){
+            QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
+            deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                                      "border:1px;\n"
+                                                      "background-color: blue;\n"
+                                                      "}"));
+            selectedFile = "";
+            return;
+        }else{
+                try {
+                    json j = json{
+                            {"operation", "delete_file"},
+                            {"name",  filename},
+                            {"username",  client_->getUser().toStdString()},
+                            {"owner", owner}
+                    };
 
-            QMessageBox::information(
-                    this,
-                    tr("Attenzione!"),
-                    tr("Impossibile eliminare il file, azione permessa solo a chi lo ha creato") );
-        }else {
+                    //PRENDI I DATI E INVIA A SERVER
+                    std::string mess = j.dump().c_str();
+                    message msg;
+                    msg.body_length(mess.size());
+                    std::memcpy(msg.body(), mess.data(), msg.body_length());
+                    msg.body()[msg.body_length()] = '\0';
+                    msg.encode_header();
+                    std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
+                    sendmessage(msg);
+                    //deseleziono file eliminato
+                    selectedFile = "";
 
+                } catch (std::exception &e) {
+                    std::cerr << "Exception: " << e.what() << "\n";
+                }
+
+        }
+
+    } else { //non sei l'owner: rimuovi invito
+        QMessageBox msgBox;
+        msgBox.setText("Do you really want to remove the file invitation?");
+        //msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.setDefaultButton(QMessageBox::Yes);
+        int ret = msgBox.exec();
+
+        if (ret == QMessageBox::No){
+            QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
+            deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                                      "border:1px;\n"
+                                                      "background-color: blue;\n"
+                                                      "}"));
+            selectedFile = "";
+            return;
+        }else{
             try {
                 json j = json{
                         {"operation", "delete_file"},
                         {"name",  filename},
-                        {"username",  client_->getUser().toStdString()}
+                        {"username",  client_->getUser().toStdString()},
+                        {"owner", owner}
                 };
 
                 //PRENDI I DATI E INVIA A SERVER
@@ -723,8 +759,12 @@ void Userpage::on_deleteButton_clicked() {
             } catch (std::exception &e) {
                 std::cerr << "Exception: " << e.what() << "\n";
             }
+
         }
     }
+
+
+
 
 }
 
@@ -778,8 +818,7 @@ void Userpage::updateRecentFiles(QString old, QString newN, QString request) {
         return;
     }
     if(request == "delete_file"){ //aggiorniamo dopo una delete
-
-        QPushButton * b = recent->findChild<QPushButton *>(QString::fromStdString(generateFileButton(client_->getUser().toStdString(), old.toStdString())));
+        QPushButton * b = recent->findChild<QPushButton *>(QString::fromStdString(generateFileButton(newN.toStdString(), old.toStdString())));
         page->findChild<QVBoxLayout *>("verticalLayout")->removeWidget(b);
         delete b;
 
