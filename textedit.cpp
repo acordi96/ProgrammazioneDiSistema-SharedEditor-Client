@@ -1279,14 +1279,11 @@ void TextEdit::drawRemoteCursors(){
 
 
 void TextEdit::initListParticipant(int participantId, QString username) {
-    if(_listParticipant.insert(std::pair<int, QString>(participantId, username)).second){
-        std::cout << "Inserisco user con id " << participantId << " ,user " << username.toStdString()<< std::endl;
-    }
+    _listParticipant.insert(std::pair<int, QString>(participantId, username));
 }
 
 
 void TextEdit::initRemoteCursors(int participantId, QString color) {
-    std::cout << "Id " << participantId << " == " << client_->getUser().toStdString() << std::endl;
     if(_listParticipant[participantId] != client_->getUser()) {
         CustomCursor remoteCursor = CustomCursor();
         _cursorsVector.insert(std::pair<int, CustomCursor>(participantId, remoteCursor));

@@ -35,11 +35,9 @@ public:
     void setUser(const QString &user);
     const QString &getColor() const;
     void setColor(const QString &color);
-    void setFiles(const std::list<std::string> &list);
-    //void setFiles(const QList<std::string> &list);
-    //                author ,  filename
-    std::multimap<std::string,std::pair<std::string, std::string>> files;
-    //QList<std::string > files;
+    void setFiles(const std::vector<std::string>& owners, const std::vector<std::string>& filenames, const std::vector<std::string>& invitations);
+
+    std::map<std::pair<std::string, std::string>, std::string> files; //<<owner, filename>, invitation>
 
 
     QString getFileName() const;
@@ -47,7 +45,7 @@ public:
 
 signals:
     void formResultSuccess(QString result);
-    void updateFile(QString old,QString newN);
+    void updateFile(QString old,QString newN, QString request);
     void insertSymbol(int pos, QChar c);
     void insertSymbolWithId(int participantId, int pos, QChar c);
     void eraseSymbols(int startIndex, int endIndex);

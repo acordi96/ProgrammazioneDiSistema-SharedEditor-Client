@@ -2,8 +2,8 @@
 // Created by Sam on 22/apr/2020.
 //
 
-#define serverRoute "93.43.250.236"
-//#define serverRoute "127.0.0.1"
+//#define serverRoute "93.43.250.236"
+#define serverRoute "127.0.0.1"
 
 #include <QtWidgets/QMessageBox>
 #include "Client.h"
@@ -99,8 +99,11 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         this->setColor(Qcolor);
 
         if (type_request == "LOGIN_SUCCESS") {
-            std::list<std::string> files = js.at("files").get<std::list<std::string>>();
-            this->setFiles(files);
+            std::vector<std::string> owners = js.at("owners").get<std::vector<std::string>>();
+            std::vector<std::string> filenames = js.at("filenames").get<std::vector<std::string>>();
+            std::vector<std::string> invitations = js.at("invitations").get<std::vector<std::string>>();
+
+            this->setFiles(owners, filenames, invitations);
 
         }
         emit formResultSuccess(res);
@@ -128,11 +131,10 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         emit eraseSymbols(start, end);
         return type_request;
     } else if (type_request == "new_file_created") {
-        std::cout << "richiesta file tornata ";
         QString res = QString::fromStdString("new_file_created");
         emit formResultSuccess(res);
-        std::string name = js.at("filename").get<std::string>() + "_|_" + this->getUser().toStdString() + js.at("invitation").get<std::string>();
-        emit updateFile("", QString::fromStdString(name));
+        std::string name = std::to_string(this->getUser().size()) + '_' + this->getUser().toStdString() + js.at("filename").get<std::string>() + js.at("invitation").get<std::string>();
+        emit updateFile("", QString::fromStdString(name), QString::fromStdString("add_new_file"));
         return type_request;
     } else if (type_request == "new_file_already_exist") {
         std::cout << "Errore file gia esistente";
@@ -152,7 +154,6 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         return type_request;
     } else if (type_request == "file_opened") {
         //file aperto con successo
-        std::cout << "file aperto correttamente ";
         QString res = QString::fromStdString("file_opened");
         emit formResultSuccess(res);
         emit clearEditor();
@@ -177,23 +178,20 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         }
         if (this->writing == js.at("ofPartToWrite")) {
             this->writing = 0;
-            std::cout << "file aperto correttamente ";
             emit formResultSuccess(res);
         } else {
-            std::cout << "written " << part << " json" << std::endl;
             this->writing++;
         }
         this->cv.notify_one();
 
         return type_request;
     } else if (type_request == "invitation_success") {
-        std::string name = js.at("owner").get<std::string>() + "_|_" + js.at("filename").get<std::string>()+"///////////////";
-        emit updateFile("", QString::fromStdString(name));
+        std::string name = std::to_string(js.at("owner").get<std::string>().size()) + '_' + js.at("owner").get<std::string>() + js.at("filename").get<std::string>();
+        emit updateFile("", QString::fromStdString(name), QString::fromStdString("add_new_file_invitation"));
         return type_request;
-    } else if (type_request == "FILE_RENAMED") {
+    } else if (type_request == "file_renamed") {
         //file rinominato correttamente
         //aggiorno nome file nella lista dei file
-        std::cout << "\n nuovo nome: " << js.at("newName").get<std::string>();
         /*QMutableListIterator<std::string> iter1(files);
         while(iter1.hasNext() ){
             std::string s = iter1.next();
@@ -206,31 +204,27 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         QString res = QString::fromStdString("file_renamed");
         emit formResultSuccess(res);
         // chiamare funzione che aggiorna interfaccia grafica di userPage, con nuovo nome file
-        emit updateFile(QString::fromStdString(js.at("oldName").get<std::string>()),QString::fromStdString(js.at("newName").get<std::string>()));
+        emit updateFile(QString::fromStdString(js.at("oldName").get<std::string>()),QString::fromStdString(js.at("newName").get<std::string>()), QString::fromStdString("rename_file"));
     }else if(type_request == "NEW_NAME_ALREADY_EXIST"){
-        std::cout <<"\n il nuovo nome esiste già";
         QString res = QString::fromStdString("new_name_already_exist");
         emit formResultSuccess(res);
 
-    }else if(type_request == "FILE_DELETED"){
+    }else if(type_request == "file_deleted"){
         QString res = QString::fromStdString("file_deleted");
-
-        std::multimap<std::string,std::pair<std::string, std::string>> :: iterator iter;
-        int i = 0;
-
-        for (iter = files.begin(); iter != files.end() && i == 0 ; iter++){
+        std::map<std::pair<std::string, std::string>, std::string> :: iterator iter;
+        for (iter = files.begin(); iter != files.end(); iter++){
             //std::cout << "\n\n file:  " << iter->first << "  " << iter->second;
-            if(iter->first == this->user.toStdString() && iter->second.first == js.at("name").get<std::string>()){
+            if(iter->first.first == this->user.toStdString() && iter->first.second == js.at("name").get<std::string>()){
                 // elimino il file
                 files.erase(iter);
-                i=1;
+                break;
             }
         }
 
         emit formResultSuccess(res);
         QString name = QString::fromStdString(js.at("name").get<std::string>());
         QString del = "";
-        emit updateFile(name,del);
+        emit updateFile(name,del, QString::fromStdString("delete_file"));
     }else if(type_request == "ERRORE_ELIMINAZIONE_FILE"){
         QString res = QString::fromStdString("error_file_deleted");
         emit formResultSuccess(res);
@@ -315,22 +309,10 @@ void Client::setColor(const QString &color) {
     Client::color = color;
 }
 
-void Client::setFiles(const std::list<std::string> &list) {
-    std::string user;
-    std::string fileName;
-    std::string invitation;
-    for (auto p : list) {
-        //std::string token = s.substr(0, s.find(delimiter));
-        user = p.substr(0, p.find("_"));
-        invitation = p.substr(p.size() - 15, p.size());
-        p.erase(p.size() - 15);
-        fileName = p.substr(p.find("_") + 1, p.size());
+void Client::setFiles(const std::vector<std::string>& owners, const std::vector<std::string>& filenames, const std::vector<std::string>& invitations) {
 
-        files.insert({user, std::pair<std::string, std::string>(fileName, invitation)});
+    for(int i = 0; i < owners.size(); i++) {
+        files.insert({std::pair<std::string, std::string>(owners[i], filenames[i]), invitations[i]});
     }
     //Client::files = list;
 }
-
-/*void Client::setFiles(const QList<std::string> &list) {
-    Client::files = list;
-}*/

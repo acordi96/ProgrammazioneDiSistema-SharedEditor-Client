@@ -252,13 +252,10 @@ void stacked::showPopupSuccess(QString result) {
             ui->stackedWidget->setCurrentIndex(2);
             //ui->stackedWidget->setCurrentIndex(3);
         } else if (result == "new_file_already_exist") {
-            std::cout << "\n file già esistente ";
             layout->addWidget(new QLabel("File already exists"));
         } else if (result == "file_opened") {
-            std::cout << "\n file aperto \n";
             setWindowTitle(client_->getFileName());
             ui->stackedWidget->setCurrentIndex(2);
-
         } else if (result == "errore_rinomina_file") {
             layout->addWidget(new QLabel("Error in renaming the file"));
         } else if (result == "file_renamed") {
