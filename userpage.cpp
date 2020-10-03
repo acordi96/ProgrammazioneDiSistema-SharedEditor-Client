@@ -537,7 +537,7 @@ void Userpage::on_openButton_clicked(){
     try {
         json j = json{ //TODO: fixare apertura file con nome utente
                 {"operation","open_file"},
-                {"name",name},
+                {"name",name.erase(name.size())},
                 {"username",username}
         };
         client_->setFileName(QString::fromStdString(name));
@@ -790,10 +790,12 @@ void Userpage::on_deleteButton_clicked() {
 }
 
 void Userpage::updateRecentFiles(QString old, QString newN) {
-    if(old == "") {
+    if(old == "") { //add button
         std::string newq = newN.toStdString();
         std::string username;
         std::string name;
+        std::string invitation = newq.substr(newq.size() - 15, newq.size());
+        newq.erase(newq.size() - 15);
         for(int i = 0; i < newq.length(); i++) {
             if(newq[i] == '_' && newq[i+1] == '|' && newq[i+2] == '_') { //parse button name (username+"_|_"+name)
                 i += 3;
@@ -808,7 +810,7 @@ void Userpage::updateRecentFiles(QString old, QString newN) {
         button = new QPushButton(scrollAreaWidgets);
         //button->setContextMenuPolicy(Qt::CustomContextMenu);
         //std::cout << "\n" << p.first << ": " << p.second << "\n";
-        button->setObjectName(newN);
+        button->setObjectName(QString::fromStdString(newq));
         button->setText("("+QString::fromStdString(name)+"): "+QString::fromStdString(username));
         button->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                                 "border:1px;\n"
@@ -817,6 +819,7 @@ void Userpage::updateRecentFiles(QString old, QString newN) {
         button->setFlat(true);
         page->findChild<QVBoxLayout *>("verticalLayout")->addWidget(button);
         connect(button,SIGNAL(clicked()),SLOT(on_fileName_clicked()));
+        client_->files.insert({username, std::pair<std::string, std::string>(name, invitation)});
         return;
     }
     if(newN == ""){
@@ -827,10 +830,15 @@ void Userpage::updateRecentFiles(QString old, QString newN) {
         page->findChild<QVBoxLayout *>("verticalLayout")->removeWidget(b);
         delete b;
 
+        for(auto &iter : client_->files) {
+            if(iter.first == client_->getUser().toStdString() && iter.second.first == old.toStdString())
+                client_->files.erase(client_->getUser().toStdString());
+        }
     }else{
         //aggiorniamo dopo rename
         recent->findChild<QPushButton *>(client_->getUser() + "_|_" + old)->setText(client_->getUser() +":   "+newN);
         recent->findChild<QPushButton *>(client_->getUser() + "_|_" + old)->setObjectName(client_->getUser() + "_|_" + newN);
+
         for(auto &iter : client_->files) {
             if(iter.first == client_->getUser().toStdString() && iter.second.first == old.toStdString())
                 iter.second.first = newN.toStdString();
@@ -872,6 +880,7 @@ void Userpage::on_inviteButton_clicked() {
         username += selectedFile[i];
     }
     if(selectedFile=="" || username != client_->getUser().toStdString()){
+        std::cout << username << "-" << client_->getUser().toStdString() << std::endl;
         //nessun file selezionato
         QMessageBox::information(
                 this,

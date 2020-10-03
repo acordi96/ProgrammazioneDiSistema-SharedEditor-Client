@@ -2,8 +2,8 @@
 // Created by Sam on 22/apr/2020.
 //
 
-//#define serverRoute "93.43.250.236"
-#define serverRoute "127.0.0.1"
+#define serverRoute "93.43.250.236"
+//#define serverRoute "127.0.0.1"
 
 #include <QtWidgets/QMessageBox>
 #include "Client.h"
@@ -108,7 +108,6 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
             this->setFiles(files);
 
         }
-        //TODO: qunado ci si registra non si vedono i file
         emit formResultSuccess(res);
         return type_request;
     } else if (type_request == "LOGIN_ERROR" || type_request == "QUERY_ERROR" || type_request == "CONNESSION_ERROR"
@@ -137,6 +136,8 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::cout << "richiesta file tornata ";
         QString res = QString::fromStdString("new_file_created");
         emit formResultSuccess(res);
+        std::string name = js.at("filename").get<std::string>() + "_|_" + this->getUser().toStdString() + js.at("invitation").get<std::string>();
+        emit updateFile("", QString::fromStdString(name));
         return type_request;
     } else if (type_request == "new_file_already_exist") {
         std::cout << "Errore file gia esistente";
@@ -191,7 +192,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
 
         return type_request;
     } else if (type_request == "invitation_success") {
-        std::string name = js.at("owner").get<std::string>() + "_|_" + js.at("filename").get<std::string>();
+        std::string name = js.at("owner").get<std::string>() + "_|_" + js.at("filename").get<std::string>()+"///////////////";
         emit updateFile("", QString::fromStdString(name));
         return type_request;
     } else if (type_request == "FILE_RENAMED") {
