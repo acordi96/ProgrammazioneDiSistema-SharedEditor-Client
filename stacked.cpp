@@ -174,14 +174,12 @@ void stacked::on_form_regButton_clicked() {
             /*
              *  PRENDI I DATI E INVIA A SERVER
              * */
-            std::cout << "\n username inviato per la registrazione: " + user.toStdString();
             std::string mess = j.dump().c_str();
             message msg;
             msg.body_length(mess.size());
             std::memcpy(msg.body(), mess.data(), msg.body_length());
             msg.body()[msg.body_length()] = '\0';
             msg.encode_header();
-            std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
             sendmessage(msg);
             /*
              if(requestType=="SIGNUP_OK"){
@@ -236,7 +234,6 @@ void stacked::showPopupSuccess(QString result) {
             ui->stackedWidget->setCurrentIndex(3);
         }
         //ui->stackedWidget->setCurrentIndex(2);
-        std::cout << "Il colore e' " << client_->getColor().toStdString() << std::endl;
     } else {
         QDialog *dialog = new QDialog();
         QVBoxLayout *layout = new QVBoxLayout();

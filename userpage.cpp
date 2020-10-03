@@ -37,7 +37,6 @@ Userpage::Userpage(QWidget *parent,Client *c):
     setupRecentFiles();
     hLayout->addWidget(userinfo);
     hLayout->addWidget(recent);
-    std::cout << "\n creazione userpage";
     page->setLayout(hLayout);
     setCentralWidget(page);
     QObject::connect(client_, &Client::updateFile, this, &Userpage::updateRecentFiles);
@@ -75,7 +74,6 @@ void Userpage::setupRecentFiles(){
 
      for (auto p : client_->files){
          //std::string s = iter1.next();
-         std::cout <<"\nentrato nel while dei file ";
          button = new QPushButton(scrollAreaWidgets);
          //button->setContextMenuPolicy(Qt::CustomContextMenu);
          //std::cout << "\n" << p.first << ": " << p.second << "\n";
@@ -304,7 +302,6 @@ void Userpage::iconSelector(){
         return;
     }
     const QString selected = fileDialog.selectedFiles().first();
-    std::cout<<"\nSelected file:  "<<selected.toStdString()<<std::endl;
 
     myIcon->setStyleSheet(QString::fromUtf8("image:url(")+selected+QString::fromUtf8(");"));
 
@@ -419,7 +416,6 @@ void Userpage::handleNewFileButton()
             };
 
             //PRENDI I DATI E INVIA A SERVER
-            std::cout << "\n username inviato per la creazione del file: " + client_->getUser().toStdString();
             std::string mess = j.dump().c_str();
             message msg;
             msg.body_length(mess.size());
@@ -435,7 +431,6 @@ void Userpage::handleNewFileButton()
 
         QString testo = modalWindow.textValue();
         client_->setFileName(testo);
-        std::cout << "CLICK SUL PULSANTE CREATE " << testo.toStdString() ;
     }
     //modalWindow.exec()
     //ui->stackedWidget->setCurrentIndex(3);
@@ -470,14 +465,12 @@ void Userpage::customMenuRequested(QPoint pos) {
 
 void Userpage::on_fileName_clicked(int i){
 
-    std::cout << "\n valore di i : " << i;
     std::string s;
     if(i==0) {
         QObject *sender = QObject::sender();
         QString str = sender->objectName();
         s = str.toStdString();
         //QMessageBox::information(0, "Button", sender->objectName());
-        std::cout << "\n bottone schiacciato" << s << "\n";
     }else {
         s = fileName;
     }
@@ -500,15 +493,10 @@ void Userpage::on_fileName_clicked(int i){
                                             "background-color: red;\n"
                                             "}"));
 
-    std::cout << "\n\ndopo focus";
 
 }
 
 void Userpage::on_openButton_clicked(){
-    std::cout << "\n\n il tasto open funziona \n\n";
-    std::cout << "\n file selezionato: " << selectedFile;
-
-    std::cout << "\napri file\n";
 
     if(selectedFile==""){
         //nessun file selezionato
@@ -520,7 +508,6 @@ void Userpage::on_openButton_clicked(){
     }
 
     //QMessageBox::information(0, "Button", sender->objectName());
-    std::cout << "\n bottone schiacciato: " << fileName <<"\n";
     //on_fileName_clicked(1);
 
     std::string username;
@@ -541,16 +528,14 @@ void Userpage::on_openButton_clicked(){
                 {"username",username}
         };
         client_->setFileName(QString::fromStdString(name));
-        std::cout<< "\nFle Name Attuale: "<<client_->getFileName().toStdString()<<std::endl;
         //PRENDI I DATI E INVIA A SERVER
-        std::cout << "\ninvio richiesta apertura file: " << selectedFile << " \n username inviato per la creazione del file: " << client_->getUser().toStdString();
         std::string mess = j.dump().c_str();
         message msg;
         msg.body_length(mess.size());
         std::memcpy(msg.body(), mess.data(), msg.body_length());
         msg.body()[msg.body_length()] = '\0';
         msg.encode_header();
-        std::cout <<"\n Richiesta da inviare al server "<< msg.body() << std::endl;
+        std::cout <<"Richiesta da inviare al server "<< msg.body() << std::endl;
         sendmessage(msg);
         //deseleziono il file
         QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
@@ -570,10 +555,6 @@ void Userpage::on_openButton_clicked(){
 }
 
 void Userpage::on_renameButton_clicked() {
-    std::cout << "\n\n il tasto rename funziona \n\n";
-    std::cout << "\n file selezionato: " << selectedFile;
-
-    std::cout<<"\nrinomina file";
     if(selectedFile==""){
         //nessun file selezionato
         QMessageBox::information(
@@ -598,7 +579,6 @@ void Userpage::on_renameButton_clicked() {
     }
     if(username != client_->getUser().toStdString()){
         //l'utente non ha il permesso di rinominare il file
-        std::cout << "\n no permesso\n";
 
         QMessageBox::information(
                 this,
@@ -683,14 +663,13 @@ void Userpage::on_renameButton_clicked() {
                 };
 
                 //PRENDI I DATI E INVIA A SERVER
-                std::cout << "\n username inviato per rinominare file: " + client_->getUser().toStdString();
                 std::string mess = j.dump().c_str();
                 message msg;
                 msg.body_length(mess.size());
                 std::memcpy(msg.body(), mess.data(), msg.body_length());
                 msg.body()[msg.body_length()] = '\0';
                 msg.encode_header();
-                std::cout << "\n Richiesta da inviare al server " << msg.body() << std::endl;
+                std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
                 sendmessage(msg);
                 // deseleziono il pulsante che ho rinominato
                 QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
@@ -709,10 +688,6 @@ void Userpage::on_renameButton_clicked() {
 }
 
 void Userpage::on_deleteButton_clicked() {
-    std::cout << "\n\n il tasto delete funziona \n\n";
-    std::cout << "\n file selezionato: " << selectedFile;
-
-    std::cout<<"\ncancella file";
 
     if(selectedFile==""){
         //nessun file selezionato
@@ -753,7 +728,6 @@ void Userpage::on_deleteButton_clicked() {
         }
         if(username != client_->getUser().toStdString()){
             //l'utente non ha il permesso di eliminare il file
-            std::cout << "\n no permesso\n";
 
             QMessageBox::information(
                     this,
@@ -769,14 +743,13 @@ void Userpage::on_deleteButton_clicked() {
                 };
 
                 //PRENDI I DATI E INVIA A SERVER
-                std::cout << "\n username inviato per eliminare file: " + client_->getUser().toStdString();
                 std::string mess = j.dump().c_str();
                 message msg;
                 msg.body_length(mess.size());
                 std::memcpy(msg.body(), mess.data(), msg.body_length());
                 msg.body()[msg.body_length()] = '\0';
                 msg.encode_header();
-                std::cout << "\n Richiesta da inviare al server " << msg.body() << std::endl;
+                std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
                 sendmessage(msg);
                 //deseleziono file eliminato
                 selectedFile = "";
@@ -825,7 +798,6 @@ void Userpage::updateRecentFiles(QString old, QString newN) {
     if(newN == ""){
         //aggiorniamo dopo una delete
 
-        std::cout<< "\n\nprima della find\nold = "<< old.toStdString();
         QPushButton * b = recent->findChild<QPushButton *>(client_->getUser() + "_|_" + old);
         page->findChild<QVBoxLayout *>("verticalLayout")->removeWidget(b);
         delete b;
@@ -861,7 +833,7 @@ void Userpage::handleOpenURLbutton() {
         std::memcpy(msg.body(), mess.data(), msg.body_length());
         msg.body()[msg.body_length()] = '\0';
         msg.encode_header();
-        std::cout << "\n Richiesta da inviare al server " << msg.body() << std::endl;
+        std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
         sendmessage(msg);
     }
 }
@@ -880,7 +852,6 @@ void Userpage::on_inviteButton_clicked() {
         username += selectedFile[i];
     }
     if(selectedFile=="" || username != client_->getUser().toStdString()){
-        std::cout << username << "-" << client_->getUser().toStdString() << std::endl;
         //nessun file selezionato
         QMessageBox::information(
                 this,

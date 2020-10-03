@@ -60,7 +60,7 @@ void Client::do_read_body() {
     boost::asio::async_read(socket_, boost::asio::buffer(read_msg_.body(), read_msg_.body_length()),
                             [this](boost::system::error_code ec, std::size_t /*length*/) {
                                 if (!ec) {
-                                    std::cout << "\n Messaggio ricevuto dal server: " << read_msg_.body() << std::endl;
+                                    std::cout << "Messaggio ricevuto dal server: " << read_msg_.body() << std::endl;
                                     json messageFromClient;
                                     try {
                                         std::string message = read_msg_.body();
@@ -72,7 +72,6 @@ void Client::do_read_body() {
                                         do_read_header();
                                     }
                                     std::string requestType = messageFromClient.at("response").get<std::string>();
-                                    std::cout << "\n requestType : " + requestType;
                                     std::string response;
                                     try {
                                         response = handleRequestType(messageFromClient, requestType);
@@ -101,10 +100,6 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
 
         if (type_request == "LOGIN_SUCCESS") {
             std::list<std::string> files = js.at("files").get<std::list<std::string>>();
-            std::cout << "User " << this->getUser().toStdString() << " loggato! File disponibili:" << std::endl;
-            for (auto p : files) {
-                std::cout << p << std::endl;
-            }
             this->setFiles(files);
 
         }
