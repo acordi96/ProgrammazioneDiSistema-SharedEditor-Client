@@ -31,14 +31,17 @@ private:
     QWidget *userinfo;
     QWidget *selector;
     std::string fileName;
+    std::string selectedFile = "";
+
+    QLineEdit * urlLine;
 
     QWidget *myIcon;
 
 private slots:
     void handleNewFileButton();
-    void openFile();
+    /*void openFile();
     void renameFile();
-    void deleteFile();
+    void deleteFile();*/
     void iconSelector();
     void changeIcon();
     //void onRightClicked();
@@ -47,9 +50,13 @@ signals:
     void upLogout();
 
 public slots:
-    void customMenuRequested(QPoint pos);
+    //void customMenuRequested(QPoint pos);
+    void on_openButton_clicked();
+    void on_renameButton_clicked();
+    void on_deleteButton_clicked();
     void on_fileName_clicked(int i = 0);
     void updateRecentFiles(QString old,QString newN);
+    void handleOpenURLbutton();
 
     //void updateFiles();
 

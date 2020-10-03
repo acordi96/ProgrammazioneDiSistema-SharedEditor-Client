@@ -190,6 +190,11 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         this->cv.notify_one();
 
         return type_request;
+    } else if (type_request == "invitation_success") {
+        //TODO: aggiungere alla lista file: js.at("owner") js.at("filename")
+        QString res = QString::fromStdString("Invitation accepted");
+        emit formResultSuccess(res);
+        return type_request;
     } else if (type_request == "file_renamed") {
         //file rinominato correttamente
         //aggiorno nome file nella lista dei file

@@ -44,7 +44,6 @@ Userpage::Userpage(QWidget *parent,Client *c):
     setCentralWidget(page);
     QObject::connect(client_, &Client::updateFile, this, &Userpage::updateRecentFiles);
     //QObject::connect(page, &stacked::updateRecentFiles, this, &Userpage::updateFiles);
-
 }
 
 void Userpage::setupRecentFiles(){
@@ -115,25 +114,27 @@ void Userpage::setupRecentFiles(){
 
     QPushButton *button;
 
-    for (auto p : client_->files){
-        //std::string s = iter1.next();
-        std::cout <<"\nentrato nel while dei file ";
-        button = new QPushButton(scrollAreaWidgets);
-        button->setContextMenuPolicy(Qt::CustomContextMenu);
-        std::cout << "\n" << p.first << ": " << p.second << "\n";
-        button->setObjectName(QString::fromStdString(p.first) + "_|_" + QString::fromStdString(p.second));
-        button->setText(QString::fromStdString(p.first)+":   "+QString::fromStdString(p.second));
-        QString buttonName = QString::fromStdString(p.first) + "_|_" + QString::fromStdString(p.second);
-        qDebug()<<"\nbutton = "<<buttonName;
-        button->setStyleSheet(QString::fromUtf8("QPushButton")+QString::fromUtf8("{background-color:rgb(255,255,0);border:1px;}"));
-        button->setFlat(true);
-        //button->setContentsMargins(10,0,0,0);
-        verticalLayout->addWidget(button);
+     for (auto p : client_->files){
+         //std::string s = iter1.next();
+         std::cout <<"\nentrato nel while dei file ";
+         button = new QPushButton(scrollAreaWidgets);
+         //button->setContextMenuPolicy(Qt::CustomContextMenu);
+         std::cout << "\n" << p.first << ": " << p.second << "\n";
+         button->setObjectName(QString::fromStdString(p.first) + "_|_" + QString::fromStdString(p.second));
+         button->setText(QString::fromStdString(p.first)+":   "+QString::fromStdString(p.second));
+         button->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                                 "border:1px;\n"
+                                                 "background-color: blue;\n"
+                                                 "}"));
 
-        connect(button,SIGNAL(clicked()),SLOT(on_fileName_clicked()));
-        connect(button, SIGNAL(customContextMenuRequested(QPoint)),
-                SLOT(customMenuRequested(QPoint)));
-    }
+         button->setFlat(true);
+         //button->setContentsMargins(10,0,0,0);
+         verticalLayout->addWidget(button);
+
+         connect(button,SIGNAL(clicked()),SLOT(on_fileName_clicked()));
+         connect(button, SIGNAL(customContextMenuRequested(QPoint)),
+                 SLOT(customMenuRequested(QPoint)));
+     }
 
     scrollAreaWidgets->setLayout(verticalLayout);
     scrollArea->setWidget(scrollAreaWidgets);
@@ -167,6 +168,7 @@ void Userpage::setupRecentFiles(){
                                                 "}"));
     openButton->setFlat(true);
 
+    connect(openButton,SIGNAL(clicked()),SLOT(on_openButton_clicked()));
     grid->addWidget(openButton,0,0,1,1);
 
     renameButton->setObjectName(QString::fromUtf8("renameButton"));
@@ -182,6 +184,26 @@ void Userpage::setupRecentFiles(){
     renameButton->setFlat(true);
 
     grid->addWidget(renameButton,0,1,1,1);
+     renameButton->setObjectName(QString::fromUtf8("renameButton"));
+     renameButton->setGeometry(QRect(160, 380, 89, 25));
+     renameButton->setStyleSheet(QString::fromUtf8("QPushButton#renameButton{\n"
+     "border:1px;\n"
+     "}\n"
+     "QPushButton#renameButton:hover{\n"
+     "background-color: rgb(255,0,0);\n"
+     "}"));
+     renameButton->setFlat(true);
+     connect(renameButton,SIGNAL(clicked()),SLOT(on_renameButton_clicked()));
+
+     inviteButton->setObjectName(QString::fromUtf8("inviteButton"));
+     inviteButton->setGeometry(QRect(40, 430, 89, 25));
+     inviteButton->setStyleSheet(QString::fromUtf8("QPushButton#inviteButton{\n"
+     "border:1px;\n"
+     "}\n"
+     "QPushButton#inviteButton:hover{\n"
+     "background-color: rgb(255,0,0);\n"
+     "}"));
+     inviteButton->setFlat(true);
 
     deleteButton->setObjectName(QString::fromUtf8("deleteButton"));
     deleteButton->setGeometry(QRect(160, 430, 89, 25));
@@ -194,6 +216,10 @@ void Userpage::setupRecentFiles(){
                                                   "background-color: rgb(255,0,0);\n"
                                                   "}"));
     deleteButton->setFlat(true);
+
+     connect(deleteButton,SIGNAL(clicked()),SLOT(on_deleteButton_clicked()));
+
+     hLayout->addWidget(recent);
 
     grid->addWidget(deleteButton,1,0,1,1);
 
@@ -276,8 +302,7 @@ void Userpage::setupUserinfo(){
 
      QPushButton *newFileButton = new QPushButton("New File",userinfo);
      newFileButton->setObjectName(QString::fromUtf8("newFileButton"));
-     newFileButton->setGeometry(QRect(120, 400, 121, 31));
-     qDebug()<<"color = "<<client_->getColor();
+     newFileButton->setGeometry(QRect(90, 320, 121, 31));
      newFileButton->setStyleSheet(QString::fromUtf8("QPushButton#newFileButton{\n"
                                                     "background-color:")+
                                   client_->getColor()+
@@ -293,12 +318,12 @@ void Userpage::setupUserinfo(){
      newFileButton->setIconSize(QSize(32, 32));
      newFileButton->setFlat(false);
 
-     lineURL= new QLineEdit(userinfo);
+     this->lineURL = new QLineEdit(userinfo);
      lineURL->setObjectName(QString::fromUtf8("lineURL"));
      lineURL->setGeometry(QRect(30,480,211,25));
      lineURL->setPlaceholderText(QString::fromUtf8("Insert URL here..."));
 
-     QPushButton *openURLbutton = new QPushButton("Open URL",userinfo);
+     QPushButton *openURLbutton = new QPushButton("Accept",userinfo);
      openURLbutton->setObjectName(QString::fromUtf8("openURLbutton"));
      openURLbutton->setGeometry(QRect(260,480,71,25));
      openURLbutton->setStyleSheet(QString::fromUtf8("QPushButton#openURLbutton{\n"
@@ -422,6 +447,7 @@ void Userpage::sendmessage(message mess) {
     client_->write(mess);
 }
 
+/*
 void Userpage::customMenuRequested(QPoint pos) {
     //QModelIndex index=button->indexAt(pos);
 
@@ -441,6 +467,7 @@ void Userpage::customMenuRequested(QPoint pos) {
 
     menu->exec(QCursor::pos());
 }
+*/
 
 void Userpage::on_fileName_clicked(int i){
 
@@ -455,18 +482,54 @@ void Userpage::on_fileName_clicked(int i){
     }else {
         s = fileName;
     }
-    //std::string s = QObject::sender()->objectName().toStdString();
-    std::cout << "\n Premuto bottone " << s <<std::endl;
+    if(selectedFile!=""){
+        //deseleziono vecchio button e seleziono quello nuovo
+        QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
+        deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                                "border:1px;\n"
+                                                "background-color: blue;\n"
+                                                "}"));
+    }
+    selectedFile = s;
+    QPushButton *b = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
+    b->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                            "border:1px;\n"
+                                            "background-color: red;\n"
+                                            "}"));
+
+    std::cout << "\n\ndopo focus";
+
+}
+
+void Userpage::on_openButton_clicked(){
+    std::cout << "\n\n il tasto open funziona \n\n";
+    std::cout << "\n file selezionato: " << selectedFile;
+
+    std::cout << "\napri file\n";
+
+    if(selectedFile==""){
+        //nessun file selezionato
+        QMessageBox::information(
+                this,
+                tr("Attenzione!"),
+                tr("Selezionare un file da aprire") );
+        return;
+    }
+
+    //QMessageBox::information(0, "Button", sender->objectName());
+    std::cout << "\n bottone schiacciato: " << fileName <<"\n";
+    //on_fileName_clicked(1);
+
     std::string username;
     std::string name;
-    for(int i = 0; i < s.length(); i++) {
-        if(s[i] == '_' && s[i+1] == '|' && s[i+2] == '_') { //parse button name (username+"_|_"+name)
+    for(int i = 0; i < selectedFile.length(); i++) {
+        if(selectedFile[i] == '_' && selectedFile[i+1] == '|' && selectedFile[i+2] == '_') { //parse button name (username+"_|_"+name)
             i += 3;
-            while(s[i] != '\0')
-                name += s[i++];
+            while(selectedFile[i] != '\0')
+                name += selectedFile[i++];
             break;
         }
-        username += s[i];
+        username += selectedFile[i];
     }
     try {
         json j = json{ //TODO: fixare apertura file con nome utente
@@ -477,7 +540,7 @@ void Userpage::on_fileName_clicked(int i){
         client_->setFileName(QString::fromStdString(name));
         std::cout<< "\nFle Name Attuale: "<<client_->getFileName().toStdString()<<std::endl;
         //PRENDI I DATI E INVIA A SERVER
-        std::cout << "\ninvio richiesta apertura file: " << s << " \n username inviato per la creazione del file: " << client_->getUser().toStdString();
+        std::cout << "\ninvio richiesta apertura file: " << selectedFile << " \n username inviato per la creazione del file: " << client_->getUser().toStdString();
         std::string mess = j.dump().c_str();
         message msg;
         msg.body_length(mess.size());
@@ -486,6 +549,15 @@ void Userpage::on_fileName_clicked(int i){
         msg.encode_header();
         std::cout <<"\n Richiesta da inviare al server "<< msg.body() << std::endl;
         sendmessage(msg);
+        //deseleziono il file
+        QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
+        deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                                "border:1px;\n"
+                                                "background-color: blue;\n"
+                                                "}"));
+
+        selectedFile = "";
+
 
     } catch (std::exception& e) {
         std::cerr << "Exception: " << e.what() << "\n";
@@ -494,31 +566,32 @@ void Userpage::on_fileName_clicked(int i){
 
 }
 
-void Userpage::openFile(){
-    std::cout << "\napri file\n";
+void Userpage::on_renameButton_clicked() {
+    std::cout << "\n\n il tasto rename funziona \n\n";
+    std::cout << "\n file selezionato: " << selectedFile;
 
-    //QMessageBox::information(0, "Button", sender->objectName());
-    std::cout << "\n bottone schiacciato: " << fileName <<"\n";
-    on_fileName_clicked(1);
-
-
-}
-
-void Userpage::renameFile(){
     std::cout<<"\nrinomina file";
+    if(selectedFile==""){
+        //nessun file selezionato
+        QMessageBox::information(
+                this,
+                tr("Attenzione!"),
+                tr("Selezionare un file da rinominare") );
+        return;
+    }
 
     //controllare se l'utente ha il permesso per rinominare il file
     std::string name;
     std::string username;
 
-    for(int i = 0; i < fileName.length(); i++) {
-        if(fileName[i] == '_' && fileName[i+1] == '|' && fileName[i+2] == '_') { //parse button name (username+"_|_"+name)
+    for(int i = 0; i < selectedFile.length(); i++) {
+        if(selectedFile[i] == '_' && selectedFile[i+1] == '|' && selectedFile[i+2] == '_') { //parse button name (username+"_|_"+name)
             i += 3;
-            while(fileName[i] != '\0')
-                name += fileName[i++];
+            while(selectedFile[i] != '\0')
+                name += selectedFile[i++];
             break;
         }
-        username += fileName[i];
+        username += selectedFile[i];
     }
     if(username != client_->getUser().toStdString()){
         //l'utente non ha il permesso di rinominare il file
@@ -616,6 +689,13 @@ void Userpage::renameFile(){
                 msg.encode_header();
                 std::cout << "\n Richiesta da inviare al server " << msg.body() << std::endl;
                 sendmessage(msg);
+                // deseleziono il pulsante che ho rinominato
+                QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
+                deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                                          "border:1px;\n"
+                                                          "background-color: blue;\n"
+                                                          "}"));
+                selectedFile = "";
 
             } catch (std::exception &e) {
                 std::cerr << "Exception: " << e.what() << "\n";
@@ -625,50 +705,82 @@ void Userpage::renameFile(){
 
 }
 
-void Userpage::deleteFile(){
+void Userpage::on_deleteButton_clicked() {
+    std::cout << "\n\n il tasto delete funziona \n\n";
+    std::cout << "\n file selezionato: " << selectedFile;
+
     std::cout<<"\ncancella file";
-    std::string name;
-    std::string username;
 
-    for(int i = 0; i < fileName.length(); i++) {
-        if(fileName[i] == '_' && fileName[i+1] == '|' && fileName[i+2] == '_') { //parse button name (username+"_|_"+name)
-            i += 3;
-            while(fileName[i] != '\0')
-                name += fileName[i++];
-            break;
-        }
-        username += fileName[i];
-    }
-    if(username != client_->getUser().toStdString()){
-        //l'utente non ha il permesso di rinominare il file
-        std::cout << "\n no permesso\n";
-
+    if(selectedFile==""){
+        //nessun file selezionato
         QMessageBox::information(
                 this,
                 tr("Attenzione!"),
-                tr("Impossibile eliminare il file, azione permessa solo a chi lo ha creato") );
-    }else {
+                tr("Selezionare un file da eliminare") );
+        return;
+    }
 
-        try {
-            json j = json{
-                    {"operation", "delete_file"},
-                    {"name",  name},
-                    {"username",  client_->getUser().toStdString()}
-            };
+    QMessageBox msgBox;
+    msgBox.setText("Confirm you want to delete the selected file?");
+    //msgBox.setInformativeText("Do you want to save your changes?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    int ret = msgBox.exec();
 
-            //PRENDI I DATI E INVIA A SERVER
-            std::cout << "\n username inviato per eliminare file: " + client_->getUser().toStdString();
-            std::string mess = j.dump().c_str();
-            message msg;
-            msg.body_length(mess.size());
-            std::memcpy(msg.body(), mess.data(), msg.body_length());
-            msg.body()[msg.body_length()] = '\0';
-            msg.encode_header();
-            std::cout << "\n Richiesta da inviare al server " << msg.body() << std::endl;
-            sendmessage(msg);
+    if (ret == QMessageBox::No){
+        QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
+        deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                                  "border:1px;\n"
+                                                  "background-color: blue;\n"
+                                                  "}"));
+        selectedFile = "";
+        return;
+    }else{
+        std::string name;
+        std::string username;
 
-        } catch (std::exception &e) {
-            std::cerr << "Exception: " << e.what() << "\n";
+        for(int i = 0; i < selectedFile.length(); i++) {
+            if(selectedFile[i] == '_' && selectedFile[i+1] == '|' && selectedFile[i+2] == '_') { //parse button name (username+"_|_"+name)
+                i += 3;
+                while(selectedFile[i] != '\0')
+                    name += selectedFile[i++];
+                break;
+            }
+            username += selectedFile[i];
+        }
+        if(username != client_->getUser().toStdString()){
+            //l'utente non ha il permesso di eliminare il file
+            std::cout << "\n no permesso\n";
+
+            QMessageBox::information(
+                    this,
+                    tr("Attenzione!"),
+                    tr("Impossibile eliminare il file, azione permessa solo a chi lo ha creato") );
+        }else {
+
+            try {
+                json j = json{
+                        {"operation", "delete_file"},
+                        {"name",  name},
+                        {"username",  client_->getUser().toStdString()}
+                };
+
+                //PRENDI I DATI E INVIA A SERVER
+                std::cout << "\n username inviato per eliminare file: " + client_->getUser().toStdString();
+                std::string mess = j.dump().c_str();
+                message msg;
+                msg.body_length(mess.size());
+                std::memcpy(msg.body(), mess.data(), msg.body_length());
+                msg.body()[msg.body_length()] = '\0';
+                msg.encode_header();
+                std::cout << "\n Richiesta da inviare al server " << msg.body() << std::endl;
+                sendmessage(msg);
+                //deseleziono file eliminato
+                selectedFile = "";
+
+            } catch (std::exception &e) {
+                std::cerr << "Exception: " << e.what() << "\n";
+            }
         }
     }
 
@@ -689,6 +801,25 @@ void Userpage::updateRecentFiles(QString old, QString newN) {
         recent->findChild<QPushButton *>(client_->getUser() + "_|_" + old)->setObjectName(client_->getUser() + "_|_" + newN);
     }
 
+}
+
+void Userpage::handleOpenURLbutton() {
+    if(!this->lineURL->text().isEmpty()) {
+        json j = json{
+                {"operation", "validate_invitation"},
+                {"invitation_code",  this->lineURL->text().toStdString()}
+        };
+
+        //PRENDI I DATI E INVIA A SERVER
+        std::string mess = j.dump().c_str();
+        message msg;
+        msg.body_length(mess.size());
+        std::memcpy(msg.body(), mess.data(), msg.body_length());
+        msg.body()[msg.body_length()] = '\0';
+        msg.encode_header();
+        std::cout << "\n Richiesta da inviare al server " << msg.body() << std::endl;
+        sendmessage(msg);
+    }
 }
 
 /*void Userpage::updateFiles() {
