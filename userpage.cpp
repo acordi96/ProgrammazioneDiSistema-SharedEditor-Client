@@ -499,8 +499,8 @@ void Userpage::on_openButton_clicked(){
         //nessun file selezionato
         QMessageBox::information(
                 this,
-                tr("Attenzione!"),
-                tr("Selezionare un file da aprire") );
+                tr("Hey!"),
+                tr("Select a file") );
         return;
     }
 
@@ -543,8 +543,8 @@ void Userpage::on_renameButton_clicked() {
         //nessun file selezionato
         QMessageBox::information(
                 this,
-                tr("Attenzione!"),
-                tr("Selezionare un file da rinominare") );
+                tr("Hey!"),
+                tr("Select a file") );
         return;
     }
 
@@ -557,8 +557,8 @@ void Userpage::on_renameButton_clicked() {
 
         QMessageBox::information(
                 this,
-                tr("Attenzione!"),
-                tr("Impossibile rinominare il file, azione permessa solo a chi lo ha creato") );
+                tr("Hey!"),
+                tr("Only who created the file can rename it") );
     }else {
 
         QInputDialog modalWindow;
@@ -668,8 +668,8 @@ void Userpage::on_deleteButton_clicked() {
         //nessun file selezionato
         QMessageBox::information(
                 this,
-                tr("Attenzione!"),
-                tr("Selezionare un file da eliminare") );
+                tr("Hey!"),
+                tr("Select a file") );
         return;
     }
     std::pair<std::string, std::string> parsed = parseFileButton(selectedFile);
@@ -768,7 +768,7 @@ void Userpage::on_deleteButton_clicked() {
 
 }
 
-void Userpage::updateRecentFiles(QString old, QString newN, QString request) {
+void Userpage::updateRecentFiles(QString old, QString newN, QString owner, QString request) {
     if(request == "add_new_file") { //add button
         std::pair<std::string, std::string> parsed = parseFileButton(newN.toStdString());
         std::string owner = parsed.first;
@@ -828,11 +828,11 @@ void Userpage::updateRecentFiles(QString old, QString newN, QString request) {
         }
     }
     if(request == "rename_file"){ //aggiorniamo dopo rename
-        recent->findChild<QPushButton *>(QString::fromStdString(generateFileButton(client_->getUser().toStdString(), old.toStdString())))->setText("("+client_->getUser() +"): "+newN);
-        recent->findChild<QPushButton *>(QString::fromStdString(generateFileButton(client_->getUser().toStdString(), old.toStdString())))->setObjectName(QString::fromStdString(generateFileButton(client_->getUser().toStdString(), newN.toStdString())));
+        recent->findChild<QPushButton *>(QString::fromStdString(generateFileButton(owner.toStdString(), old.toStdString())))->setText("("+owner +"): "+newN);
+        recent->findChild<QPushButton *>(QString::fromStdString(generateFileButton(owner.toStdString(), old.toStdString())))->setObjectName(QString::fromStdString(generateFileButton(owner.toStdString(), newN.toStdString())));
 
         for(auto &iter : client_->files) {
-            if(iter.first.first == client_->getUser().toStdString() && iter.first.second == old.toStdString()) {
+            if(iter.first.first == owner.toStdString() && iter.first.second == old.toStdString()) {
                 client_->files.insert({std::pair<std::string, std::string>(iter.first.first, newN.toStdString()), iter.second});
                 client_->files.erase(iter.first);
                 break;
@@ -869,8 +869,8 @@ void Userpage::on_inviteButton_clicked() {
         //nessun file selezionato
         QMessageBox::information(
                 this,
-                tr("Attenzione!"),
-                tr("Seleziona un tuo file a cui invitare") );
+                tr("Hey!"),
+                tr("Select a file") );
         return;
     }
     const char * code;

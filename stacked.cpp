@@ -22,6 +22,7 @@ stacked::stacked(QWidget *parent) :
     //connect(te,&TextEdit::logout,this,&stacked::logout);
     //connect(te,&TextEdit::closeAll,this,&stacked::closeAll);
     QObject::connect(client_, &Client::formResultSuccess, this, &stacked::showPopupSuccess);
+    setWindowTitle("SharedEditor - Login or Register");
 
     //Userpage *up = new Userpage(this,client_);
     //setFixedSize(1000,600);
@@ -75,7 +76,7 @@ void stacked::on_loginButton_clicked() {
         QDialog *dialog = new QDialog();
         QVBoxLayout *layout = new QVBoxLayout();
         dialog->setLayout(layout);
-        layout->addWidget(new QLabel("Error! Empty username and/or password"));
+        layout->addWidget(new QLabel("Empty username and/or password"));
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
         layout->addWidget(buttonBox);
 
@@ -129,7 +130,7 @@ void stacked::on_form_regButton_clicked() {
         QDialog *dialog = new QDialog();
         QVBoxLayout *layout = new QVBoxLayout();
         dialog->setLayout(layout);
-        layout->addWidget(new QLabel("Error! Not accpted email format"));
+        layout->addWidget(new QLabel("Wrong email format"));
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
         layout->addWidget(buttonBox);
 
@@ -230,7 +231,7 @@ void stacked::showPopupSuccess(QString result) {
         if (result == "SIGNUP_SUCCESS") {
             ui->stackedWidget->setCurrentIndex(0);
         } else {
-            setWindowTitle("Userpage");
+            setWindowTitle("SharedEditor - Userpage");
             ui->stackedWidget->setCurrentIndex(3);
         }
         //ui->stackedWidget->setCurrentIndex(2);
@@ -241,51 +242,51 @@ void stacked::showPopupSuccess(QString result) {
         if (result == "QUERY_ERROR" || result == "CONNESSION_ERROR" || result == "SIGNUP_ERROR_INSERT_FAILED") {
             layout->addWidget(new QLabel("Error with the DB, try again"));
         } else if (result == "LOGIN_ERROR") {
-            layout->addWidget(new QLabel("Error! Invalid username and/or password"));
+            layout->addWidget(new QLabel("Invalid username and/or password"));
+        } else if (result == "user_already_logged") {
+            layout->addWidget(new QLabel("User already logged"));
         } else if (result == "SIGNUP_ERROR_DUPLICATE_USERNAME") {
-            layout->addWidget(new QLabel("Error! Username already exixts"));
+            layout->addWidget(new QLabel("Username already registered"));
         } else if (result == "new_file_created") {
 
-            layout->addWidget(new QLabel("File correclty created"));
+            layout->addWidget(new QLabel("File correctly created"));
             //index 2 = text editor
-            setWindowTitle(client_->getFileName());
+            setWindowTitle("SharedEditor - " + client_->getUser() + " @ " + client_->getFileName());
             ui->stackedWidget->setCurrentIndex(2);
             //ui->stackedWidget->setCurrentIndex(3);
         } else if (result == "new_file_already_exist") {
             layout->addWidget(new QLabel("File already exists"));
         } else if (result == "file_opened") {
-            setWindowTitle(client_->getFileName());
+            setWindowTitle("SharedEditor - " + client_->getUser() + " @ " + client_->getFileName());
             ui->stackedWidget->setCurrentIndex(2);
+            layout->addWidget(new QLabel("File correctly opened"));
         } else if (result == "errore_rinomina_file") {
-            layout->addWidget(new QLabel("Error in renaming the file"));
+            layout->addWidget(new QLabel("Rename file error"));
         } else if (result == "file_renamed") {
-            //inviamo signal per aggiornare recent files
-            //emit updateRecentFiles();
             layout->addWidget(new QLabel("File correctly renamed"));
         } else if (result == "new_name_already_exist") {
             layout->addWidget(new QLabel("New name already exist"));
         } else if (result == "file_deleted") {
             layout->addWidget(new QLabel("File correctly deleted"));
         } else if (result == "ERRORE_ELIMINAZIONE_FILE") {
-            layout->addWidget(new QLabel("Error in file elimination"));
+            layout->addWidget(new QLabel("Delete file error"));
         } else if (result == "error_file_in_use") {
-            layout->addWidget(new QLabel("Impossibile rinominare file perchè in uso "));
+            layout->addWidget(new QLabel("File in use, rename failed"));
         } else if (result == "error_file_in_use") {
-            layout->addWidget(new QLabel("Impossibile eliminare file perchè in uso "));
+            layout->addWidget(new QLabel("File in use, delete failed"));
         }
 
-        QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+        QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
         layout->addWidget(buttonBox);
 
         connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
-        connect(buttonBox, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
 
         dialog->show();
     }
 }
 
 void stacked::on_reglogButton_clicked() {
-    setWindowTitle("Sign Up Page");
+    setWindowTitle("SharedEditor - Login or Register");
     ui->stackedWidget->setCurrentIndex(1);
 
 }
@@ -398,13 +399,13 @@ void stacked::on_form_cancButton_clicked() {
 }
 
 void stacked::logout() {
-    setWindowTitle("MainWindow");
+    setWindowTitle("SharedEditor - Login or Register");
     ui->stackedWidget->setCurrentIndex(0);
     //ui->stackedWidget->setCurrentIndex(3);
 }
 
 void stacked::closeFile() {
-    setWindowTitle("Userpage");
+    setWindowTitle("SharedEditor - Userpage");
     ui->stackedWidget->setCurrentIndex(3);
 }
 

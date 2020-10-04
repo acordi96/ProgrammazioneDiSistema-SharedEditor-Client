@@ -77,7 +77,7 @@ public slots:
 
     void on_fileName_clicked(int i = 0);
 
-    void updateRecentFiles(QString old, QString newN, QString request);
+    void updateRecentFiles(QString old, QString newN, QString owner, QString request);
 
     void handleOpenURLbutton();
 

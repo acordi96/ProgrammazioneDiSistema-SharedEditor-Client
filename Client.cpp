@@ -134,7 +134,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         QString res = QString::fromStdString("new_file_created");
         emit formResultSuccess(res);
         std::string name = std::to_string(this->getUser().size()) + '_' + this->getUser().toStdString() + js.at("filename").get<std::string>() + js.at("invitation").get<std::string>();
-        emit updateFile("", QString::fromStdString(name), QString::fromStdString("add_new_file"));
+        emit updateFile("", QString::fromStdString(name), "", QString::fromStdString("add_new_file"));
         return type_request;
     } else if (type_request == "new_file_already_exist") {
         std::cout << "Errore file gia esistente";
@@ -168,11 +168,8 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::string toWrite = js.at("toWrite");
         int part = js.at("partToWrite");
 
-        std::unique_lock<std::mutex> lk(this->m);
-        while (this->writing != part) {
-            this->cv.wait(lk);
-        }
-        emit clearEditor();
+        if (this->writing == 0)
+            emit clearEditor();
         for (int i = 0; i < toWrite.length(); i++) {
             emit insertSymbol((maxBuffer * part) + i, toWrite[i]);
         }
@@ -182,29 +179,18 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         } else {
             this->writing++;
         }
-        this->cv.notify_one();
 
         return type_request;
     } else if (type_request == "invitation_success") {
         std::string name = std::to_string(js.at("owner").get<std::string>().size()) + '_' + js.at("owner").get<std::string>() + js.at("filename").get<std::string>();
-        emit updateFile("", QString::fromStdString(name), QString::fromStdString("add_new_file_invitation"));
+        emit updateFile("", QString::fromStdString(name), "", QString::fromStdString("add_new_file_invitation"));
         return type_request;
     } else if (type_request == "file_renamed") {
-        //file rinominato correttamente
-        //aggiorno nome file nella lista dei file
-        /*QMutableListIterator<std::string> iter1(files);
-        while(iter1.hasNext() ){
-            std::string s = iter1.next();
-            std::cout <<"\nentrato nel while dei file ";
-            if (s==js.at("oldName").get<std::string>()){
-                iter1.setValue(js.at("newName").get<std::string>());
-                break;
-            }
-        }*/
         QString res = QString::fromStdString("file_renamed");
-        emit formResultSuccess(res);
+        if(js.at("owner").get<std::string>() == this->getUser().toStdString())
+            emit formResultSuccess(res);
         // chiamare funzione che aggiorna interfaccia grafica di userPage, con nuovo nome file
-        emit updateFile(QString::fromStdString(js.at("oldName").get<std::string>()),QString::fromStdString(js.at("newName").get<std::string>()), QString::fromStdString("rename_file"));
+        emit updateFile(QString::fromStdString(js.at("oldName").get<std::string>()),QString::fromStdString(js.at("newName").get<std::string>()), QString::fromStdString(js.at("owner").get<std::string>()), QString::fromStdString("rename_file"));
     }else if(type_request == "NEW_NAME_ALREADY_EXIST"){
         QString res = QString::fromStdString("new_name_already_exist");
         emit formResultSuccess(res);
@@ -220,11 +206,11 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
                 break;
             }
         }
-
-        emit formResultSuccess(res);
+        if(js.at("owner").get<std::string>() == this->getUser().toStdString())
+            emit formResultSuccess(res);
         QString name = QString::fromStdString(js.at("name").get<std::string>());
         QString del = QString::fromStdString(js.at("owner").get<std::string>());
-        emit updateFile(name,del, QString::fromStdString("delete_file"));
+        emit updateFile(name,del, "", QString::fromStdString("delete_file"));
     }else if(type_request == "ERRORE_ELIMINAZIONE_FILE"){
         QString res = QString::fromStdString("error_file_deleted");
         emit formResultSuccess(res);

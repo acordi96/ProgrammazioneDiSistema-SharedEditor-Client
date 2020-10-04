@@ -45,7 +45,7 @@ public:
 
 signals:
     void formResultSuccess(QString result);
-    void updateFile(QString old,QString newN, QString request);
+    void updateFile(QString old,QString newN, QString owner, QString request);
     void insertSymbol(int pos, QChar c);
     void insertSymbolWithId(int participantId, int pos, QChar c);
     void eraseSymbols(int startIndex, int endIndex);
@@ -74,8 +74,6 @@ private:
     QString user;
     QString color;
     QString fileName;
-    std::condition_variable cv;
-    std::mutex m;
     int writing = 0;
 };
 
