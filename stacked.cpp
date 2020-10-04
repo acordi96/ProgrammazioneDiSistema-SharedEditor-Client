@@ -15,23 +15,14 @@ using boost::asio::ip::tcp;
 
 
 stacked::stacked(QWidget *parent) :
-        QMainWindow(parent),
-        ui(new Ui::stacked),
-        client_(new Client) {
-    // TextEdit *te = new TextEdit(client_);
-    //connect(te,&TextEdit::logout,this,&stacked::logout);
-    //connect(te,&TextEdit::closeAll,this,&stacked::closeAll);
+    QMainWindow(parent),
+    ui(new Ui::stacked),
+    client_(new Client)
+{
     QObject::connect(client_, &Client::formResultSuccess, this, &stacked::showPopupSuccess);
     setWindowTitle("SharedEditor - Login or Register");
 
-    //Userpage *up = new Userpage(this,client_);
-    //setFixedSize(1000,600);
     ui->setupUi(this);
-    //ui->stackedWidget->addWidget(up);
-    //ui->stackedWidget->addWidget(te);
-
-    //Userpage *up = new Userpage();
-    //ui->stackedWidget->addWidget(up);
 }
 
 stacked::~stacked() {
@@ -53,7 +44,6 @@ void stacked::closeEvent(QCloseEvent *e) {
     std::cout << "Messaggio da inviare al server " << msg.body() << std::endl;
     client_->write(msg);
 }
-
 /*
  *  indici
  *  0 = loginpage
@@ -110,7 +100,6 @@ void stacked::on_loginButton_clicked() {
         };
     }//else esterno
 }
-
 void stacked::sendmessage(message mess) {
     client_->write(mess);
 }
@@ -181,6 +170,7 @@ void stacked::on_form_regButton_clicked() {
             std::memcpy(msg.body(), mess.data(), msg.body_length());
             msg.body()[msg.body_length()] = '\0';
             msg.encode_header();
+            std::cout <<"Richiesta da inviare al server "<< msg.body() << std::endl;
             sendmessage(msg);
             /*
              if(requestType=="SIGNUP_OK"){
@@ -205,8 +195,6 @@ void stacked::on_form_regButton_clicked() {
     }
 }
 
-
-
 // type_request=="QUERY_ERROR"    LOGIN_ERROR
 // || type_request=="CONNESSION_ERROR" || SIGNUP_ERROR_DUPLICATE_USERNAME || SIGNUP_ERROR_INSERT_FAILED)
 
@@ -221,9 +209,10 @@ void stacked::showPopupSuccess(QString result) {
     if (result == "LOGIN_SUCCESS" || result == "SIGNUP_SUCCESS") {
         up = new Userpage(this, client_);
         te = new TextEdit(client_);
-        connect(te, &TextEdit::logout, this, &stacked::logout);
-        connect(te, &TextEdit::closeFile, this, &stacked::closeFile);
-        connect(te, &TextEdit::closeAll, this, &stacked::closeAll);
+        connect(te,&TextEdit::logout,this,&stacked::logout);
+        connect(up,&Userpage::upLogout,this,&stacked::logout);
+        connect(te,&TextEdit::closeFile,this,&stacked::closeFile);
+        connect(te,&TextEdit::closeAll,this,&stacked::closeAll);
 
         //ui->setupUi(this);
         ui->stackedWidget->addWidget(te);
@@ -397,9 +386,10 @@ void stacked::on_newFileButton_clicked(){
 void stacked::on_form_cancButton_clicked() {
     ui->stackedWidget->setCurrentIndex(0);
 }
-
-void stacked::logout() {
+void stacked::logout(){
     setWindowTitle("SharedEditor - Login or Register");
+    ui->user_log_line->clear();
+    ui->psw_log_line->clear();
     ui->stackedWidget->setCurrentIndex(0);
     //ui->stackedWidget->setCurrentIndex(3);
 }

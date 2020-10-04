@@ -55,5 +55,8 @@
         <file>images/mac/mechanical-gears-.png</file>
         <file>images/win/beach.png</file>
         <file>images/mac/beach.png</file>
+        <file>images/win/logout.png</file>
+        <file>images/mac/logout.png</file>
+        <file>images/back-arrow.png</file>
     </qresource>
 </RCC>

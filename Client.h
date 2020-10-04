@@ -43,6 +43,9 @@ public:
     QString getFileName() const;
     void setFileName(const QString &value);
 
+    QString getEmail() const;
+    void setEmail(const QString &value);
+
 signals:
     void formResultSuccess(QString result);
     void updateFile(QString old,QString newN, QString owner, QString request);
@@ -72,6 +75,7 @@ private:
 
     //cose da salvare
     QString user;
+    QString email;
     QString color;
     QString fileName;
     int writing = 0;

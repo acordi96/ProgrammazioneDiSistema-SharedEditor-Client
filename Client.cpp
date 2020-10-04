@@ -132,6 +132,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         return type_request;
     } else if (type_request == "new_file_created") {
         QString res = QString::fromStdString("new_file_created");
+        emit clearEditor();
         emit formResultSuccess(res);
         std::string name = std::to_string(this->getUser().size()) + '_' + this->getUser().toStdString() + js.at("filename").get<std::string>() + js.at("invitation").get<std::string>();
         emit updateFile("", QString::fromStdString(name), "", QString::fromStdString("add_new_file"));
@@ -269,6 +270,16 @@ void Client::do_write() {
                                      socket_.close();
                                  }
                              });
+}
+
+QString Client::getEmail() const
+{
+    return email;
+}
+
+void Client::setEmail(const QString &value)
+{
+    email = value;
 }
 
 QString Client::getFileName() const {
