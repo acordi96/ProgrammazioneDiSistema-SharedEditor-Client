@@ -68,7 +68,7 @@ void Userpage::setupRecentFiles(){
     QLabel *recentLabel = new QLabel("Recent Files",recent);
     recentLabel->setObjectName(QString::fromUtf8("recentLabel"));
     //recentLabel->setGeometry(QRect(10, 0, 281, 31));
-    recentLabel->setStyleSheet(QString::fromUtf8("font: 75 22pt \"Sawasdee Bold\";"));
+    recentLabel->setStyleSheet(QString::fromUtf8("font: 75 25pt \"Sawasdee Bold\";"));
     recentLabel->setAlignment(Qt::AlignCenter);
 
     hLayout3->addWidget(recentLabel);
@@ -77,6 +77,10 @@ void Userpage::setupRecentFiles(){
 
     QPushButton *upLogoutButton = new QPushButton(recent);
     upLogoutButton->setObjectName(QString::fromUtf8("upLogoutButton"));
+    upLogoutButton->setStyleSheet(QString::fromUtf8("QPushButton#upLogoutButton:hover{\n"
+                                                    "background-color:rgb(243,243,243);\n"
+                                                    "border:1px"
+                                                    "}"));
     //upLogoutButton->setGeometry(QRect(400,0,40,30));
 
     QIcon logoutIcon;
@@ -91,6 +95,8 @@ void Userpage::setupRecentFiles(){
     });
 
     hLayout3->addWidget(upLogoutButton);
+    QSpacerItem *vSpacer1 = new QSpacerItem(20,25,QSizePolicy::Minimum,QSizePolicy::Fixed);
+    vLayout3->addItem(vSpacer1);
     vLayout3->addLayout(hLayout3);
 
     QScrollArea *scrollArea = new QScrollArea(recent);
@@ -107,6 +113,7 @@ void Userpage::setupRecentFiles(){
     verticalLayout->setObjectName("verticalLayout");
     QLabel *title = new QLabel(QString::fromUtf8("author    title"),recent);
     title->setGeometry(QRect(10,35,281,20));
+    title->setStyleSheet(QString::fromUtf8("font: 12pt \"Sawasdee Bold\";"));
     title->setAlignment(Qt::AlignCenter);
 
     vLayout3->addWidget(title);
@@ -119,7 +126,8 @@ void Userpage::setupRecentFiles(){
          button->setText("("+QString::fromStdString(p.first.first)+"): "+QString::fromStdString(p.first.second));
          button->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                                  "border:1px;\n"
-                                                 "background-color: blue;\n"
+                                                 "background-color: rgb(0,204,204);\n"
+                                                 "font: 75 12pt \"Sawasdee Bold\";\n"
                                                  "}"));
 
          button->setFlat(true);
@@ -154,9 +162,9 @@ void Userpage::setupRecentFiles(){
     openButton->setGeometry(QRect(40,380,89,25));
     openButton->setGeometry(QRect(40, 380, 89, 25));
     openButton->setStyleSheet(QString::fromUtf8("QPushButton#openButton{\n"
-                                                "background-color:")+
-                              client_->getColor()+
-                              QString::fromUtf8(";border:1px;\n"
+                                                "background-color:rgb(0,204,204);\n"
+                                                "border:1px;\n"
+                                                "font: 12pt \"Sawasdee\";\n"
                                                 "}\n"
                                                 "QPushButton#openButton:hover{\n"
                                                 "background-color: rgb(255,0,0);\n"
@@ -170,9 +178,9 @@ void Userpage::setupRecentFiles(){
     renameButton->setObjectName(QString::fromUtf8("renameButton"));
     renameButton->setGeometry(QRect(160, 380, 89, 25));
     renameButton->setStyleSheet(QString::fromUtf8("QPushButton#renameButton{\n"
-                                                  "background-color:")+
-                                client_->getColor()+
-                                QString::fromUtf8(";border:1px;\n"
+                                                  "background-color:rgb(0,204,204);\n"
+                                                  "border:1px;\n"
+                                                  "font: 12pt \"Sawasdee\";\n"
                                                   "}\n"
                                                   "QPushButton#renameButton:hover{\n"
                                                   "background-color: rgb(255,0,0);\n"
@@ -180,33 +188,15 @@ void Userpage::setupRecentFiles(){
     renameButton->setFlat(true);
 
     grid->addWidget(renameButton,0,1,1,1);
-     renameButton->setObjectName(QString::fromUtf8("renameButton"));
-     renameButton->setGeometry(QRect(160, 380, 89, 25));
-     renameButton->setStyleSheet(QString::fromUtf8("QPushButton#renameButton{\n"
-     "border:1px;\n"
-     "}\n"
-     "QPushButton#renameButton:hover{\n"
-     "background-color: rgb(255,0,0);\n"
-     "}"));
-     renameButton->setFlat(true);
-     connect(renameButton,SIGNAL(clicked()),SLOT(on_renameButton_clicked()));
 
-     inviteButton->setObjectName(QString::fromUtf8("inviteButton"));
-     inviteButton->setGeometry(QRect(40, 430, 89, 25));
-     inviteButton->setStyleSheet(QString::fromUtf8("QPushButton#inviteButton{\n"
-     "border:1px;\n"
-     "}\n"
-     "QPushButton#inviteButton:hover{\n"
-     "background-color: rgb(255,0,0);\n"
-     "}"));
-     inviteButton->setFlat(true);
+     connect(renameButton,SIGNAL(clicked()),SLOT(on_renameButton_clicked()));
 
     deleteButton->setObjectName(QString::fromUtf8("deleteButton"));
     deleteButton->setGeometry(QRect(160, 430, 89, 25));
     deleteButton->setStyleSheet(QString::fromUtf8("QPushButton#deleteButton{\n"
-                                                  "background-color:")+
-                                client_->getColor()+
-                                QString::fromUtf8(";border:1px;\n"
+                                                  "background-color:rgb(0,204,204);\n"
+                                                  "border:1px;\n"
+                                                  "font: 12pt \"Sawasdee\";\n"
                                                   "}\n"
                                                   "QPushButton#deleteButton:hover{\n"
                                                   "background-color: rgb(255,0,0);\n"
@@ -222,9 +212,9 @@ void Userpage::setupRecentFiles(){
     inviteButton->setObjectName(QString::fromUtf8("inviteButton"));
     inviteButton->setGeometry(QRect(40, 430, 89, 25));
     inviteButton->setStyleSheet(QString::fromUtf8("QPushButton#inviteButton{\n"
-                                                  "background-color:")+
-                                client_->getColor()+
-                                QString::fromUtf8(";border:1px;\n"
+                                                  "background-color:rgb(0,204,204);\n"
+                                                  "border:1px;\n"
+                                                  "font: 12pt \"Sawasdee\";\n"
                                                   "}\n"
                                                   "QPushButton#inviteButton:hover{background-color: rgb(255,0,0);}"));
     inviteButton->setFlat(true);
@@ -256,7 +246,17 @@ void Userpage::requestLogout(){
     std::cout<<"Messaggio da inviare al server "<< msg.body() << std::endl;
     client_->write(msg);
 }
+bool Userpage::colorIsDark(QString colorStr){
+    bool val = false;
+    uint r = colorStr.mid(1,2).toUInt(&val,16);
+    uint g = colorStr.mid(3,2).toUInt(&val,16);
+    uint b = colorStr.mid(5,2).toUInt(&val,16);
 
+    int brightness = (int)sqrt((r*r*0.241)+
+                               (g*g*0.691)+
+                               (b*b*0.068));
+    return brightness<140;
+}
 void Userpage::setupUserinfo(){
 
      QVBoxLayout *userLayout = new QVBoxLayout();
@@ -265,22 +265,33 @@ void Userpage::setupUserinfo(){
      userinfo->setObjectName(QString::fromUtf8("user_info"));
      userinfo->setStyleSheet(QString::fromUtf8("background-color:rgb(255,255,255);"));
 
-
      QWidget *user_image = new QWidget(userinfo);
-     user_image->setGeometry(QRect(80, 10, 61, 51));
+     user_image->setGeometry(QRect(80, 15, 61, 51));
      user_image->setStyleSheet(QString::fromUtf8("image: url(:/images/photo_2020-09-22_17-58-05.jpg);"));
 
      QLabel *userpageLabel = new QLabel("Userpage",userinfo);
      userpageLabel->setObjectName(QString::fromUtf8("userpageLabel"));
      userpageLabel->setGeometry(QRect(160, 10, 221, 61));
-     userpageLabel->setStyleSheet(QString::fromUtf8("font: 75 25pt \"Sawasdee\";"));
-     userpageLabel->setAlignment(Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft);
+     userpageLabel->setStyleSheet(QString::fromUtf8("font: 75 25pt \"Sawasdee Bold\";"));
+     userpageLabel->setAlignment(Qt::AlignBottom|Qt::AlignLeading|Qt::AlignTop);
 
      myIcon = new QWidget(userinfo);
      myIcon->setObjectName(QString::fromUtf8("myIcon"));
      myIcon->setGeometry(QRect(80,120,101,91));
      myIcon->setStyleSheet(QString::fromUtf8("background-color:")+client_->getColor());
 
+     QLabel *usrLetters = new QLabel(client_->getUser()[0].toUpper(),myIcon);
+     usrLetters->setObjectName(QString::fromUtf8("usrLetters"));
+     usrLetters->setGeometry(5,5,90,80);
+
+     if(colorIsDark(client_->getColor())){
+        usrLetters->setStyleSheet(QString::fromUtf8("color:rgb(243,243,243);font:36pt \"Sawasdee\";"));
+     }
+     else{
+        usrLetters->setStyleSheet(QString::fromUtf8("color:rgb(0,0,0);font:36pt \"Sawasdee\";"));
+     }
+
+     usrLetters->setAlignment(Qt::AlignHCenter);
 
      QLabel *usernameLabel = new QLabel(client_->getUser(),userinfo);
      usernameLabel->setObjectName(QString::fromUtf8("usernameButton"));
@@ -288,21 +299,19 @@ void Userpage::setupUserinfo(){
      usernameLabel->setFont(QFont(QString::fromUtf8("Sawasdee"),25,60,false));
      usernameLabel->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
-
-     //QLabel *email_lab = new QLabel(client_->getEmail(),userinfo);
-     QLabel *email_lab = new QLabel("email",userinfo);
+     QLabel *email_lab = new QLabel(client_->getEmail(),userinfo);
      email_lab->setObjectName(QString::fromUtf8("email_lab"));
-     email_lab->setGeometry(QRect(230, 180, 91, 31));
+     email_lab->setGeometry(QRect(230, 180, 191, 31));
      email_lab->setStyleSheet(QString::fromUtf8("font: 14pt \"Sawasdee\";"));
      email_lab->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
      QPushButton *newFileButton = new QPushButton("New File",userinfo);
      newFileButton->setObjectName(QString::fromUtf8("newFileButton"));
-     newFileButton->setGeometry(QRect(90, 320, 121, 31));
+     newFileButton->setGeometry(QRect(160, 345, 121, 31));
      newFileButton->setStyleSheet(QString::fromUtf8("QPushButton#newFileButton{\n"
-                                                    "background-color:")+
-                                  client_->getColor()+
-                                  QString::fromUtf8(";border:1px;\n"
+                                                    "background-color:rgb(0,204,204);\n"
+                                                    "border:1px;\n"
+                                                    "font: 12pt \"Sawasdee\";\n"
                                                     "}\n"
                                                     "QPushButton#newFileButton:hover{\n"
                                                     "background-color: rgb(255,0,0);\n"
@@ -312,20 +321,20 @@ void Userpage::setupUserinfo(){
      icon.addFile(QString::fromUtf8(":/images/Science-Plus2-Math-icon.png"), QSize(), QIcon::Normal, QIcon::On);
      newFileButton->setIcon(icon);
      newFileButton->setIconSize(QSize(32, 32));
-     newFileButton->setFlat(false);
+     newFileButton->setFlat(true);
 
      this->lineURL = new QLineEdit(userinfo);
      lineURL->setObjectName(QString::fromUtf8("lineURL"));
-     lineURL->setGeometry(QRect(30,480,211,25));
+     lineURL->setGeometry(QRect(80,480,211,25));
      lineURL->setPlaceholderText(QString::fromUtf8("Insert URL here..."));
 
      QPushButton *openURLbutton = new QPushButton("Accept",userinfo);
      openURLbutton->setObjectName(QString::fromUtf8("openURLbutton"));
-     openURLbutton->setGeometry(QRect(260,480,71,25));
+     openURLbutton->setGeometry(QRect(310,480,71,25));
      openURLbutton->setStyleSheet(QString::fromUtf8("QPushButton#openURLbutton{\n"
-                                                    "background-color:")+
-                                  client_->getColor()+
-                                  QString::fromUtf8(";border:1px;\n"
+                                                    "background-color:rgb(0,204,204);\n"
+                                                    "border:1px;\n"
+                                                    "font: 12pt \"Sawasdee\";\n"
                                                     "}\n"
                                                     "QPushButton#openURLbutton:hover{\n"
                                                     "background-color: rgb(255,0,0);\n"
@@ -552,7 +561,8 @@ void Userpage::on_fileName_clicked(int i){
         QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
         deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                                 "border:1px;\n"
-                                                "background-color: blue;\n"
+                                                "background-color: rgb(0,204,204);\n"
+                                                "font: 75 12pt \"Sawasdee Bold\";\n"
                                                 "}"));
         if(selectedFile == s) {
             selectedFile = "";
@@ -603,7 +613,8 @@ void Userpage::on_openButton_clicked(){
         QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
         deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                                 "border:1px;\n"
-                                                "background-color: blue;\n"
+                                                "background-color: rgb(0,204,204);\n"
+                                                "font: 75 12pt \"Sawasdee Bold\";\n"
                                                 "}"));
 
         selectedFile = "";
@@ -727,6 +738,7 @@ void Userpage::on_renameButton_clicked() {
                 deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                                           "border:1px;\n"
                                                           "background-color: blue;\n"
+                                                          "font: 75 12pt \"Sawasdee Bold\";\n"
                                                           "}"));
                 selectedFile = "";
 
@@ -764,7 +776,8 @@ void Userpage::on_deleteButton_clicked() {
             QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
             deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                                       "border:1px;\n"
-                                                      "background-color: blue;\n"
+                                                      "background-color: rgb(0,204,204);\n"
+                                                      "font: 75 12pt \"Sawasdee Bold\";\n"
                                                       "}"));
             selectedFile = "";
             return;
@@ -807,7 +820,8 @@ void Userpage::on_deleteButton_clicked() {
             QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
             deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                                       "border:1px;\n"
-                                                      "background-color: blue;\n"
+                                                      "background-color: rgb(0,204,204);\n"
+                                                      "font: 75 12pt \"Sawasdee Bold\";\n"
                                                       "}"));
             selectedFile = "";
             return;
@@ -861,7 +875,8 @@ void Userpage::updateRecentFiles(QString old, QString newN, QString owner, QStri
         button->setText("("+QString::fromStdString(owner)+"): "+QString::fromStdString(filename));
         button->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                                 "border:1px;\n"
-                                                "background-color: blue;\n"
+                                                "background-color: rgb(0,204,204);\n"
+                                                "font: 75 12pt \"Sawasdee Bold\";\n"
                                                 "}"));
         button->setFlat(true);
         page->findChild<QVBoxLayout *>("verticalLayout")->addWidget(button);
@@ -883,7 +898,8 @@ void Userpage::updateRecentFiles(QString old, QString newN, QString owner, QStri
         button->setText("("+QString::fromStdString(owner)+"): "+QString::fromStdString(filename));
         button->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                                 "border:1px;\n"
-                                                "background-color: blue;\n"
+                                                "background-color:  rgb(0,204,204);\n"
+                                                "font: 75 12pt \"Sawasdee Bold\";\n"
                                                 "}"));
         button->setFlat(true);
         page->findChild<QVBoxLayout *>("verticalLayout")->addWidget(button);

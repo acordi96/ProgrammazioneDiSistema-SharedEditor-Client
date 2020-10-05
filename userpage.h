@@ -87,6 +87,8 @@ public slots:
 private:
     QPushButton *newFileButton;
     QLineEdit *lineURL;
+
+    bool colorIsDark(QString color);
 };
 
 #endif // USERPAGE_H

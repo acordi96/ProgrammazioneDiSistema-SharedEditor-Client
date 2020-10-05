@@ -94,6 +94,9 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::string name = js.at("username").get<std::string>();
         QString Qname = QString::fromUtf8(name.data(), name.size());
         this->setUser(Qname);
+        std::string email = js.at("email").get<std::string>();
+        QString qEmail = QString::fromUtf8(email.data(),email.size());
+        this->setEmail(qEmail);
         std::string color = js.at("colorUser").get<std::string>();
         QString Qcolor = QString::fromUtf8(color.data(), color.size());
         this->setColor(Qcolor);
