@@ -127,8 +127,8 @@ void Userpage::setupRecentFiles(){
          verticalLayout->addWidget(button);
 
          connect(button,SIGNAL(clicked()),SLOT(on_fileName_clicked()));
-         connect(button, SIGNAL(customContextMenuRequested(QPoint)),
-                 SLOT(customMenuRequested(QPoint)));
+         /*connect(button, SIGNAL(customContextMenuRequested(QPoint)),
+                 SLOT(customMenuRequested(QPoint)));*/
      }
 
     scrollAreaWidgets->setLayout(verticalLayout);
@@ -335,7 +335,6 @@ void Userpage::setupUserinfo(){
      hLayout->addLayout(userLayout);
 
      connect(newFileButton, SIGNAL (released()), this, SLOT (handleNewFileButton()));
-     connect(modifyIcon,&QPushButton::clicked,this,&Userpage::iconSelector);
      connect(openURLbutton, SIGNAL (released()), this, SLOT (handleOpenURLbutton()));
 }
 void Userpage::iconSelector(){
@@ -868,7 +867,6 @@ void Userpage::updateRecentFiles(QString old, QString newN, QString owner, QStri
         page->findChild<QVBoxLayout *>("verticalLayout")->addWidget(button);
         connect(button,SIGNAL(clicked()),SLOT(on_fileName_clicked()));
 
-        client_->files.insert({std::pair<std::string, std::string>(owner, filename), invitation});
         return;
     }
     if(request == "add_new_file_invitation") {
@@ -891,30 +889,16 @@ void Userpage::updateRecentFiles(QString old, QString newN, QString owner, QStri
         page->findChild<QVBoxLayout *>("verticalLayout")->addWidget(button);
         connect(button,SIGNAL(clicked()),SLOT(on_fileName_clicked()));
 
-        client_->files.insert({std::pair<std::string, std::string>(owner, filename), "///////////////"});
         return;
     }
     if(request == "delete_file"){ //aggiorniamo dopo una delete
         QPushButton * b = recent->findChild<QPushButton *>(QString::fromStdString(generateFileButton(newN.toStdString(), old.toStdString())));
         page->findChild<QVBoxLayout *>("verticalLayout")->removeWidget(b);
         delete b;
-
-        for(auto &iter : client_->files) {
-            if(iter.first.first == client_->getUser().toStdString() && iter.first.second == old.toStdString())
-                client_->files.erase(iter.first);
-        }
     }
     if(request == "rename_file"){ //aggiorniamo dopo rename
         recent->findChild<QPushButton *>(QString::fromStdString(generateFileButton(owner.toStdString(), old.toStdString())))->setText("("+owner +"): "+newN);
         recent->findChild<QPushButton *>(QString::fromStdString(generateFileButton(owner.toStdString(), old.toStdString())))->setObjectName(QString::fromStdString(generateFileButton(owner.toStdString(), newN.toStdString())));
-
-        for(auto &iter : client_->files) {
-            if(iter.first.first == owner.toStdString() && iter.first.second == old.toStdString()) {
-                client_->files.insert({std::pair<std::string, std::string>(iter.first.first, newN.toStdString()), iter.second});
-                client_->files.erase(iter.first);
-                break;
-            }
-        }
     }
 
 }
@@ -942,12 +926,20 @@ void Userpage::on_inviteButton_clicked() {
     std::pair<std::string, std::string> parsed = parseFileButton(selectedFile);
     std::string owner = parsed.first;
     std::string filename = parsed.second;
-    if(selectedFile=="" || owner != client_->getUser().toStdString()){
+    if(selectedFile==""){
         //nessun file selezionato
         QMessageBox::information(
                 this,
                 tr("Hey!"),
                 tr("Select a file") );
+        return;
+    }
+    if(owner != client_->getUser().toStdString()){
+        //nessun file selezionato
+        QMessageBox::information(
+                this,
+                tr("Hey!"),
+                tr("You must be the owner in order to invite") );
         return;
     }
     const char * code;

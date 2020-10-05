@@ -132,8 +132,8 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         return type_request;
     } else if (type_request == "new_file_created") {
         QString res = QString::fromStdString("new_file_created");
-        emit clearEditor();
         emit formResultSuccess(res);
+        emit clearEditor();
         std::string name = std::to_string(this->getUser().size()) + '_' + this->getUser().toStdString() + js.at("filename").get<std::string>() + js.at("invitation").get<std::string>();
         emit updateFile("", QString::fromStdString(name), "", QString::fromStdString("add_new_file"));
         return type_request;
@@ -184,10 +184,18 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         return type_request;
     } else if (type_request == "invitation_success") {
         std::string name = std::to_string(js.at("owner").get<std::string>().size()) + '_' + js.at("owner").get<std::string>() + js.at("filename").get<std::string>();
+        files.insert({std::pair<std::string, std::string>(js.at("owner").get<std::string>(), js.at("filename").get<std::string>()), "///////////////"});
         emit updateFile("", QString::fromStdString(name), "", QString::fromStdString("add_new_file_invitation"));
         return type_request;
     } else if (type_request == "file_renamed") {
         QString res = QString::fromStdString("file_renamed");
+        for(auto &iter : files) {
+            if(iter.first.first == js.at("owner").get<std::string>() && iter.first.second == js.at("oldName").get<std::string>()) {
+                files.insert({std::pair<std::string, std::string>(iter.first.first, js.at("newName").get<std::string>()), iter.second});
+                files.erase(iter.first);
+                break;
+            }
+        }
         if(js.at("owner").get<std::string>() == this->getUser().toStdString())
             emit formResultSuccess(res);
         // chiamare funzione che aggiorna interfaccia grafica di userPage, con nuovo nome file
@@ -198,19 +206,17 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
 
     }else if(type_request == "file_deleted"){
         QString res = QString::fromStdString("file_deleted");
-        std::map<std::pair<std::string, std::string>, std::string> :: iterator iter;
-        for (iter = files.begin(); iter != files.end(); iter++){
-            //std::cout << "\n\n file:  " << iter->first << "  " << iter->second;
-            if(iter->first.first == this->user.toStdString() && iter->first.second == js.at("name").get<std::string>()){
-                // elimino il file
-                files.erase(iter);
-                break;
-            }
-        }
+
         if(js.at("owner").get<std::string>() == this->getUser().toStdString())
             emit formResultSuccess(res);
         QString name = QString::fromStdString(js.at("name").get<std::string>());
         QString del = QString::fromStdString(js.at("owner").get<std::string>());
+        for(auto &iter : files) {
+            if(iter.first.first == js.at("owner").get<std::string>() && iter.first.second == js.at("name").get<std::string>()) {
+                files.erase(iter.first);
+                break;
+            }
+        }
         emit updateFile(name,del, "", QString::fromStdString("delete_file"));
     }else if(type_request == "ERRORE_ELIMINAZIONE_FILE"){
         QString res = QString::fromStdString("error_file_deleted");
