@@ -45,7 +45,7 @@
 #endif
 #endif
 
-#include "textedit.h"
+#include "Headers/textedit.h"
 
 #ifdef Q_OS_MACOS
 const QString rsrcPath = ":/images/mac";
@@ -985,7 +985,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev){
                     else{
                         pos = cursor.position();
                     }
-                    char c = key_ev->text().toStdString().c_str()[0];
+                    char c = key_ev->text().toStdString().c_str()[0]; //TODO: prende il tasto che schiaccio
                      /* update char format
                      * QCharFormat form;
                      * form.set{quello_che c'è da settare}(valorechedeveaver);

@@ -2,11 +2,11 @@
 // Created by Sam on 22/apr/2020.
 //
 
-//#define serverRoute "93.43.250.236"
-#define serverRoute "127.0.0.1"
+#define serverRoute "93.43.250.236"
+//#define serverRoute "127.0.0.1"
 
 #include <QtWidgets/QMessageBox>
-#include "Client.h"
+#include "Headers/Client.h"
 
 Client::Client()
         : work_(new boost::asio::io_context::work(io_context_)),

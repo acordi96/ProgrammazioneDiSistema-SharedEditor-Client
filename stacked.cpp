@@ -1,4 +1,4 @@
-#include "stacked.h"
+#include "Headers/stacked.h"
 #include "ui_stacked.h"
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -6,8 +6,8 @@
 #include <iostream>
 #include <boost/asio.hpp>
 #include <QtWidgets/QInputDialog>
-#include "json.hpp"
-#include "lib/md5.h"
+#include "Libs/json.hpp"
+#include "Libs/md5.h"
 #include <QDesktopWidget>
 
 using json = nlohmann::json;

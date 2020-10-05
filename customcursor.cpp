@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include "customcursor.h"
+#include "Headers/customcursor.h"
 
 CustomCursor::CustomCursor():position(0),hasSelection(false),reverseSelection(false),selectionStart(0),selectionEnd(0){
 }

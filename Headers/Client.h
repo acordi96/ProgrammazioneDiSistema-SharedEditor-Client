@@ -9,7 +9,7 @@
 #include <QTimer>
 #include <memory>
 #include <boost/asio.hpp>
-#include "json.hpp"
+#include "Libs/json.hpp"
 #include "message.h"
 #include <QColor>
 #ifndef PROGETTO_PROVA_CLIENT_H

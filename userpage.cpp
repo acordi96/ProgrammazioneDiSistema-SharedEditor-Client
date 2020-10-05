@@ -1,6 +1,6 @@
-#include "userpage.h"
-#include "Client.h"
-#include "stacked.h"
+#include "Headers/userpage.h"
+#include "Headers/Client.h"
+#include "Headers/stacked.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>

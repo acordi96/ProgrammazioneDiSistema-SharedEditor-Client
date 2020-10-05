@@ -24,11 +24,12 @@ list(APPEND LIBRARIES
         Qt5::PrintSupport
         Qt5::Sql)
 list(REMOVE_DUPLICATES LIBRARIES)
-add_executable(progetto_prova main.cpp prova.pro prova.pro.user textedit.cpp textedit.h
-        stacked.h stacked.cpp Client.cpp Client.h message.cpp message.h
-        userpage.cpp userpage.h
-        lib/md5.cpp lib/md5.h
-        customcursor.h customcursor.cpp
+add_executable(progetto_prova main.cpp prova.pro prova.pro.user textedit.cpp Headers/textedit.h
+        Headers/stacked.h stacked.cpp Client.cpp Headers/Client.h message.cpp Headers/message.h
+        userpage.cpp Headers/userpage.h
+        Libs/md5.cpp Libs/md5.h
+        Headers/customcursor.h customcursor.cpp
+        Headers/Symbol.h Symbol.cpp
         project_icons.qrc)
 
 #target_link_libraries(DBMSProject ${Boost_LIBRARIES})  # that didn't work

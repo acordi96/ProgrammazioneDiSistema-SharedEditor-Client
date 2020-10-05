@@ -1,5 +1,5 @@
-#include "registrationform.h"
-#include "stacked.h"
+#include "Headers/registrationform.h"
+#include "Headers/stacked.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
