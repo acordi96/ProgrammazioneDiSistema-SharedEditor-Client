@@ -77,13 +77,13 @@ TextEdit::TextEdit(Client* c, QWidget *parent)
     setupFileActions();
     setupConnectedUsers();
 
-    {
+    /*{
         QMenu *userMenu = menuBar()->addMenu(client_->getUser());
         userMenu->addAction(tr("Logout"),this,[=](){
             requestLogout();
             emit this->logout();
         });
-    }
+    }*/
     QFont textFont("Helvetica");
     textFont.setStyleHint(QFont::SansSerif);
     textEdit->setFont(textFont);
@@ -154,11 +154,14 @@ void TextEdit::closingFile(){
 
 void TextEdit::setupFileActions()
 {
-
-
+        QToolBar *tb = addToolBar(tr("File Actions"));
 
         const QIcon backIcon = QIcon::fromTheme("go-back",QIcon(rsrcPath+"/left-arrow.png"));
-
+        QAction *a = tb->addAction(backIcon,tr("&Close File"),this,[=](){
+            closingFile();
+            emit this->closeFile();
+        });
+/*
         QPushButton *goback = new QPushButton(menuBar());
         goback->setIcon(backIcon);
         goback->setFlat(true);
@@ -172,10 +175,11 @@ void TextEdit::setupFileActions()
             //look for better solution
             QMenu *space=menuBar()->addMenu(tr("   "));
      }
+
     QMenu *menu = menuBar()->addMenu(tr("&File"));
 
     const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(rsrcPath + "/filenew.png"));
-    QAction *a = menu->addAction(newIcon,  tr("&New"), this, &TextEdit::fileNew);
+    a = menu->addAction(newIcon,  tr("&New"), this, &TextEdit::fileNew);
 
     a->setPriority(QAction::LowPriority);
     a->setShortcut(QKeySequence::New);
@@ -188,27 +192,27 @@ void TextEdit::setupFileActions()
     menu->addSeparator();
 
     menu->addSeparator();
-
+*/
 #ifndef QT_NO_PRINTER
 
     const QIcon exportPdfIcon = QIcon::fromTheme("exportpdf", QIcon(rsrcPath + "/exportpdf.png"));
-    a = menu->addAction(exportPdfIcon, tr("&Export PDF..."), this, &TextEdit::filePrintPdf);
+    a = tb->addAction(exportPdfIcon, tr("&Export PDF..."), this, &TextEdit::filePrintPdf);
     a->setPriority(QAction::LowPriority);
     a->setShortcut(Qt::CTRL + Qt::Key_D);
     //tb->addAction(a);
 
-    menu->addSeparator();
+    //menu->addSeparator();
 #endif
-    const QIcon quitIcon = QIcon::fromTheme("quit",QIcon(rsrcPath + "/cancel-icon.png"));
-    a = menu->addAction(tr("&Quit"), this,[=](){
+    const QIcon quitIcon = QIcon::fromTheme("quit",QIcon(rsrcPath + "/logout.png"));
+    a = tb->addAction(quitIcon,tr("&Logout"), this,[=](){
         requestLogout();
         emit this->closeAll();
     });
     a->setShortcut(Qt::CTRL + Qt::Key_Q);
 
 
-    const QIcon profileIcon = QIcon::fromTheme("profile",QIcon(rsrcPath + "/user.png"));
-    a = menu->addAction(profileIcon,tr("&Userpage"),this,[=](){emit this->closeFile();});
+    //const QIcon profileIcon = QIcon::fromTheme("profile",QIcon(rsrcPath + "/user.png"));
+    //a = menu->addAction(profileIcon,tr("&Userpage"),this,[=](){emit this->closeFile();});
 
 }
 
@@ -810,7 +814,6 @@ void TextEdit::showSymbolWithId(int id, int pos, QChar c) {
     //qDebug()<< "Written in pos: "<< pos << endl;
     textEdit->setFocus();
 }
-
 
 void TextEdit::showSymbol(int pos, QChar c) {
     QTextCharFormat format;
