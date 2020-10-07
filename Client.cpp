@@ -351,17 +351,19 @@ std::vector<int> Client::insertSymbolNewCRDT(int index, char character, std::str
 //aggiunge al crdt un symbol sulla base del vettore posizione
 int Client::generateIndexCRDT(Symbol symbol, int iter, int start, int end) { //inserisci symbol gia' generato in un vettore di symbol nel posto giusto
     if(start == -1 && end == -1) {
-        if(symbol.getPosizione()[0] < this->symbolsPerFile.at(filename)[0].getPosizione()[0])
+        if(this->symbols.empty())
+            return 0;
+        if(symbol.getPosizione()[0] < this->symbols[0].getPosizione()[0])
             return 0;
         start = 0;
-        end = this->symbolsPerFile.at(filename).size();
+        end = this->symbols.size();
     }
     if(start == end) {
         return iter;
     }
     int newStart = -1;
     int newEnd = start;
-    for(auto iterPositions = this->symbolsPerFile.at(filename).begin() + start; iterPositions != this->symbolsPerFile.at(filename).begin() + end; ++iterPositions) {
+    for(auto iterPositions = this->symbols.begin() + start; iterPositions != this->symbols.begin() + end; ++iterPositions) {
         if(iterPositions->getPosizione().size() > iter && symbol.getPosizione().size() > iter) {
             if(iterPositions->getPosizione()[iter] == symbol.getPosizione()[iter] && newStart == -1)
                 newStart = newEnd;
@@ -369,7 +371,7 @@ int Client::generateIndexCRDT(Symbol symbol, int iter, int start, int end) { //i
                 if (newStart == -1)
                     return newEnd;
                 else
-                    return generateIndexCRDT(symbol, filename, ++iter, newStart, newEnd);
+                    return generateIndexCRDT(symbol, ++iter, newStart, newEnd);
             }
         }
         newEnd++;
@@ -400,6 +402,7 @@ std::pair<int, int> Client::eraseSymbolCRDT(Symbol symbolStart, Symbol symbolEnd
             end++;
         }
     }
+    return {-1, -1};
 }
 
 //genera nuovo vettore posizione per un nuovo symbol
@@ -440,4 +443,16 @@ std::vector<int> Client::generatePosBetween(std::vector<int> pos1, std::vector<i
             return newPos;
         }
     }
+    return std::vector<int>();
+}
+
+void Client::sendAtServer(const json& js) {
+    std::string msg = js.dump().c_str();
+    message mess;
+    mess.body_length(msg.size());
+    std::memcpy(mess.body(), msg.data(), mess.body_length());
+    mess.body()[mess.body_length()] = '\0';
+    mess.encode_header();
+    std::cout <<"Messaggio da inviare al server: "<< mess.body() << std::endl;
+    this->write(mess);
 }

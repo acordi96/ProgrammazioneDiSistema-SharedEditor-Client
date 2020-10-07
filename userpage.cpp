@@ -237,14 +237,8 @@ void Userpage::requestLogout(){
              {"operation","req_logout"},
              {"username",client_->getUser().toStdString()},
     };
-    std::string mess = j.dump().c_str();
-    message msg;
-    msg.body_length(mess.size());
-    std::memcpy(msg.body(),mess.data(),msg.body_length());
-    msg.body()[msg.body_length()]='\0';
-    msg.encode_header();
-    std::cout<<"Messaggio da inviare al server "<< msg.body() << std::endl;
-    client_->write(msg);
+    client_->sendAtServer(j);
+
 }
 bool Userpage::colorIsDark(QString colorStr){
     bool val = false;

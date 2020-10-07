@@ -72,6 +72,8 @@ public:
 
     std::vector<int> generatePosBetween(std::vector<int> pos1, std::vector<int> pos2, std::vector<int> newPos);
 
+    void sendAtServer(const json& js);
+
 signals:
 
     void formResultSuccess(QString result);

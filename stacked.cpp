@@ -35,14 +35,8 @@ void stacked::closeEvent(QCloseEvent *e) {
             {"operation", "req_logout"},
             {"username",  ""}
     };
-    std::string mess = j.dump().c_str();
-    message msg;
-    msg.body_length(mess.size());
-    std::memcpy(msg.body(), mess.data(), msg.body_length());
-    msg.body()[msg.body_length()] = '\0';
-    msg.encode_header();
-    std::cout << "Messaggio da inviare al server " << msg.body() << std::endl;
-    client_->write(msg);
+    client_->sendAtServer(j);
+
 }
 /*
  *  indici
