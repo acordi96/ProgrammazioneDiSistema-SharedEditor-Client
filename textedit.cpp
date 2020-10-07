@@ -757,7 +757,6 @@ void TextEdit::showSymbolWithId(int id, int pos, QChar c) {
     int oldPos = pos < cur.position() ? cur.position() + 1 : cur.position();
 
     if (cur.hasSelection() && pos == endIndex) {
-        qDebug() << cur.selectedText();
 
         int startIndex = cur.selectionStart();
 
@@ -795,7 +794,6 @@ void TextEdit::showSymbol(int pos, QChar c) {
     int oldPos = pos < cur.position() ? cur.position() + 1 : cur.position();
 
     if (cur.hasSelection() && pos == endIndex) {
-        qDebug() << cur.selectedText();
 
         int startIndex = cur.selectionStart();
 
@@ -871,7 +869,6 @@ void TextEdit::localInsert() {
         //insert char
         cur.movePosition(QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor, 1);
         c = cur.selectedText().toStdString().c_str()[0];
-        qDebug() << c;
     }
 
     //TODO: cos'e'?
@@ -889,12 +886,15 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
     if (ev->type() == QEvent::KeyPress) {
         QKeyEvent *key_ev = static_cast<QKeyEvent *>(ev);
         int key = key_ev->key();
-        std::cout << "CRDT: ";
+        std::cout << "CRDT: " << std::flush;
         for(auto iterPositions = client_->symbols.begin(); iterPositions != client_->symbols.end(); ++iterPositions) {
-            std::cout << "[" << iterPositions->getCharacter() << " ";
+            if(iterPositions->getCharacter() != 10 && iterPositions->getCharacter() != 13)
+                std::cout << "[" << (int)iterPositions->getCharacter() << "(" << iterPositions->getCharacter()  << ") - " << std::flush;
+            else
+                std::cout << "[" << (int)iterPositions->getCharacter() << "(\\n) - " << std::flush;
             for(int i = 0; i < iterPositions->getPosizione().size(); i++)
-                std::cout << std::to_string(iterPositions->getPosizione()[i]);
-            std::cout << "]";
+                std::cout << std::to_string(iterPositions->getPosizione()[i]) << std::flush;
+            std::cout << "]" << std::flush;
         }
         std::cout << std::endl;
         if (obj == textEdit) {
@@ -908,6 +908,9 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     key_ev->text().toStdString().c_str()[0] != 1) {
                     startIndex = cursor.selectionStart();
                     endIndex = cursor.selectionEnd();
+                    pos = startIndex;
+
+                    std::cout << "SELECTION: " << std::to_string(startIndex) << " - " << std::to_string(endIndex) << std::endl;
 
                     cursor.beginEditBlock();
                     cursor.setPosition(startIndex, QTextCursor::MoveAnchor);
@@ -916,7 +919,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     cursor.endEditBlock();
 
                     Symbol symbolStart = client_->symbols[startIndex];
-                    Symbol symbolEnd = client_->symbols[endIndex];
+                    Symbol symbolEnd = client_->symbols[endIndex - 1];
                     client_->eraseSymbolCRDT(symbolStart, symbolEnd);
 
                     json j = json{
@@ -1055,7 +1058,6 @@ void TextEdit::eraseSymbols(int start, int end) {
 
     cur.endEditBlock();
 
-    qDebug() << "deleted char ranges " << endl;
     textEdit->setFocus();
 }
 

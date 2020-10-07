@@ -47,7 +47,7 @@ Userpage::Userpage(QWidget *parent,Client *c):
 
 void Userpage::setupRecentFiles(){
     recent = new QWidget(page);
-    recent->setObjectName(QString::fromUtf8("Recent Files"));
+    recent->setObjectName(QString::fromUtf8("Files"));
     QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
     recent->setMinimumSize(QSize(500,580));
     sizePolicy1.setHorizontalStretch(0);

@@ -74,7 +74,7 @@ void Client::do_read_body() {
                                     std::string requestType = messageFromClient.at("response").get<std::string>();
                                     std::string response;
                                     //try {
-                                        response = handleRequestType(messageFromClient, requestType);
+                                    response = handleRequestType(messageFromClient, requestType);
                                     /*} catch (...) {
                                         std::cout << "GENERIC ERROR HandleRequest of: " << messageFromClient
                                                   << std::endl;
@@ -95,7 +95,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         QString Qname = QString::fromUtf8(name.data(), name.size());
         this->setUser(Qname);
         std::string email = js.at("email").get<std::string>();
-        QString qEmail = QString::fromUtf8(email.data(),email.size());
+        QString qEmail = QString::fromUtf8(email.data(), email.size());
         this->setEmail(qEmail);
         std::string color = js.at("colorUser").get<std::string>();
         QString Qcolor = QString::fromUtf8(color.data(), color.size());
@@ -118,9 +118,13 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         emit formResultSuccess(res);
     } else if (type_request == "insert_res") {
         //prendo simbolo da inserire dal json
-        Symbol newSymbol(js.at("char").get<char>(), js.at("username").get<std::string>(), js.at("crdt").get<std::vector<int>>());
-        //inserisco nel crdt e prendo indice
+        Symbol newSymbol(js.at("char").get<char>(), js.at("username").get<std::string>(),
+                         js.at("crdt").get<std::vector<int>>());
+        //genero indice nel crdt
         int index = this->generateIndexCRDT(newSymbol, 0, -1, -1);
+        std::cout << "INDEX: " << std::to_string(index) << std::endl;
+        //inserisco symbol nel crdt
+        this->insertSymbolIndex(newSymbol, index);
         //emetto per inserimento nel testo
         emit insertSymbol(index, newSymbol.getCharacter());
         return type_request;
@@ -132,14 +136,17 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
                          js.at("crdtEnd").get<std::vector<int>>());
         //cancello dal crdt symbols compresi tra i due e prendo indici
         std::pair<int, int> indexesStartEnd = this->eraseSymbolCRDT(symbolStart, symbolEnd);
+        std::cout << "PAIR: " << std::to_string(indexesStartEnd.first) << " " << std::to_string(indexesStartEnd.second)
+                  << std::endl;
         //emetto per aggiornamento testo con gli indici
-        emit eraseSymbols(indexesStartEnd.first, indexesStartEnd.second);
+        emit eraseSymbols(indexesStartEnd.first, indexesStartEnd.second + 1);
         return type_request;
     } else if (type_request == "new_file_created") {
         QString res = QString::fromStdString("new_file_created");
         emit formResultSuccess(res);
         emit clearEditor();
-        std::string name = std::to_string(this->getUser().size()) + '_' + this->getUser().toStdString() + js.at("filename").get<std::string>() + js.at("invitation").get<std::string>();
+        std::string name = std::to_string(this->getUser().size()) + '_' + this->getUser().toStdString() +
+                           js.at("filename").get<std::string>() + js.at("invitation").get<std::string>();
         emit updateFile("", QString::fromStdString(name), "", QString::fromStdString("add_new_file"));
         return type_request;
     } else if (type_request == "new_file_already_exist") {
@@ -175,11 +182,11 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
 
         //prima parte di file deve pulire il testo
         if (this->writing == 0)
-            emit clearEditor();
+                emit clearEditor();
         //per ogni carattere ametti di scriverlo
         for (int i = 0; i < toWrite.length(); i++) {
             //creo symbol e aggiungo al crdt
-            this->insertSymbolNewCRDT((maxBuffer * part) + i, toWrite[i], this->getUser().toStdString());
+            this->insertSymbolNewCRDT((maxBuffer * part) + i, toWrite[i], "");
             //emetto di scrivere il carattere sul testo
             emit insertSymbol((maxBuffer * part) + i, toWrite[i]);
         }
@@ -192,51 +199,61 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
 
         return type_request;
     } else if (type_request == "invitation_success") {
-        std::string name = std::to_string(js.at("owner").get<std::string>().size()) + '_' + js.at("owner").get<std::string>() + js.at("filename").get<std::string>();
-        files.insert({std::pair<std::string, std::string>(js.at("owner").get<std::string>(), js.at("filename").get<std::string>()), "///////////////"});
+        std::string name =
+                std::to_string(js.at("owner").get<std::string>().size()) + '_' + js.at("owner").get<std::string>() +
+                js.at("filename").get<std::string>();
+        files.insert({std::pair<std::string, std::string>(js.at("owner").get<std::string>(),
+                                                          js.at("filename").get<std::string>()), "///////////////"});
         emit updateFile("", QString::fromStdString(name), "", QString::fromStdString("add_new_file_invitation"));
         return type_request;
     } else if (type_request == "file_renamed") {
         QString res = QString::fromStdString("file_renamed");
-        for(auto &iter : files) {
-            if(iter.first.first == js.at("owner").get<std::string>() && iter.first.second == js.at("oldName").get<std::string>()) {
-                files.insert({std::pair<std::string, std::string>(iter.first.first, js.at("newName").get<std::string>()), iter.second});
+        for (auto &iter : files) {
+            if (iter.first.first == js.at("owner").get<std::string>() &&
+                iter.first.second == js.at("oldName").get<std::string>()) {
+                files.insert(
+                        {std::pair<std::string, std::string>(iter.first.first, js.at("newName").get<std::string>()),
+                         iter.second});
                 files.erase(iter.first);
                 break;
             }
         }
-        if(js.at("owner").get<std::string>() == this->getUser().toStdString())
-            emit formResultSuccess(res);
+        if (js.at("owner").get<std::string>() == this->getUser().toStdString())
+                emit formResultSuccess(res);
         // chiamare funzione che aggiorna interfaccia grafica di userPage, con nuovo nome file
-        emit updateFile(QString::fromStdString(js.at("oldName").get<std::string>()),QString::fromStdString(js.at("newName").get<std::string>()), QString::fromStdString(js.at("owner").get<std::string>()), QString::fromStdString("rename_file"));
-    }else if(type_request == "NEW_NAME_ALREADY_EXIST"){
+        emit updateFile(QString::fromStdString(js.at("oldName").get<std::string>()),
+                        QString::fromStdString(js.at("newName").get<std::string>()),
+                        QString::fromStdString(js.at("owner").get<std::string>()),
+                        QString::fromStdString("rename_file"));
+    } else if (type_request == "NEW_NAME_ALREADY_EXIST") {
         QString res = QString::fromStdString("new_name_already_exist");
         emit formResultSuccess(res);
 
-    }else if(type_request == "file_deleted"){
+    } else if (type_request == "file_deleted") {
         QString res = QString::fromStdString("file_deleted");
 
-        if(js.at("owner").get<std::string>() == this->getUser().toStdString())
-            emit formResultSuccess(res);
+        if (js.at("owner").get<std::string>() == this->getUser().toStdString())
+                emit formResultSuccess(res);
         QString name = QString::fromStdString(js.at("name").get<std::string>());
         QString del = QString::fromStdString(js.at("owner").get<std::string>());
-        for(auto &iter : files) {
-            if(iter.first.first == js.at("owner").get<std::string>() && iter.first.second == js.at("name").get<std::string>()) {
+        for (auto &iter : files) {
+            if (iter.first.first == js.at("owner").get<std::string>() &&
+                iter.first.second == js.at("name").get<std::string>()) {
                 files.erase(iter.first);
                 break;
             }
         }
-        emit updateFile(name,del, "", QString::fromStdString("delete_file"));
-    }else if(type_request == "ERRORE_ELIMINAZIONE_FILE"){
+        emit updateFile(name, del, "", QString::fromStdString("delete_file"));
+    } else if (type_request == "ERRORE_ELIMINAZIONE_FILE") {
         QString res = QString::fromStdString("error_file_deleted");
         emit formResultSuccess(res);
-    }else if(type_request == "FILE_IN_USE"){
+    } else if (type_request == "FILE_IN_USE") {
         QString res = QString::fromStdString("error_file_in_use");
         emit formResultSuccess(res);
-    }else if(type_request == "FILE_IN_USE_D"){
+    } else if (type_request == "FILE_IN_USE_D") {
         QString res = QString::fromStdString("error_file_in_use_d");
         emit formResultSuccess(res);
-    }else if(type_request == "update_participants"){
+    } else if (type_request == "update_participants") {
         std::vector<int> othersOnFile;
         std::vector<std::string> colors;
         std::vector<std::string> usernames;
@@ -244,14 +261,14 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         colors = js.at("colorsList").get<std::vector<std::string>>();
         usernames = js.at("usernames").get<std::vector<std::string>>();
         int j = 0;
-        for(auto u:usernames) {
+        for (auto u:usernames) {
             QString username = QString::fromStdString(u);
             emit insertParticipant(othersOnFile[j], username);
             j++;
         }
 
         int i = 0;
-        for(auto c:colors) {
+        for (auto c:colors) {
             QString color = QString::fromStdString(c);
             emit updateCursorParticipant(othersOnFile[i], color);
             i++;
@@ -287,13 +304,11 @@ void Client::do_write() {
                              });
 }
 
-QString Client::getEmail() const
-{
+QString Client::getEmail() const {
     return email;
 }
 
-void Client::setEmail(const QString &value)
-{
+void Client::setEmail(const QString &value) {
     email = value;
 }
 
@@ -321,15 +336,16 @@ void Client::setColor(const QString &color) {
     Client::color = color;
 }
 
-void Client::setFiles(const std::vector<std::string>& owners, const std::vector<std::string>& filenames, const std::vector<std::string>& invitations) {
+void Client::setFiles(const std::vector<std::string> &owners, const std::vector<std::string> &filenames,
+                      const std::vector<std::string> &invitations) {
 
-    for(int i = 0; i < owners.size(); i++) {
+    for (int i = 0; i < owners.size(); i++) {
         files.insert({std::pair<std::string, std::string>(owners[i], filenames[i]), invitations[i]});
     }
 }
 
 //crea un nuovo symbol e lo inserisce nel crdt in posizione index
-std::vector<int> Client::insertSymbolNewCRDT(int index, char character, std::string username) {
+std::vector<int> Client::insertSymbolNewCRDT(int index, char character, const std::string &username) {
     std::vector<int> vector;
     if (this->symbols.empty()) {
         vector = {0};
@@ -341,7 +357,7 @@ std::vector<int> Client::insertSymbolNewCRDT(int index, char character, std::str
         vector = {this->symbols.front().getPosizione().at(0) - 1};
     } else
         vector = generatePos(index);
-    Symbol s(character, this->getUser().toStdString(), vector);
+    Symbol s(character, username, vector);
 
     this->symbols.insert(this->symbols.begin() + index, s);
 
@@ -349,25 +365,27 @@ std::vector<int> Client::insertSymbolNewCRDT(int index, char character, std::str
 }
 
 //aggiunge al crdt un symbol sulla base del vettore posizione
-int Client::generateIndexCRDT(Symbol symbol, int iter, int start, int end) { //inserisci symbol gia' generato in un vettore di symbol nel posto giusto
-    if(start == -1 && end == -1) {
-        if(this->symbols.empty())
+int Client::generateIndexCRDT(Symbol symbol, int iter, int start,
+                              int end) { //inserisci symbol gia' generato in un vettore di symbol nel posto giusto
+    if (start == -1 && end == -1) {
+        if (this->symbols.empty())
             return 0;
-        if(symbol.getPosizione()[0] < this->symbols[0].getPosizione()[0])
+        if (symbol.getPosizione()[0] < this->symbols[0].getPosizione()[0])
             return 0;
         start = 0;
         end = this->symbols.size();
     }
-    if(start == end) {
+    if (start == end) {
         return iter;
     }
     int newStart = -1;
     int newEnd = start;
-    for(auto iterPositions = this->symbols.begin() + start; iterPositions != this->symbols.begin() + end; ++iterPositions) {
-        if(iterPositions->getPosizione().size() > iter && symbol.getPosizione().size() > iter) {
-            if(iterPositions->getPosizione()[iter] == symbol.getPosizione()[iter] && newStart == -1)
+    for (auto iterPositions = this->symbols.begin() + start;
+         iterPositions != this->symbols.begin() + end; ++iterPositions) {
+        if (iterPositions->getPosizione().size() > iter && symbol.getPosizione().size() > iter) {
+            if (iterPositions->getPosizione()[iter] == symbol.getPosizione()[iter] && newStart == -1)
                 newStart = newEnd;
-            if(iterPositions->getPosizione()[iter] > symbol.getPosizione()[iter]) {
+            if (iterPositions->getPosizione()[iter] > symbol.getPosizione()[iter]) {
                 if (newStart == -1)
                     return newEnd;
                 else
@@ -381,19 +399,23 @@ int Client::generateIndexCRDT(Symbol symbol, int iter, int start, int end) { //i
 
 //rimuove dal crdt uno specifico symbol
 std::pair<int, int> Client::eraseSymbolCRDT(Symbol symbolStart, Symbol symbolEnd) {
+    if (this->symbols[0] == symbolStart && this->symbols[this->symbols.size() - 1] == symbolEnd) {
+        int size = this->symbols.size() - 1;
+        this->symbols.clear();
+        return {0, size};
+    }
     bool foundStart = false;
     std::pair<int, int> result;
     int start = 0;
     int end = 0;
-    for(auto iter = this->symbols.begin(); iter != this->symbols.end(); ++iter) {
-        if(*iter == symbolEnd) {
-            if(symbolStart == symbolEnd)
-                this->symbols.erase(iter);
+    for (auto iter = this->symbols.begin(); iter != this->symbols.end(); ++iter) {
+        if (*iter == symbolEnd) {
+            this->symbols.erase(iter);
             return {start, end};
         }
-        if(symbolStart == *iter)
+        if (symbolStart == *iter)
             foundStart = true;
-        if(foundStart) {
+        if (foundStart) {
             this->symbols.erase(iter);
             iter--;
             end++;
@@ -405,9 +427,21 @@ std::pair<int, int> Client::eraseSymbolCRDT(Symbol symbolStart, Symbol symbolEnd
     return {-1, -1};
 }
 
+void Client::insertSymbolIndex(const Symbol &symbol, int index) {
+    int i = 0;
+    for (auto iterPositions = this->symbols.begin(); iterPositions != this->symbols.end(); ++iterPositions) {
+        if (index == i) {
+            this->symbols.insert(iterPositions, symbol);
+            return;
+        }
+        i++;
+    }
+    this->symbols.insert(this->symbols.end(), symbol);
+}
+
 //genera nuovo vettore posizione per un nuovo symbol
 std::vector<int> Client::generatePos(int index) {
-    const std::vector<int> posBefore = symbols[index-1].getPosizione();
+    const std::vector<int> posBefore = symbols[index - 1].getPosizione();
     const std::vector<int> posAfter = symbols[index].getPosizione();
     std::vector<int> newPos;
     return generatePosBetween(posBefore, posAfter, newPos);
@@ -418,41 +452,39 @@ std::vector<int> Client::generatePosBetween(std::vector<int> pos1, std::vector<i
     int id1 = pos1.at(0);
     int id2 = pos2.at(0);
 
-    if(id2 - id1 == 0) {
+    if (id2 - id1 == 0) {
         newPos.push_back(id1);
         pos1.erase(pos1.begin());
         pos2.erase(pos2.begin());
-        if(pos1.empty()) {
-            newPos.push_back(pos2.front()-1);
+        if (pos1.empty()) {
+            newPos.push_back(pos2.front() - 1);
             return newPos;
         } else
             return generatePosBetween(pos1, pos2, newPos);
-    }
-    else if(id2 - id1 > 1) {
-        newPos.push_back(pos1.front()+1);
+    } else if (id2 - id1 > 1) {
+        newPos.push_back(pos1.front() + 1);
         return newPos;
-    }
-    else if(id2 - id1 == 1) {
+    } else if (id2 - id1 == 1) {
         newPos.push_back(id1);
         pos1.erase(pos1.begin());
-        if(pos1.empty()) {
+        if (pos1.empty()) {
             newPos.push_back(0); //
             return newPos;
         } else {
-            newPos.push_back(pos1.front()+1);
+            newPos.push_back(pos1.front() + 1);
             return newPos;
         }
     }
     return std::vector<int>();
 }
 
-void Client::sendAtServer(const json& js) {
+void Client::sendAtServer(const json &js) {
     std::string msg = js.dump().c_str();
     message mess;
     mess.body_length(msg.size());
     std::memcpy(mess.body(), msg.data(), mess.body_length());
     mess.body()[mess.body_length()] = '\0';
     mess.encode_header();
-    std::cout <<"Messaggio da inviare al server: "<< mess.body() << std::endl;
+    std::cout << "Messaggio da inviare al server: " << mess.body() << std::endl;
     this->write(mess);
 }

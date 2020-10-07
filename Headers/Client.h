@@ -62,17 +62,19 @@ public:
 
     void setEmail(const QString &value);
 
-    std::vector<int> insertSymbolNewCRDT(int index, char character, std::string username);
+    std::vector<int> insertSymbolNewCRDT(int index, char character, const std::string &username);
 
     int generateIndexCRDT(Symbol symbol, int iter, int start, int end);
 
     std::pair<int, int> eraseSymbolCRDT(Symbol symbolStart, Symbol symbolEnd);
 
+    void insertSymbolIndex(const Symbol &symbol, int index);
+
     std::vector<int> generatePos(int index);
 
     std::vector<int> generatePosBetween(std::vector<int> pos1, std::vector<int> pos2, std::vector<int> newPos);
 
-    void sendAtServer(const json& js);
+    void sendAtServer(const json &js);
 
 signals:
 
