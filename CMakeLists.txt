@@ -30,6 +30,7 @@ add_executable(progetto_prova main.cpp prova.pro prova.pro.user textedit.cpp Hea
         Libs/md5.cpp Libs/md5.h
         Headers/customcursor.h customcursor.cpp
         Headers/Symbol.h Symbol.cpp
+        Headers/MessageSymbol.h MessageSymbol.cpp
         project_icons.qrc)
 
 #target_link_libraries(DBMSProject ${Boost_LIBRARIES})  # that didn't work

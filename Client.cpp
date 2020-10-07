@@ -2,8 +2,8 @@
 // Created by Sam on 22/apr/2020.
 //
 
-#define serverRoute "93.43.250.236"
-//#define serverRoute "127.0.0.1"
+//#define serverRoute "93.43.250.236"
+#define serverRoute "127.0.0.1"
 
 #include <QtWidgets/QMessageBox>
 #include "Headers/Client.h"
@@ -117,21 +117,23 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         QString res = QString::fromStdString(type_request);
         emit formResultSuccess(res);
     } else if (type_request == "insert_res") {
-        std::pair<int, char> corpo;
-        corpo = js.at("corpo").get<std::pair<int, char>>();
-        int participantId;
-        participantId = js.at("participant").get<int>();
-
-        std::pair<int, QChar> corpo2(corpo.first, static_cast<QChar>(corpo.second));
-        //non funziona
-        emit insertSymbolWithId(participantId, corpo.first, static_cast<QChar>(corpo.second));
-        //emit showSymbol(corpo);
+        //prendo simbolo da inserire dal json
+        Symbol newSymbol(js.at("char").get<char>(), js.at("username").get<std::string>(), js.at("crdt").get<std::vector<int>>());
+        //inserisco nel crdt e prendo indice
+        int index = this->generateIndexCRDT(newSymbol, 0, -1, -1);
+        //emetto per inserimento nel testo
+        emit insertSymbol(index, newSymbol.getCharacter());
         return type_request;
     } else if (type_request == "remove_res") {
-        int start, end;
-        start = js.at("start").get<int>();
-        end = js.at("end").get<int>();
-        emit eraseSymbols(start, end);
+        //prendo dal json simbolo di inizio e fine cancellazione dal json
+        Symbol symbolStart(js.at("charStart").get<char>(), js.at("usernameStart").get<std::string>(),
+                           js.at("crdtStart").get<std::vector<int>>());
+        Symbol symbolEnd(js.at("charEnd").get<char>(), js.at("usernameEnd").get<std::string>(),
+                         js.at("crdtEnd").get<std::vector<int>>());
+        //cancello dal crdt symbols compresi tra i due e prendo indici
+        std::pair<int, int> indexesStartEnd = this->eraseSymbolCRDT(symbolStart, symbolEnd);
+        //emetto per aggiornamento testo con gli indici
+        emit eraseSymbols(indexesStartEnd.first, indexesStartEnd.second);
         return type_request;
     } else if (type_request == "new_file_created") {
         QString res = QString::fromStdString("new_file_created");
@@ -168,18 +170,22 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
 
     } else if (type_request == "open_file") {
         int maxBuffer = js.at("maxBuffer");
-        QString res = QString::fromStdString("file_opened");
         std::string toWrite = js.at("toWrite");
         int part = js.at("partToWrite");
 
+        //prima parte di file deve pulire il testo
         if (this->writing == 0)
             emit clearEditor();
+        //per ogni carattere ametti di scriverlo
         for (int i = 0; i < toWrite.length(); i++) {
+            //creo symbol e aggiungo al crdt
+            this->insertSymbolNewCRDT((maxBuffer * part) + i, toWrite[i], this->getUser().toStdString());
+            //emetto di scrivere il carattere sul testo
             emit insertSymbol((maxBuffer * part) + i, toWrite[i]);
         }
         if (this->writing == js.at("ofPartToWrite")) {
             this->writing = 0;
-            emit formResultSuccess(res);
+            emit formResultSuccess(QString::fromStdString("file_opened"));
         } else {
             this->writing++;
         }
@@ -320,5 +326,118 @@ void Client::setFiles(const std::vector<std::string>& owners, const std::vector<
     for(int i = 0; i < owners.size(); i++) {
         files.insert({std::pair<std::string, std::string>(owners[i], filenames[i]), invitations[i]});
     }
-    //Client::files = list;
+}
+
+//crea un nuovo symbol e lo inserisce nel crdt in posizione index
+std::vector<int> Client::insertSymbolNewCRDT(int index, char character, std::string username) {
+    std::vector<int> vector;
+    if (this->symbols.empty()) {
+        vector = {0};
+        index = 0;
+    } else if (index > this->symbols.size() - 1) {
+        vector = {this->symbols.back().getPosizione().at(0) + 1};
+        index = this->symbols.size();
+    } else if (index == 0) {
+        vector = {this->symbols.front().getPosizione().at(0) - 1};
+    } else
+        vector = generatePos(index);
+    Symbol s(character, this->getUser().toStdString(), vector);
+
+    this->symbols.insert(this->symbols.begin() + index, s);
+
+    return vector;
+}
+
+//aggiunge al crdt un symbol sulla base del vettore posizione
+int Client::generateIndexCRDT(Symbol symbol, int iter, int start, int end) { //inserisci symbol gia' generato in un vettore di symbol nel posto giusto
+    if(start == -1 && end == -1) {
+        if(symbol.getPosizione()[0] < this->symbolsPerFile.at(filename)[0].getPosizione()[0])
+            return 0;
+        start = 0;
+        end = this->symbolsPerFile.at(filename).size();
+    }
+    if(start == end) {
+        return iter;
+    }
+    int newStart = -1;
+    int newEnd = start;
+    for(auto iterPositions = this->symbolsPerFile.at(filename).begin() + start; iterPositions != this->symbolsPerFile.at(filename).begin() + end; ++iterPositions) {
+        if(iterPositions->getPosizione().size() > iter && symbol.getPosizione().size() > iter) {
+            if(iterPositions->getPosizione()[iter] == symbol.getPosizione()[iter] && newStart == -1)
+                newStart = newEnd;
+            if(iterPositions->getPosizione()[iter] > symbol.getPosizione()[iter]) {
+                if (newStart == -1)
+                    return newEnd;
+                else
+                    return generateIndexCRDT(symbol, filename, ++iter, newStart, newEnd);
+            }
+        }
+        newEnd++;
+    }
+    return newEnd;
+}
+
+//rimuove dal crdt uno specifico symbol
+std::pair<int, int> Client::eraseSymbolCRDT(Symbol symbolStart, Symbol symbolEnd) {
+    bool foundStart = false;
+    std::pair<int, int> result;
+    int start = 0;
+    int end = 0;
+    for(auto iter = this->symbols.begin(); iter != this->symbols.end(); ++iter) {
+        if(*iter == symbolEnd) {
+            if(symbolStart == symbolEnd)
+                this->symbols.erase(iter);
+            return {start, end};
+        }
+        if(symbolStart == *iter)
+            foundStart = true;
+        if(foundStart) {
+            this->symbols.erase(iter);
+            iter--;
+            end++;
+        } else {
+            start++;
+            end++;
+        }
+    }
+}
+
+//genera nuovo vettore posizione per un nuovo symbol
+std::vector<int> Client::generatePos(int index) {
+    const std::vector<int> posBefore = symbols[index-1].getPosizione();
+    const std::vector<int> posAfter = symbols[index].getPosizione();
+    std::vector<int> newPos;
+    return generatePosBetween(posBefore, posAfter, newPos);
+}
+
+//richiamata da generatePos
+std::vector<int> Client::generatePosBetween(std::vector<int> pos1, std::vector<int> pos2, std::vector<int> newPos) {
+    int id1 = pos1.at(0);
+    int id2 = pos2.at(0);
+
+    if(id2 - id1 == 0) {
+        newPos.push_back(id1);
+        pos1.erase(pos1.begin());
+        pos2.erase(pos2.begin());
+        if(pos1.empty()) {
+            newPos.push_back(pos2.front()-1);
+            return newPos;
+        } else
+            return generatePosBetween(pos1, pos2, newPos);
+    }
+    else if(id2 - id1 > 1) {
+        newPos.push_back(pos1.front()+1);
+        return newPos;
+    }
+    else if(id2 - id1 == 1) {
+        newPos.push_back(id1);
+        pos1.erase(pos1.begin());
+        if(pos1.empty()) {
+            newPos.push_back(0); //
+            return newPos;
+        } else {
+            newPos.push_back(pos1.front()+1);
+            return newPos;
+        }
+    }
 }

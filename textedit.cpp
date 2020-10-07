@@ -924,6 +924,7 @@ void TextEdit::localInsert(){
         qDebug()<< c;
     }
 
+    //TODO: cos'e'?
     m = std::make_pair(cur.position(),c);
     json j = json{
         {"operation","insert"},
@@ -948,6 +949,14 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev){
         int key = key_ev->key();
         if (obj == textEdit){
             if(!key_ev->text().isEmpty()){
+                std::cout << "CRDT: ";
+                for(auto iterPositions = client_->symbols.begin(); iterPositions != client_->symbols.end(); ++iterPositions) {
+                    std::cout << "[" << iterPositions->getCharacter() << " ";
+                    for(int i = 0; i < iterPositions->getPosizione().size(); i++)
+                        std::cout << std::to_string(iterPositions->getPosizione()[i]);
+                    std::cout << "]";
+                }
+                std::cout << std::endl;
                 if( !(key == Qt::Key_Backspace) &&
                     !(key==Qt::Key_Delete) &&
                     !(key==Qt::Key_Escape) &&
@@ -970,10 +979,18 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev){
                         textEdit->setTextCursor(cursor);
                         cursor.endEditBlock();
 
+                        Symbol symbolStart = client_->symbols[startIndex];
+                        Symbol symbolEnd = client_->symbols[endIndex];
+                        client_->eraseSymbolCRDT(symbolStart, symbolEnd);
+
                         json j = json{
                                     {"operation","remove"},
-                                    {"start", startIndex},
-                                    {"end",endIndex}
+                                    {"usernameStart", symbolStart.getUsername()},
+                                    {"charStart", symbolStart.getCharacter()},
+                                    {"crdtStart", symbolStart.getPosizione()},
+                                    {"usernameEnd", symbolEnd.getUsername()},
+                                    {"charEnd", symbolEnd.getCharacter()},
+                                    {"crdtEnd", symbolEnd.getPosizione()}
                                 };
                         std::string msg = j.dump().c_str();
                         size_t size_msg = msg.size();
@@ -988,23 +1005,18 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev){
                     else{
                         pos = cursor.position();
                     }
-                    char c = key_ev->text().toStdString().c_str()[0]; //TODO: prende il tasto che schiaccio
-                     /* update char format
-                     * QCharFormat form;
-                     * form.set{quello_che c'è da settare}(valorechedeveaver);
-                     * --
-                     * --
-                     * --
-                     * cursor.setCharFormat(form);
-                     * textEdit->setTextCursor(cursor);
-                     */
+                    char c = key_ev->text().toStdString().c_str()[0];
+
+                    std::vector<int> crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
+
                     textEdit->setTextCursor(cursor);
                     emit updateCursor();
-                    tuple = std::make_pair(pos,c);
 
                     json j = json{
                                 {"operation","insert"},
-                                {"corpo",tuple}
+                                {"username", client_->getUser().toStdString()},
+                                {"char", c},
+                                {"crdt", crdt}
                             };
                     std::string msg = j.dump().c_str();
                     size_t size_msg = msg.size();
@@ -1038,10 +1050,18 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev){
                         textEdit->setTextCursor(cursor);
                         cursor.endEditBlock();
 
+                        Symbol symbolStart = client_->symbols[startIndex];
+                        Symbol symbolEnd = client_->symbols[endIndex];
+                        client_->eraseSymbolCRDT(symbolStart, symbolEnd);
+
                         json j = json{
                                 {"operation","remove"},
-                                {"start", startIndex},
-                                {"end",endIndex}
+                                {"usernameStart", symbolStart.getUsername()},
+                                {"charStart", symbolStart.getCharacter()},
+                                {"crdtStart", symbolStart.getPosizione()},
+                                {"usernameEnd", symbolEnd.getUsername()},
+                                {"charEnd", symbolEnd.getCharacter()},
+                                {"crdtEnd", symbolEnd.getPosizione()}
                         };
                         std::string msg = j.dump().c_str();
                         size_t size_msg = msg.size();
@@ -1059,11 +1079,13 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev){
                     for(int i=0; i<pastedText.length(); i++) {
                         textEdit->setTextCursor(cursor);
                         char c = pastedText.toStdString().c_str()[i];
-                        tuple = std::make_pair(pos,c);
+                        std::vector<int> crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
                         pos++;
                         json j = json{
                                 {"operation","insert"},
-                                {"corpo",tuple}
+                                {"username", client_->getUser().toStdString()},
+                                {"char", c},
+                                {"crdt", crdt}
                         };
                         std::string msg = j.dump().c_str();
                         size_t size_msg = msg.size();
@@ -1091,6 +1113,8 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev){
                     QTextCursor cursor = textEdit->textCursor();
                     int pos = cursor.position();
 
+                    std::cout << "POS: " << std::to_string(pos) << std::endl;
+
                     if(cursor.hasSelection()){
                         int startIndex = cursor.selectionStart();
                         int endIndex = cursor.selectionEnd();
@@ -1103,10 +1127,18 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev){
                         textEdit->setAlignment(textBlockFormat.alignment());
                         cursor.setPosition(pos);
 
+                        Symbol symbolStart = client_->symbols[startIndex];
+                        Symbol symbolEnd = client_->symbols[endIndex];
+                        client_->eraseSymbolCRDT(symbolStart, symbolEnd);
+
                         json j = json{
                                 {"operation","remove"},
-                                {"start",startIndex},
-                                {"end",endIndex}
+                                {"usernameStart", symbolStart.getUsername()},
+                                {"charStart", symbolStart.getCharacter()},
+                                {"crdtStart", symbolStart.getPosizione()},
+                                {"usernameEnd", symbolEnd.getUsername()},
+                                {"charEnd", symbolEnd.getCharacter()},
+                                {"crdtEnd", symbolEnd.getPosizione()}
                         };
 
                         std::string msg = j.dump().c_str();
@@ -1119,10 +1151,19 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev){
                         client_->write(mess);
                     }
                     else if(pos > 0 ){
+
+                        Symbol symbolStart = client_->symbols[pos - 1];
+                        Symbol symbolEnd = symbolStart;
+                        client_->eraseSymbolCRDT(symbolStart, symbolEnd);
+
                         json j = json{
                                 {"operation","remove"},
-                                {"start",pos-1},
-                                {"end",pos}
+                                {"usernameStart", symbolStart.getUsername()},
+                                {"charStart", symbolStart.getCharacter()},
+                                {"crdtStart", symbolStart.getPosizione()},
+                                {"usernameEnd", symbolEnd.getUsername()},
+                                {"charEnd", symbolEnd.getCharacter()},
+                                {"crdtEnd", symbolEnd.getPosizione()}
                         };
 
                         std::string msg = j.dump().c_str();
@@ -1153,11 +1194,20 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev){
                         textEdit->setAlignment(textBlockFormat.alignment());
                         cursor.setPosition(pos);
 
+                        Symbol symbolStart = client_->symbols[startIndex];
+                        Symbol symbolEnd = client_->symbols[endIndex];
+                        client_->eraseSymbolCRDT(symbolStart, symbolEnd);
+
                         json j = json{
-                            {"operation","remove"},
-                            {"start",startIndex},
-                            {"end",endIndex}
+                                {"operation","remove"},
+                                {"usernameStart", symbolStart.getUsername()},
+                                {"charStart", symbolStart.getCharacter()},
+                                {"crdtStart", symbolStart.getPosizione()},
+                                {"usernameEnd", symbolEnd.getUsername()},
+                                {"charEnd", symbolEnd.getCharacter()},
+                                {"crdtEnd", symbolEnd.getPosizione()}
                         };
+
                         std::string msg = j.dump().c_str();
                         size_t size_msg = msg.size();
                         message mess;
@@ -1168,11 +1218,20 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev){
                         client_->write(mess);
                     }
                     else if(pos>=0 && pos<textEdit->toPlainText().size()){
+                        Symbol symbolStart = client_->symbols[pos];
+                        Symbol symbolEnd = symbolStart;
+                        client_->eraseSymbolCRDT(symbolStart, symbolEnd);
+
                         json j = json{
-                            {"operation","remove"},
-                            {"start",pos},
-                            {"end",pos+1}
+                                {"operation","remove"},
+                                {"usernameStart", symbolStart.getUsername()},
+                                {"charStart", symbolStart.getCharacter()},
+                                {"crdtStart", symbolStart.getPosizione()},
+                                {"usernameEnd", symbolEnd.getUsername()},
+                                {"charEnd", symbolEnd.getCharacter()},
+                                {"crdtEnd", symbolEnd.getPosizione()}
                         };
+
                         std::string msg = j.dump();
                         size_t size_msg = msg.size();
                         message mess;
