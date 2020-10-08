@@ -2,18 +2,28 @@
 // Created by cordi on 09/10/19.
 //
 
-
+#include <QInputDialog>
+#include <QLineEdit>
+#include <QColorDialog>
+#include <QFileDialog>
+#include <QTextStream>
+#include <QMessageBox>
+#include <QGraphicsOpacityEffect>
+#include <QPrinter>
+#include <QEvent>
+#include <stdexcept>
+#include <QMenu>
+#include <QCursor>
+#include <QShortcut>
 #include <QAction>
 #include <QApplication>
 #include <QClipboard>
-#include <QColorDialog>
 #include <QComboBox>
+#include <QPainter>
 #include <QFontComboBox>
 #include <QFile>
-#include <QFileDialog>
 #include <QFileInfo>
 #include <QFontDatabase>
-#include <QMenu>
 #include <QMenuBar>
 #include <QTextCodec>
 #include <QTextEdit>
@@ -24,7 +34,6 @@
 #include <QTextList>
 #include <QtDebug>
 #include <QCloseEvent>
-#include <QMessageBox>
 #include <QMimeData>
 #include <QTextBlockFormat>
 #include <QDockWidget>
@@ -59,20 +68,30 @@ TextEdit::TextEdit(Client* c, QWidget *parent)
 #ifdef Q_OS_MACOS
     setUnifiedTitleAndToolBarOnMac(true);
 #endif
-    textEdit = new QTextEdit(this);
+    textEdit = new documentShared(this);
 
     connect(this,&TextEdit::updateCursor,this,&TextEdit::drawRemoteCursors);
 
     connect(client_, &Client::insertSymbol, this, &TextEdit::showSymbol);
     connect(client_, &Client::insertSymbolWithId, this, &TextEdit::showSymbolWithId);
     connect(client_, &Client::updateCursorParticipant, this, &TextEdit::initRemoteCursors);
-    connect(client_, &Client::insertParticipant, this, &TextEdit::initListParticipant);
+    //connect(client_, &Client::insertParticipant, this, &TextEdit::initListParticipant);
+
+    connect(client_, &Client::updateParticipant, this, &TextEdit::initParticipant);
     connect(client_,&Client::eraseSymbols,this, &TextEdit::eraseSymbols);
     connect(client_,&Client::clearEditor,textEdit,&QTextEdit::clear);
+
+
+    // ALTRE CONNECT
+    connect(client_, &Client::changeRemoteCursor, textEdit, &documentShared::changeRemoteCursor);
+    connect(textEdit, &documentShared::updateAlignmentButton, this, &TextEdit::updateAlignmentButton);
+    connect(&textEdit->timer, &QTimer::timeout, textEdit, &documentShared::hideHorizontalRect);
+
 
     textEdit->installEventFilter(this);
 
     setCentralWidget(textEdit);
+    qRegisterMetaType<myCollabColorsMap>("std::map<std::string,std::pair<std::string,bool>");
 
     setupFileActions();
     setupConnectedUsers();
@@ -389,6 +408,18 @@ void TextEdit::updateConnectedUsers(QString user, QString color){
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
 }
+void TextEdit::updateConnectedParticipant(myCollabColorsMap map) {
+    connectedUsers->clear();
+    QLabel * label = new QLabel(client_->getUser());
+    label->setStyleSheet("font-weight: bold; color: "+client_->getColor());
+    QListWidgetItem * item = new QListWidgetItem();
+    connectedUsers->addItem(item);
+    connectedUsers->setItemWidget(item, label);
+    for(auto m:map)
+        if(m.first!=client_->getUser().toStdString())
+            updateConnectedUsers(QString::fromStdString(m.first), QString::fromStdString(m.second.second));
+}
+
 void TextEdit::setupConnectedUsers(){
     QDockWidget *dock = new QDockWidget(tr("Connected Users"),this);
     dock->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
@@ -1280,9 +1311,6 @@ void TextEdit::drawRemoteCursors(){
 }
 
 
-void TextEdit::initListParticipant(int participantId, QString username) {
-    _listParticipant.insert(std::pair<int, QString>(participantId, username));
-}
 
 
 void TextEdit::initRemoteCursors(int participantId, QString color) {
@@ -1293,6 +1321,22 @@ void TextEdit::initRemoteCursors(int participantId, QString color) {
             updateConnectedUsers(_listParticipant[participantId], color);
         }
     }
+
+}
+
+void TextEdit::initParticipant(myCollabColorsMap mapParticipant) {
+    _cursorsVector.clear();
+    _cursorColors.clear();
+    for(auto m:mapParticipant){
+        if(m.first!=client_->getUser().toStdString()){
+            std::cout << "SONO QUI " << m.first << " color " << m.second.second <<  " ID " << m.second.first<<std::endl;
+            CustomCursor remoteCursor = CustomCursor();
+            _cursorsVector.insert(std::pair<int, CustomCursor>(m.second.first, remoteCursor));
+            _cursorColors.insert(std::pair<int, QColor>(m.second.first, QString::fromStdString(m.second.second)));
+        }
+    }
+    drawRemoteCursors();
+    updateConnectedParticipant(mapParticipant);
 
 }
 
@@ -1314,3 +1358,9 @@ void TextEdit::updateCursors(const CustomCursor &cursor){
     _oldCursor = CustomCursor(_newCursor);
     _newCursor = CustomCursor(cursor);
 }
+
+void TextEdit::updateAlignmentButton() {
+    //setAlignmentButton(static_cast<Qt::AlignmentFlag>(static_cast<int>(textEdit->textCursor().blockFormat().alignment())));
+    //AlignButtonStyleHandler();
+}
+

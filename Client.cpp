@@ -125,7 +125,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::pair<int, QChar> corpo2(corpo.first, static_cast<QChar>(corpo.second));
         //non funziona
         emit insertSymbolWithId(participantId, corpo.first, static_cast<QChar>(corpo.second));
-        //emit showSymbol(corpo);
+        emit changeRemoteCursor("pippo", "blue", corpo.second);
         return type_request;
     } else if (type_request == "remove_res") {
         int start, end;
@@ -237,6 +237,14 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         othersOnFile = js.at("idList").get<std::vector<int>>();
         colors = js.at("colorsList").get<std::vector<std::string>>();
         usernames = js.at("usernames").get<std::vector<std::string>>();
+
+        myCollabColorsMap mapParticipant;
+        for(int i=0; i<usernames.size(); i++){
+            mapParticipant.insert(std::pair<std::string, std::pair<int, std::string>>(usernames[i], std::pair<int, std::string>(othersOnFile[i], colors[i])));
+        }
+        emit updateParticipant(mapParticipant);
+
+        /*
         int j = 0;
         for(auto u:usernames) {
             QString username = QString::fromStdString(u);
@@ -250,7 +258,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
             emit updateCursorParticipant(othersOnFile[i], color);
             i++;
         }
-
+*/
     }
     return type_request;
 }

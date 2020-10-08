@@ -11,7 +11,7 @@
 #include <QPointer>
 #include "Client.h"
 #include "customcursor.h"
-
+#include "documentShared.h"
 QT_BEGIN_NAMESPACE
 class QAction;
 class QComboBox;
@@ -23,6 +23,7 @@ class QPrinter;
 QT_END_NAMESPACE
 
 class QEvent;
+typedef std::map<std::string, std::pair<int,std::string>> myCollabColorsMap;
 
 class TextEdit : public QMainWindow
 {
@@ -34,6 +35,9 @@ public:
     bool load(const QString &f);
 
     QString getFileName() const;
+
+
+
 
 public slots:
     void fileNew();
@@ -52,6 +56,7 @@ signals:
     void updateCursor();
 
 private slots:
+    void updateAlignmentButton();
     void fileOpen();
     bool fileSave();
     bool fileSaveAs();
@@ -76,9 +81,10 @@ private slots:
     void printPreview(QPrinter *);
     void drawRemoteCursors();
     void initRemoteCursors(int participantId, QString color);
-    void initListParticipant(int participantId, QString username);
-    //void initRemoteCursors(int id_client, QColor remoteColor);
-    //void updateRemoteCursors(int id_client,int pos);
+    void initParticipant(myCollabColorsMap mapParticipant);
+
+
+
 private:
     Client *client_;
     void setupFileActions();
@@ -96,11 +102,17 @@ private:
     void resetCursors();
     void updateCursors(const CustomCursor &cursor);
     void updateConnectedUsers(QString user, QString color);
+    void updateConnectedParticipant(myCollabColorsMap map);
     void updateCursors();
     //for debug
     void setupConnectedUsers();
     void requestLogout();
     void closingFile();
+
+    void setAlignmentButton(Qt::AlignmentFlag alignment);
+
+
+
     void draw2(unsigned int position);
     QAction *actionSave;
     QAction *actionTextBold;
@@ -125,7 +137,8 @@ private:
 
     QToolBar *tb;
     QString fileName;
-    QTextEdit *textEdit;
+    //QTextEdit *textEdit;
+    documentShared *textEdit;
     QListWidget *connectedUsers;
 
     bool key_to_handle = false;
@@ -135,6 +148,13 @@ private:
     std::map<unsigned int, CustomCursor> _cursorsVector;
     std::map<unsigned int, QColor> _cursorColors;
     std::map<unsigned int, QString> _listParticipant;
+
+
+
+
+
+
+
 };
 
 

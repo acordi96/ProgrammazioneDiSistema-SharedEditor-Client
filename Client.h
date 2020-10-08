@@ -12,6 +12,7 @@
 #include "json.hpp"
 #include "message.h"
 #include <QColor>
+#include <QVector>
 #ifndef PROGETTO_PROVA_CLIENT_H
 #define PROGETTO_PROVA_CLIENT_H
 
@@ -19,7 +20,9 @@
 using json = nlohmann::json;
 using boost::asio::ip::tcp;
 typedef std::deque<message> message_queue;
+typedef std::map<std::string, std::pair<int, std::string>> myCollabColorsMap;
 
+Q_DECLARE_METATYPE(myCollabColorsMap)
 class Client : public QObject{
     Q_OBJECT
 public:
@@ -54,7 +57,9 @@ signals:
     void eraseSymbols(int startIndex, int endIndex);
     void showSymbol(std::pair<int,char> tuple);
     void updateCursorParticipant(int partecipantId, QString color);
-    void insertParticipant(int partecipantId, QString user);
+    void changeRemoteCursor(QString username, QString color, int pos);
+    //void insertParticipant(myCollabColorsMap mymap);
+    void updateParticipant(myCollabColorsMap mymap);
     void clearEditor();
     //void addCollaborator(int id,QColor color);// aggiunge collaboratore e crea customcursor
     //void updateCollaborator(int id, int pos); //aggiorna posizione cursore con quel id
