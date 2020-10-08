@@ -107,7 +107,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
             this->setFiles(owners, filenames, invitations);
 
             std::string email = js.at("email").get<std::string>();
-            QString qEmail = QString::fromUtf8(email.data(),email.size());
+            QString qEmail = QString::fromUtf8(email.data(), email.size());
             this->setEmail(qEmail);
 
         }
@@ -131,17 +131,18 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         emit insertSymbol(index, newSymbol.getCharacter());
         return type_request;
     } else if (type_request == "remove_res") {
-        //prendo dal json simbolo di inizio e fine cancellazione dal json
-        Symbol symbolStart(js.at("charStart").get<char>(), js.at("usernameStart").get<std::string>(),
-                           js.at("crdtStart").get<std::vector<int>>());
-        Symbol symbolEnd(js.at("charEnd").get<char>(), js.at("usernameEnd").get<std::string>(),
-                         js.at("crdtEnd").get<std::vector<int>>());
+        //prendo il vettore di symbol
+        std::vector<Symbol> symbolsToErase;
+        std::vector<std::string> usernameToErase = js.at("usernameToErase").get<std::vector<std::string>>();
+        std::vector<char> charToErase = js.at("charToErase").get<std::vector<char>>();
+        std::vector<std::vector<int>> crdtToErase = js.at("crdtToErase").get<std::vector<std::vector<int>>>();
+        for (int i = 0; i < usernameToErase.size(); i++)
+            symbolsToErase.emplace_back(charToErase[i], usernameToErase[i], crdtToErase[i]);
         //cancello dal crdt symbols compresi tra i due e prendo indici
-        std::pair<int, int> indexesStartEnd = this->eraseSymbolCRDT(symbolStart, symbolEnd);
-        std::cout << "PAIR: " << std::to_string(indexesStartEnd.first) << " " << std::to_string(indexesStartEnd.second)
-                  << std::endl;
+        std::vector<int> erased = this->eraseSymbolCRDT(symbolsToErase);
         //emetto per aggiornamento testo con gli indici
-        emit eraseSymbols(indexesStartEnd.first, indexesStartEnd.second + 1);
+        for (auto &indexToErase : erased)
+                emit eraseSymbols(indexToErase);
         return type_request;
     } else if (type_request == "new_file_created") {
         QString res = QString::fromStdString("new_file_created");
@@ -178,7 +179,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         return type_request;
 
     } else if (type_request == "open_file") {
-        int maxBuffer = js.at("maxBuffer");
+        int maxBufferChar = js.at("maxBufferChar");
         std::string toWrite = js.at("toWrite");
         int part = js.at("partToWrite");
 
@@ -188,9 +189,9 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         //per ogni carattere ametti di scriverlo
         for (int i = 0; i < toWrite.length(); i++) {
             //creo symbol e aggiungo al crdt
-            this->insertSymbolNewCRDT((maxBuffer * part) + i, toWrite[i], "");
+            this->insertSymbolNewCRDT((maxBufferChar * part) + i, toWrite[i], "");
             //emetto di scrivere il carattere sul testo
-            emit insertSymbol((maxBuffer * part) + i, toWrite[i]);
+            emit insertSymbol((maxBufferChar * part) + i, toWrite[i]);
         }
         if (this->writing == js.at("ofPartToWrite")) {
             this->writing = 0;
@@ -400,33 +401,39 @@ int Client::generateIndexCRDT(Symbol symbol, int iter, int start,
 }
 
 //rimuove dal crdt uno specifico symbol
-std::pair<int, int> Client::eraseSymbolCRDT(Symbol symbolStart, Symbol symbolEnd) {
-    if (this->symbols[0] == symbolStart && this->symbols[this->symbols.size() - 1] == symbolEnd) {
-        int size = this->symbols.size() - 1;
-        this->symbols.clear();
-        return {0, size};
-    }
-    bool foundStart = false;
-    std::pair<int, int> result;
-    int start = 0;
-    int end = 0;
-    for (auto iter = this->symbols.begin(); iter != this->symbols.end(); ++iter) {
-        if (*iter == symbolEnd) {
-            this->symbols.erase(iter);
-            return {start, end};
+std::vector<int> Client::eraseSymbolCRDT(std::vector<Symbol> symbolsToErase) {
+    int lastFound = 0;
+    std::vector<int> erased;
+    bool foundSecondPart = false;
+    for (auto iterSymbolsToErase = symbolsToErase.begin(); iterSymbolsToErase !=
+                                                           symbolsToErase.end(); ++iterSymbolsToErase) { //cerca prima da dove hai trovato prima in poi
+        int count = lastFound;
+        if ((lastFound - 2) >= 0)
+            lastFound -= 2;
+        for (auto iterSymbols = this->symbols.begin() + lastFound; iterSymbols != this->symbols.end(); ++iterSymbols) {
+            if (*iterSymbolsToErase == *iterSymbols) {
+                erased.push_back(generateIndexCRDT(*iterSymbols, 0, -1, -1));
+                this->symbols.erase(iterSymbols);
+                lastFound = count;
+                foundSecondPart = true;
+                break;
+            }
+            count++;
         }
-        if (symbolStart == *iter)
-            foundStart = true;
-        if (foundStart) {
-            this->symbols.erase(iter);
-            iter--;
-            end++;
-        } else {
-            start++;
-            end++;
+        if (!foundSecondPart) { //se non hai trovato cerca anche nella prima parte
+            for (auto iterSymbols = this->symbols.begin();
+                 iterSymbols != this->symbols.begin() + lastFound; ++iterSymbols) {
+                if (*iterSymbolsToErase == *iterSymbols) {
+                    erased.push_back(generateIndexCRDT(*iterSymbols, 0, -1, -1));
+                    this->symbols.erase(iterSymbols);
+                    lastFound = count;
+                    break;
+                }
+                count++;
+            }
         }
     }
-    return {-1, -1};
+    return erased;
 }
 
 void Client::insertSymbolIndex(const Symbol &symbol, int index) {

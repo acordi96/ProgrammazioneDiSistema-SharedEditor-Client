@@ -66,7 +66,7 @@ public:
 
     int generateIndexCRDT(Symbol symbol, int iter, int start, int end);
 
-    std::pair<int, int> eraseSymbolCRDT(Symbol symbolStart, Symbol symbolEnd);
+    std::vector<int> eraseSymbolCRDT(std::vector<Symbol> symbolsToErase);
 
     void insertSymbolIndex(const Symbol &symbol, int index);
 
@@ -86,7 +86,7 @@ signals:
 
     void insertSymbolWithId(int participantId, int pos, QChar c);
 
-    void eraseSymbols(int startIndex, int endIndex);
+    void eraseSymbols(int erased);
 
     void showSymbol(std::pair<int, char> tuple);
 
