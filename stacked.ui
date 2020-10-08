@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>963</width>
+    <width>998</width>
     <height>587</height>
    </rect>
   </property>
@@ -276,7 +276,7 @@
                     </size>
                    </property>
                    <property name="styleSheet">
-                    <string notr="true">lineedit-password-mask-delay:0.5;</string>
+                    <string notr="true">lineedit-password-mask-delay:1;</string>
                    </property>
                    <property name="echoMode">
                     <enum>QLineEdit::Password</enum>
@@ -1122,7 +1122,7 @@ background-color:rgb(255,0,0);
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>963</width>
+     <width>998</width>
      <height>22</height>
     </rect>
    </property>

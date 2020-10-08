@@ -90,7 +90,6 @@ TextEdit::TextEdit(Client* c, QWidget *parent)
 
     connect(textEdit->document(), &QTextDocument::modificationChanged,this, &QWidget::setWindowModified);
 
-
     setWindowModified(textEdit->document()->isModified());
 
 #ifndef QT_NO_CLIPBOARD
@@ -203,16 +202,20 @@ void TextEdit::setupFileActions()
 
     //menu->addSeparator();
 #endif
+    QWidget *spacer = new QWidget();
+    spacer->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+    tb->addWidget(spacer);
+
     const QIcon quitIcon = QIcon::fromTheme("quit",QIcon(rsrcPath + "/logout.png"));
     a = tb->addAction(quitIcon,tr("&Logout"), this,[=](){
         requestLogout();
-        emit this->closeAll();
+        emit this->logout();
     });
     a->setShortcut(Qt::CTRL + Qt::Key_Q);
 
 
-    //const QIcon profileIcon = QIcon::fromTheme("profile",QIcon(rsrcPath + "/user.png"));
-    //a = menu->addAction(profileIcon,tr("&Userpage"),this,[=](){emit this->closeFile();});
+//    const QIcon profileIcon = QIcon::fromTheme("profile",QIcon(rsrcPath + "/user.png"));
+//    a = tb->addAction(profileIcon,tr("&Userpage"),this,[=](){emit this->closeFile();});
 
 }
 
@@ -381,7 +384,6 @@ void TextEdit::setupTextActions()
     connect(comboSize, QOverload<const QString &>::of(&QComboBox::activated), this, &TextEdit::textSize);
 }
 
-
 void TextEdit::updateConnectedUsers(QString user, QString color){
     QLabel * label = new QLabel(user);
     label->setStyleSheet("color:"+color);
@@ -420,9 +422,11 @@ void TextEdit::setupConnectedUsers(){
     connectedUsers->setItemWidget(item,label);
     */
     dock->setWidget(connectedUsers);
+    dock->setFeatures(QDockWidget::NoDockWidgetFeatures);
     addDockWidget(Qt::RightDockWidgetArea,dock);
-}
 
+
+}
 
 bool TextEdit::load(const QString &f)
 {
@@ -550,7 +554,6 @@ void TextEdit::filePrint()
 #endif
 }
 
-
 void TextEdit::filePrintPreview()
 {
 
@@ -573,7 +576,6 @@ void TextEdit::printPreview(QPrinter *printer)
 #endif
 
 }
-
 
 void TextEdit::filePrintPdf()
 {
@@ -1215,6 +1217,7 @@ void TextEdit::eraseSymbols(int start, int end){
     qDebug() << "deleted char ranges " << endl;
     textEdit->setFocus();
 }
+
 void TextEdit::draw2 (unsigned int position){
     QTextCursor cursor= QTextCursor(textEdit->textCursor());
     cursor.setPosition(position);
@@ -1243,6 +1246,7 @@ QString TextEdit::getFileName() const
 {
     return fileName;
 }
+
 void TextEdit::drawRemoteCursors(){
     QTextCursor cursor= QTextCursor(textEdit->textCursor());
     QTextCursor tempCursor = QTextCursor(cursor);
@@ -1279,11 +1283,9 @@ void TextEdit::drawRemoteCursors(){
 
 }
 
-
 void TextEdit::initListParticipant(int participantId, QString username) {
     _listParticipant.insert(std::pair<int, QString>(participantId, username));
 }
-
 
 void TextEdit::initRemoteCursors(int participantId, QString color) {
     if(_listParticipant[participantId] != client_->getUser()) {
@@ -1293,7 +1295,6 @@ void TextEdit::initRemoteCursors(int participantId, QString color) {
             updateConnectedUsers(_listParticipant[participantId], color);
         }
     }
-
 }
 
 void TextEdit::resetText(){
@@ -1310,6 +1311,7 @@ void TextEdit::updateCursors(){
     CustomCursor cursor = CustomCursor(QTextCursor(textEdit->textCursor()));
     updateCursors(cursor);
 }
+
 void TextEdit::updateCursors(const CustomCursor &cursor){
     _oldCursor = CustomCursor(_newCursor);
     _newCursor = CustomCursor(cursor);
