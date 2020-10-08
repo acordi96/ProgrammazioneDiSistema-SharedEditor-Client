@@ -38,6 +38,9 @@ private slots:
    void closeFile();
 /*signals:
     void updateRecentFiles();*/
+private:
+   Userpage *up;
+   TextEdit *te;
 };
 
 #endif // STACKED_H

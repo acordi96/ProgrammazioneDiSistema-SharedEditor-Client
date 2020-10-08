@@ -20,9 +20,9 @@ stacked::stacked(QWidget *parent) :
     client_(new Client)
 {
     QObject::connect(client_, &Client::formResultSuccess, this, &stacked::showPopupSuccess);
-    setWindowTitle("SharedEditor - Login or Register");
 
     ui->setupUi(this);
+    setWindowTitle("SharedEditor - Login or Register");
 }
 
 stacked::~stacked() {
@@ -198,8 +198,7 @@ void stacked::on_form_regButton_clicked() {
  *
  * */
 void stacked::showPopupSuccess(QString result) {
-    Userpage *up;
-    TextEdit *te;
+
     if (result == "LOGIN_SUCCESS" || result == "SIGNUP_SUCCESS") {
         up = new Userpage(this, client_);
         te = new TextEdit(client_);
@@ -384,6 +383,9 @@ void stacked::logout(){
     setWindowTitle("SharedEditor - Login or Register");
     ui->user_log_line->clear();
     ui->psw_log_line->clear();
+    ui->user_log_line->setFocus();
+    ui->stackedWidget->removeWidget(te);
+    ui->stackedWidget->removeWidget(up);
     ui->stackedWidget->setCurrentIndex(0);
     //ui->stackedWidget->setCurrentIndex(3);
 }
