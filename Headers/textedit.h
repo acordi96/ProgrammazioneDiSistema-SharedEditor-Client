@@ -40,7 +40,7 @@ public slots:
     void showSymbol(int pos, QChar c);
     void showSymbolWithId(QString user, int pos, QChar c);
 
-    void eraseSymbols(int start,int end);
+    void eraseSymbols(QString user, int start,int end);
     //void show_Symbol(std::pair<int,char> tuple);
 protected:
     void closeEvent(QCloseEvent *e) override;

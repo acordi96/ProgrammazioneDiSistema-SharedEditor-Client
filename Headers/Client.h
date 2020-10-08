@@ -88,7 +88,7 @@ signals:
 
     void insertSymbolWithId(QString username, int pos, QChar c);
 
-    void eraseSymbols(int startIndex, int endIndex);
+    void eraseSymbols(QString user, int startIndex, int endIndex);
 
     void showSymbol(std::pair<int, char> tuple);
 

@@ -142,7 +142,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::cout << "PAIR: " << std::to_string(indexesStartEnd.first) << " " << std::to_string(indexesStartEnd.second)
                   << std::endl;
         //emetto per aggiornamento testo con gli indici
-        emit eraseSymbols(indexesStartEnd.first, indexesStartEnd.second + 1);
+        emit eraseSymbols(QString::fromStdString(symbolStart.getUsername()), indexesStartEnd.first, indexesStartEnd.second + 1);
         return type_request;
     } else if (type_request == "new_file_created") {
         QString res = QString::fromStdString("new_file_created");

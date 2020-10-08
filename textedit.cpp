@@ -783,7 +783,16 @@ void TextEdit::showSymbolWithId(QString user, int pos, QChar c) {
     cur.endEditBlock();
 
     textEdit->setTextCursor(cur);
-    _cursorsVector[user].setPosition(pos + 1);
+
+    for(auto list:_listParticipantsAndColors){
+        std::cout << "Posizione corrente " << pos << " posizione dei tipi remoti " << _cursorsVector[list.first].position << " color " << _listParticipantsAndColors[list.first].name().toStdString()<< std::endl;
+        if(list.first!=user){
+            if(pos<_cursorsVector[list.first].position)
+                _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position + 1);
+        }else{
+            _cursorsVector[user].setPosition(pos + 1);
+        }
+    }
     drawRemoteCursors();
     textEdit->setFocus();
 }
@@ -939,6 +948,12 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                             {"charEnd",       symbolEnd.getCharacter()},
                             {"crdtEnd",       symbolEnd.getPosizione()}
                     };
+                    for(auto list:_listParticipantsAndColors){
+                        if(_cursorsVector[list.first].position<endIndex-1 && _cursorsVector[list.first].position>startIndex){
+                                _cursorsVector[list.first].setPosition(startIndex);
+                        }
+                    }
+                    drawRemoteCursors();
                     client_->sendAtServer(j);
                 } else {
                     pos = cursor.position();
@@ -965,7 +980,10 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     };
                     client_->sendAtServer(j);
                     for(auto list:_listParticipantsAndColors){
-                        _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position+1);
+                        std::cout << "Posizione corrente " << pos << " posizione dei tipi remoti " << _cursorsVector[list.first].position << " color " << _listParticipantsAndColors[list.first].name().toStdString()<< std::endl;
+                        if(pos<_cursorsVector[list.first].position) {
+                            _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position + 1);
+                        }
                     }
                     drawRemoteCursors();
                     return QObject::eventFilter(obj, ev);
@@ -1017,6 +1035,13 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                                 {"crdtEnd",       symbolEnd.getPosizione()}
                         };
                         client_->sendAtServer(j);
+                        for(auto list:_listParticipantsAndColors){
+                            if(_cursorsVector[list.first].position<endIndex-1 && _cursorsVector[list.first].position>startIndex){
+                                _cursorsVector[list.first].setPosition(startIndex);
+                            }
+                        }
+                        drawRemoteCursors();
+
                     }
                     return QObject::eventFilter(obj, ev);
                 }
@@ -1039,6 +1064,12 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                                 {"crdtEnd",       symbolEnd.getPosizione()}
                         };
                         client_->sendAtServer(j);
+                        for(auto list:_listParticipantsAndColors){
+                            if(_cursorsVector[list.first].position<endIndex-1 && _cursorsVector[list.first].position>startIndex){
+                                _cursorsVector[list.first].setPosition(startIndex);
+                            }
+                        }
+                        drawRemoteCursors();
                     }
                     return QObject::eventFilter(obj, ev);
                 }
@@ -1048,7 +1079,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
     return false;
 }
 
-void TextEdit::eraseSymbols(int start, int end) {
+void TextEdit::eraseSymbols(QString user, int start, int end) {
     QTextCursor cur = textEdit->textCursor();
 
     cur.beginEditBlock();
@@ -1067,7 +1098,16 @@ void TextEdit::eraseSymbols(int start, int end) {
     textBlockFormat = cur.blockFormat();
     textBlockFormat.setAlignment(static_cast<Qt::AlignmentFlag>(startAlignment));
     cur.mergeBlockFormat(textBlockFormat);
+    for(auto list:_listParticipantsAndColors){
+        std::cout << "Posizione corrente f " << start << " posizione dei tipi remoti " << _cursorsVector[list.first].position << " pos end " << end << std::endl;
 
+        if(list.first!=user){
+            if(_cursorsVector[list.first].position<end && _cursorsVector[list.first].position>start)
+                _cursorsVector[list.first].setPosition(start);
+        } else{
+            _cursorsVector[user].setPosition(start);
+        }
+    }
     cur.endEditBlock();
 
     textEdit->setFocus();
@@ -1161,9 +1201,9 @@ void TextEdit::updateConnectedUsers(usersInFile users) {
     QListWidgetItem * item = new QListWidgetItem();
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
-    for(auto u:users)
-        if(u.first!=client_->getUser().toStdString())
-            updateConnectedUser(QString::fromStdString(u.first), QString::fromStdString(u.second));
+    for(auto u:_listParticipantsAndColors)
+        if(u.first.toStdString()!=client_->getUser().toStdString())
+            updateConnectedUser(u.first, u.second.name());
 }
 
 void TextEdit::resetText() {
