@@ -22,7 +22,9 @@
 using json = nlohmann::json;
 using boost::asio::ip::tcp;
 typedef std::deque<message> message_queue;
+typedef std::map<std::string, std::string> usersInFile;
 
+Q_DECLARE_METATYPE(usersInFile)
 class Client : public QObject {
 Q_OBJECT
 public:
@@ -84,15 +86,13 @@ signals:
 
     void insertSymbol(int pos, QChar c);
 
-    void insertSymbolWithId(int participantId, int pos, QChar c);
+    void insertSymbolWithId(QString username, int pos, QChar c);
 
     void eraseSymbols(int startIndex, int endIndex);
 
     void showSymbol(std::pair<int, char> tuple);
 
-    void updateCursorParticipant(int partecipantId, QString color);
-
-    void insertParticipant(int partecipantId, QString user);
+    void updateUserslist(usersInFile users);
 
     void clearEditor();
 

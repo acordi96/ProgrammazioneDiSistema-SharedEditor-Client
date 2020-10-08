@@ -23,7 +23,7 @@ class QPrinter;
 QT_END_NAMESPACE
 
 class QEvent;
-
+typedef  std::map<std::string, std::string> usersInFile;
 class TextEdit : public QMainWindow
 {
 Q_OBJECT
@@ -38,7 +38,7 @@ public:
 public slots:
     void fileNew();
     void showSymbol(int pos, QChar c);
-    void showSymbolWithId(int id, int pos, QChar c);
+    void showSymbolWithId(QString user, int pos, QChar c);
 
     void eraseSymbols(int start,int end);
     //void show_Symbol(std::pair<int,char> tuple);
@@ -75,10 +75,8 @@ private slots:
     void about();
     void printPreview(QPrinter *);
     void drawRemoteCursors();
-    void initRemoteCursors(int participantId, QString color);
-    void initListParticipant(int participantId, QString username);
-    //void initRemoteCursors(int id_client, QColor remoteColor);
-    //void updateRemoteCursors(int id_client,int pos);
+    void updateListParticipants(usersInFile users);
+
 private:
     Client *client_;
     void setupFileActions();
@@ -95,7 +93,9 @@ private:
     void resetText();
     void resetCursors();
     void updateCursors(const CustomCursor &cursor);
-    void updateConnectedUsers(QString user, QString color);
+    void updateConnectedUser(QString user, QString color);
+    void updateConnectedUsers(usersInFile users);
+
     void updateCursors();
     //for debug
     void setupConnectedUsers();
@@ -132,9 +132,8 @@ private:
     CustomCursor _newCursor = CustomCursor();
     CustomCursor _oldCursor = CustomCursor();
     QString _currentText = QString{};
-    std::map<unsigned int, CustomCursor> _cursorsVector;
-    std::map<unsigned int, QColor> _cursorColors;
-    std::map<unsigned int, QString> _listParticipant;
+    std::map<QString, CustomCursor> _cursorsVector;
+    std::map<QString, QColor> _listParticipantsAndColors;
 };
 
 

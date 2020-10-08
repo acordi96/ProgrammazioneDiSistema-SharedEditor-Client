@@ -128,7 +128,8 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         //inserisco symbol nel crdt
         this->insertSymbolIndex(newSymbol, index);
         //emetto per inserimento nel testo
-        emit insertSymbol(index, newSymbol.getCharacter());
+        //emit insertSymbol(index, newSymbol.getCharacter());
+        emit insertSymbolWithId(QString::fromStdString(newSymbol.getUsername()), index, newSymbol.getCharacter());
         return type_request;
     } else if (type_request == "remove_res") {
         //prendo dal json simbolo di inizio e fine cancellazione dal json
@@ -262,19 +263,11 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         othersOnFile = js.at("idList").get<std::vector<int>>();
         colors = js.at("colorsList").get<std::vector<std::string>>();
         usernames = js.at("usernames").get<std::vector<std::string>>();
-        int j = 0;
-        for (auto u:usernames) {
-            QString username = QString::fromStdString(u);
-            emit insertParticipant(othersOnFile[j], username);
-            j++;
+        usersInFile users;
+        for(int i=0; i<usernames.size(); i++){
+            users.insert(std::pair<std::string, std::string>(usernames[i], colors[i]));
         }
-
-        int i = 0;
-        for (auto c:colors) {
-            QString color = QString::fromStdString(c);
-            emit updateCursorParticipant(othersOnFile[i], color);
-            i++;
-        }
+        emit updateUserslist(users);
 
     }
     return type_request;
