@@ -26,10 +26,13 @@ public:
 
     static std::string generateFileButton(const std::string &owner, const std::string &filename);
 
+    void clearLineURL();
+
 private:
     void setupRecentFiles();
 
     void setupUserinfo();
+
     void sendmessage(message mess);
 
     void requestLogout();
@@ -54,9 +57,7 @@ private slots:
     /*void openFile();
     void renameFile();
     void deleteFile();*/
-    void iconSelector();
 
-    void changeIcon();
     //void onRightClicked();
 
 signals:

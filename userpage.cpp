@@ -69,18 +69,14 @@ void Userpage::setupUserinfo(){
     //user image + user Userpage label
     QHBoxLayout *hrzLayout3 = new QHBoxLayout();
     hrzLayout3->setObjectName(QString::fromUtf8("hrzLayout3"));
-    //hrzLayout3->setGeometry(QRect(1,0,273,79));
     hrzLayout3->setSpacing(1);
 
     QWidget *user_image = new QWidget(userinfo);
-    //user_image->setGeometry(QRect(80, 15, 61, 51));
     user_image->setStyleSheet(QString::fromUtf8("image: url(")+rsrcPath+QString::fromUtf8("/user.png);"));
-    //user_image->setStyleSheet(QString::fromUtf8("image: url(:/images/photo_2020-09-22_17-58-05.jpg);"));
     hrzLayout3->addWidget(user_image);
 
     QLabel *userpageLabel = new QLabel("Userpage",userinfo);
     userpageLabel->setObjectName(QString::fromUtf8("userpageLabel"));
-//  userpageLabel->setGeometry(QRect(160, 10, 221, 61));
     userpageLabel->setStyleSheet(QString::fromUtf8("font: 75 25pt \"Sawasdee Bold\";"));
     userpageLabel->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
@@ -96,7 +92,6 @@ void Userpage::setupUserinfo(){
 
     //icon
     QHBoxLayout *icon_userLayout = new QHBoxLayout();
-    //icon_userLayout->setGeometry(QRect(80,120,270,160));
     icon_userLayout->setSpacing(0);
 
     QHBoxLayout *iconLayout = new QHBoxLayout();
@@ -129,13 +124,7 @@ void Userpage::setupUserinfo(){
     QSpacerItem *iconSpacer2 = new QSpacerItem(120,20,QSizePolicy::Fixed,QSizePolicy::Minimum);
     iconLayout->addItem(iconSpacer2);
 
-//    QSpacerItem *iconVSpacer = new QSpacerItem(20,10,QSizePolicy::Minimum,QSizePolicy::MinimumExpanding);
-//    userVLayout3->addItem(iconVSpacer);
     userVLayout3->addLayout(iconLayout);
-//    userVLayout3->addItem(iconVSpacer);
-
-    //icon_userLayout->addLayout(iconSpace);
-    //icon_userLayout->addItem(iconSpacer2);
 
     QSpacerItem *iconVSpacer2 = new QSpacerItem(20,40,QSizePolicy::Minimum,QSizePolicy::Fixed);
     userVLayout3->addItem(iconVSpacer2);
@@ -144,23 +133,17 @@ void Userpage::setupUserinfo(){
 
     QLabel *usernameLabel = new QLabel(client_->getUser(),userinfo);
     usernameLabel->setObjectName(QString::fromUtf8("usernameButton"));
-//  usernameLabel->setGeometry(QRect(200, 110, 171, 71));
     usernameLabel->setFont(QFont(QString::fromUtf8("Sawasdee"),25,60,false));
     usernameLabel->setAlignment(Qt::AlignLeading|Qt::AlignCenter|Qt::AlignVCenter);
     labelsLayout->addWidget(usernameLabel);
 
     QLabel *email_lab = new QLabel(client_->getEmail(),userinfo);
     email_lab->setObjectName(QString::fromUtf8("email_lab"));
-    //email_lab->setGeometry(QRect(230, 180, 191, 31));
-    //email_lab->move(200,180);
     email_lab->setStyleSheet(QString::fromUtf8("font: 13pt \"Sawasdee\";"));
     email_lab->setAlignment(Qt::AlignLeading|Qt::AlignCenter|Qt::AlignVCenter);
     labelsLayout->addWidget(email_lab);
 
     icon_userLayout->addLayout(labelsLayout);
-
-//    QSpacerItem *iconSpacer2 = new QSpacerItem(20,20,QSizePolicy::MinimumExpanding,QSizePolicy::Fixed);
-//    icon_userLayout->addItem(iconSpacer2);
 
     QSpacerItem *vSpacer5 = new QSpacerItem(20,20,QSizePolicy::Minimum,QSizePolicy::Fixed);
     userVLayout3->addItem(vSpacer5);
@@ -237,8 +220,6 @@ void Userpage::setupUserinfo(){
 
     QSpacerItem *hSpacer5 = new QSpacerItem(10,20,QSizePolicy::MinimumExpanding,QSizePolicy::Minimum);
     hrzLayout4->addItem(hSpacer5);
-
-    //hLayout->addWidget(userinfo);
 
 }
 
@@ -449,79 +430,6 @@ bool Userpage::colorIsDark(QString colorStr){
     return brightness<140;
 }
 
-void Userpage::iconSelector(){
-    /*
-    selector = new QWidget();
-    QWidget *widget;
-    QPushButton *button;
-    selector->setFixedSize(600,400);
-    selector->move(200,100);
-    int offY = 20, startY=80;
-    int offX = 30, startX=70;
-    int dim = 80;
-
-    for(int i=0; i<3;i++){
-        widget = new QWidget(selector);
-        widget->setGeometry(QRect(startX+i*(offX+dim),startY,dim,dim));
-        widget->setStyleSheet(QString::fromUtf8("image:url(")+rsrcPath+QString::fromUtf8("/beach.png")+QString::fromUtf8(");"));
-        button = new QPushButton(widget);
-        //button->setObjectName(QString::fromUtf8("icon_")+i);
-        std::cout<<"\n"<<button->objectName().toStdString()<<std::endl;
-        button->setGeometry(QRect(0,0,80,80));
-        button->setFlat(true);
-
-    }
-
-    connect(button,&QPushButton::clicked,this,&Userpage::changeIcon);
-    selector->show();
-    */
-
-    /******** QFileDialog -> open from my own PC ********/
-
-    QFileDialog fileDialog(this,tr("Choose Icon..."));
-    fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
-    fileDialog.setFileMode(QFileDialog::ExistingFile);
-    fileDialog.setMimeTypeFilters(QStringList()<<"image/jpg"<<"image/png");
-
-    if(fileDialog.exec() != QDialog::Accepted){
-        return;
-    }
-    const QString selected = fileDialog.selectedFiles().first();
-
-    myIcon->setStyleSheet(QString::fromUtf8("image:url(")+selected+QString::fromUtf8(");"));
-
-    // inviare al server
-
-    const QImage image = QImage(selected);
-    QByteArray ban;
-
-    QDataStream out(&ban,QIODevice::ReadWrite);
-    out.setVersion(QDataStream::Qt_5_12);
-    out<<image; //serialize image
-
-    json j = json{
-             {"operation","send-icon"},
-             {"username",client_->getUser().toStdString()},
-             {"icon",ban.toBase64().data()},
-    };
-
-    std::string mess = j.dump().c_str();
-    message msg;
-    msg.body_length(mess.size());
-    std::memcpy(msg.body(), mess.data(), msg.body_length());
-    msg.body()[msg.body_length()] = '\0';
-    msg.encode_header();
-    std::cout <<"Richiesta da inviare al server "<< msg.body() << std::endl;
-    sendmessage(msg);
-
-
-}
-
-void Userpage::changeIcon(){
-  myIcon->setStyleSheet(QString::fromUtf8("image:url(")+rsrcPath+QString::fromUtf8("/beach.png")+QString::fromUtf8(");"));
-
-}
-
 void Userpage::handleNewFileButton()
 {
 
@@ -620,7 +528,6 @@ void Userpage::handleNewFileButton()
     //modalWindow.exec()
     //ui->stackedWidget->setCurrentIndex(3);
 }
-
 
 void Userpage::sendmessage(message mess) {
     client_->write(mess);
@@ -1105,4 +1012,8 @@ std::pair<std::string, std::string> Userpage::parseFileButton(const std::string&
 
 std::string Userpage::generateFileButton(const std::string& owner, const std::string& filename) {
     return std::to_string(owner.size()) + '_' + owner + filename;
+}
+
+void Userpage::clearLineURL(){
+    lineURL->clear();
 }

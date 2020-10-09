@@ -395,6 +395,7 @@ void stacked::logout(){
 
 void stacked::closeFile() {
     setWindowTitle("SharedEditor - Userpage");
+    up->clearLineURL();
     ui->stackedWidget->setCurrentIndex(3);
 }
 
