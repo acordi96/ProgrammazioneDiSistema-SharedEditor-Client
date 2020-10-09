@@ -979,13 +979,14 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                             {"crdt",      crdt}
                     };
                     client_->sendAtServer(j);
+                    drawRemoteCursors();
                     for(auto list:_listParticipantsAndColors){
                         std::cout << "Posizione corrente " << pos << " posizione dei tipi remoti " << _cursorsVector[list.first].position << " color " << _listParticipantsAndColors[list.first].name().toStdString()<< std::endl;
                         if(pos<_cursorsVector[list.first].position) {
                             _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position + 1);
                         }
                     }
-                    drawRemoteCursors();
+
                     return QObject::eventFilter(obj, ev);
                 }
                     //*********************PASTE*****************************************
@@ -1007,6 +1008,15 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         };
                         client_->sendAtServer(j);
                     }
+
+
+                    for(auto list:_listParticipantsAndColors){
+                        std::cout << "Posizione corrente " << pos << " posizione dei tipi remoti " << _cursorsVector[list.first].position << " color " << _listParticipantsAndColors[list.first].name().toStdString()<< std::endl;
+                        if(pos<_cursorsVector[list.first].position) {
+                            _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position + pastedText.length());
+                        }
+                    }
+                    drawRemoteCursors();
                 }
                     //*********************COPY*****************************************
                 else if (key_ev->text().toStdString().c_str()[0] == 3) {
