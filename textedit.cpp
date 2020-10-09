@@ -196,11 +196,11 @@ void TextEdit::setupFileActions() {
     //menu->addSeparator();
 #endif
     QWidget *spacer = new QWidget();
-    spacer->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     tb->addWidget(spacer);
 
-    const QIcon quitIcon = QIcon::fromTheme("quit",QIcon(rsrcPath + "/logout.png"));
-    a = tb->addAction(quitIcon,tr("&Logout"), this,[=](){
+    const QIcon quitIcon = QIcon::fromTheme("quit", QIcon(rsrcPath + "/logout.png"));
+    a = tb->addAction(quitIcon, tr("&Logout"), this, [=]() {
         requestLogout();
         emit this->logout();
     });
@@ -375,10 +375,10 @@ void TextEdit::setupTextActions() {
     connect(comboSize, QOverload<const QString &>::of(&QComboBox::activated), this, &TextEdit::textSize);
 }
 
-void TextEdit::updateConnectedUsers(QString user, QString color){
-    QLabel * label = new QLabel(user);
-    label->setStyleSheet("color:"+color);
-    QListWidgetItem * item = new QListWidgetItem();
+void TextEdit::updateConnectedUsers(QString user, QString color) {
+    QLabel *label = new QLabel(user);
+    label->setStyleSheet("color:" + color);
+    QListWidgetItem *item = new QListWidgetItem();
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
 }
@@ -415,7 +415,7 @@ void TextEdit::setupConnectedUsers() {
     */
     dock->setWidget(connectedUsers);
     dock->setFeatures(QDockWidget::NoDockWidgetFeatures);
-    addDockWidget(Qt::RightDockWidgetArea,dock);
+    addDockWidget(Qt::RightDockWidgetArea, dock);
 
 
 }
@@ -538,8 +538,7 @@ void TextEdit::filePrint() {
 #endif
 }
 
-void TextEdit::filePrintPreview()
-{
+void TextEdit::filePrintPreview() {
 
 #if QT_CONFIG(printpreviewdialog)
     QPrinter printer(QPrinter::HighResolution);
@@ -560,8 +559,7 @@ void TextEdit::printPreview(QPrinter *printer) {
 
 }
 
-void TextEdit::filePrintPdf()
-{
+void TextEdit::filePrintPdf() {
 
 #ifndef QT_NO_PRINTER
 //! [0]
@@ -891,12 +889,13 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
         QKeyEvent *key_ev = static_cast<QKeyEvent *>(ev);
         int key = key_ev->key();
         std::cout << "CRDT: " << std::flush;
-        for(auto iterPositions = client_->symbols.begin(); iterPositions != client_->symbols.end(); ++iterPositions) {
-            if(iterPositions->getCharacter() != 10 && iterPositions->getCharacter() != 13)
-                std::cout << "[" << (int)iterPositions->getCharacter() << "(" << iterPositions->getCharacter()  << ") - " << std::flush;
+        for (auto iterPositions = client_->symbols.begin(); iterPositions != client_->symbols.end(); ++iterPositions) {
+            if (iterPositions->getCharacter() != 10 && iterPositions->getCharacter() != 13)
+                std::cout << "[" << (int) iterPositions->getCharacter() << "(" << iterPositions->getCharacter()
+                          << ") - " << std::flush;
             else
-                std::cout << "[" << (int)iterPositions->getCharacter() << "(\\n) - " << std::flush;
-            for(int i = 0; i < iterPositions->getPosizione().size(); i++)
+                std::cout << "[" << (int) iterPositions->getCharacter() << "(\\n) - " << std::flush;
+            for (int i = 0; i < iterPositions->getPosizione().size(); i++)
                 std::cout << std::to_string(iterPositions->getPosizione()[i]) << std::flush;
             std::cout << "]" << std::flush;
         }
@@ -914,7 +913,8 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     endIndex = cursor.selectionEnd();
                     pos = startIndex;
 
-                    std::cout << "SELECTION: " << std::to_string(startIndex) << " - " << std::to_string(endIndex) << std::endl;
+                    std::cout << "SELECTION: " << std::to_string(startIndex) << " - " << std::to_string(endIndex)
+                              << std::endl;
 
                     cursor.beginEditBlock();
                     cursor.setPosition(startIndex, QTextCursor::MoveAnchor);
@@ -922,20 +922,56 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     textEdit->setTextCursor(cursor);
                     cursor.endEditBlock();
 
-                    Symbol symbolStart = client_->symbols[startIndex];
-                    Symbol symbolEnd = client_->symbols[endIndex - 1];
-                    client_->eraseSymbolCRDT(symbolStart, symbolEnd);
+                    std::vector<Symbol> symbolsToErase;
+                    std::vector<std::string> usernameToErase;
+                    std::vector<char> charToErase;
+                    std::vector<std::vector<int>> crdtToErase;
 
-                    json j = json{
-                            {"operation",     "remove"},
-                            {"usernameStart", symbolStart.getUsername()},
-                            {"charStart",     symbolStart.getCharacter()},
-                            {"crdtStart",     symbolStart.getPosizione()},
-                            {"usernameEnd",   symbolEnd.getUsername()},
-                            {"charEnd",       symbolEnd.getCharacter()},
-                            {"crdtEnd",       symbolEnd.getPosizione()}
-                    };
-                    client_->sendAtServer(j);
+                    int k = 0;
+                    int dim = endIndex - startIndex;
+                    int of = dim / client_->maxBufferSymbol;
+                    while ((k + 1) * client_->maxBufferSymbol <= dim) {
+                        symbolsToErase.clear();
+                        usernameToErase.clear();
+                        charToErase.clear();
+                        crdtToErase.clear();
+                        for (int i = 0; i < client_->maxBufferSymbol; i++) {
+                            symbolsToErase.push_back(client_->symbols.at(i + startIndex));
+                            usernameToErase.push_back(client_->symbols.at(i + startIndex).getUsername());
+                            charToErase.push_back(client_->symbols.at(i + startIndex).getCharacter());
+                            crdtToErase.push_back(client_->symbols.at(i + startIndex).getPosizione());
+                        }
+                        client_->eraseSymbolCRDT(symbolsToErase);
+
+                        json j = json{
+                                {"operation",       "remove"},
+                                {"usernameToErase", usernameToErase},
+                                {"charToErase",     charToErase},
+                                {"crdtToErase",     crdtToErase}
+                        };
+                        client_->sendAtServer(j);
+                        k++;
+                    }
+                    if ((dim % client_->maxBufferSymbol) > 0) {
+                        symbolsToErase.clear();
+                        usernameToErase.clear();
+                        charToErase.clear();
+                        crdtToErase.clear();
+                        for (int i = 0; i < (dim % client_->maxBufferSymbol); i++) {
+                            symbolsToErase.push_back(client_->symbols.at(i + startIndex));
+                            usernameToErase.push_back(client_->symbols.at(i + startIndex).getUsername());
+                            charToErase.push_back(client_->symbols.at(i + startIndex).getCharacter());
+                            crdtToErase.push_back(client_->symbols.at(i + startIndex).getPosizione());
+                        }
+                        client_->eraseSymbolCRDT(symbolsToErase);
+                        json j = json{
+                                {"operation",       "remove"},
+                                {"usernameToErase", usernameToErase},
+                                {"charToErase",     charToErase},
+                                {"crdtToErase",     crdtToErase}
+                        };
+                        client_->sendAtServer(j);
+                    }
                 } else {
                     pos = cursor.position();
                 }
@@ -966,18 +1002,59 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                 else if (key_ev->text().toStdString().c_str()[0] == 22) {
                     QClipboard *clipboard = QGuiApplication::clipboard();
                     QString pastedText = clipboard->text();
-                    std::cout << "Incollato " << pastedText.length() << " caratteri" << std::endl;
 
-                    for (int i = 0; i < pastedText.length(); i++) {
-                        textEdit->setTextCursor(cursor);
-                        char c = pastedText.toStdString().c_str()[i];
-                        std::vector<int> crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
-                        pos++;
+                    std::vector<std::string> usernameToPaste;
+                    std::vector<char> charToPaste;
+                    std::vector<std::vector<int>> crdtToPaste;
+                    std::vector<int> crdt;
+                    char c;
+
+                    int dim = pastedText.size();
+                    int of = dim / client_->maxBufferSymbol;
+                    int i = 0;
+
+                    while ((i + 1) * client_->maxBufferSymbol <= dim) {
+                        usernameToPaste.clear();
+                        charToPaste.clear();
+                        crdtToPaste.clear();
+
+                        for (int k = 0; k < client_->maxBufferSymbol; k++) {
+                            textEdit->setTextCursor(cursor);
+                            usernameToPaste.push_back(client_->getUser().toStdString());
+                            c = pastedText.toStdString().c_str()[(i * client_->maxBufferSymbol) + k];
+                            charToPaste.push_back(c);
+                            crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
+                            crdtToPaste.push_back(crdt);
+                            pos++;
+                        }
                         json j = json{
-                                {"operation", "insert"},
-                                {"username",  client_->getUser().toStdString()},
-                                {"char",      c},
-                                {"crdt",      crdt}
+                                {"operation", "insert_paste"},
+                                {"usernameToPaste",  usernameToPaste},
+                                {"charToPaste",      charToPaste},
+                                {"crdtToPaste",      crdtToPaste}
+                        };
+                        client_->sendAtServer(j);
+                        i++;
+                    }
+                    if ((dim % client_->maxBufferSymbol) > 0) {
+                        usernameToPaste.clear();
+                        charToPaste.clear();
+                        crdtToPaste.clear();
+
+                        for (int i = 0; i < (dim % client_->maxBufferSymbol); i++) {
+                            textEdit->setTextCursor(cursor);
+                            usernameToPaste.push_back(client_->getUser().toStdString());
+                            c = pastedText.toStdString().c_str()[(of * client_->maxBufferSymbol) + i];
+                            charToPaste.push_back(c);
+                            crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
+                            crdtToPaste.push_back(crdt);
+                            pos++;
+                        }
+                        json j = json{
+                                {"operation", "insert_paste"},
+                                {"usernameToPaste",  usernameToPaste},
+                                {"charToPaste",      charToPaste},
+                                {"crdtToPaste",      crdtToPaste}
                         };
                         client_->sendAtServer(j);
                     }
@@ -992,21 +1069,25 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                 }
                     //*********************BACKSPACE*************************************
                 else if (key == Qt::Key_Backspace) {
-                    if(cursor.hasSelection()) //gia' cancellato
+                    if (cursor.hasSelection()) //gia' cancellato
                         return QObject::eventFilter(obj, ev);
                     if (pos > 0) {
-                        Symbol symbolStart = client_->symbols[pos - 1];
-                        Symbol symbolEnd = symbolStart;
-                        client_->eraseSymbolCRDT(symbolStart, symbolEnd);
+                        std::vector<Symbol> symbolsToErase;
+                        std::vector<std::string> usernameToErase;
+                        std::vector<char> charToErase;
+                        std::vector<std::vector<int>> crdtToErase;
+                        symbolsToErase.push_back(client_->symbols[pos - 1]);
+                        usernameToErase.push_back(client_->symbols[pos - 1].getUsername());
+                        charToErase.push_back(client_->symbols[pos - 1].getCharacter());
+                        crdtToErase.push_back(client_->symbols[pos - 1].getPosizione());
+
+                        client_->eraseSymbolCRDT(symbolsToErase);
 
                         json j = json{
-                                {"operation",     "remove"},
-                                {"usernameStart", symbolStart.getUsername()},
-                                {"charStart",     symbolStart.getCharacter()},
-                                {"crdtStart",     symbolStart.getPosizione()},
-                                {"usernameEnd",   symbolEnd.getUsername()},
-                                {"charEnd",       symbolEnd.getCharacter()},
-                                {"crdtEnd",       symbolEnd.getPosizione()}
+                                {"operation",       "remove"},
+                                {"usernameToErase", usernameToErase},
+                                {"charToErase",     charToErase},
+                                {"crdtToErase",     crdtToErase}
                         };
                         client_->sendAtServer(j);
                     }
@@ -1014,21 +1095,25 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                 }
                     //**********************CANC****************************/
                 else if (key == Qt::Key_Delete) {
-                    if(cursor.hasSelection()) //gia' cancellato
+                    if (cursor.hasSelection()) //gia' cancellato
                         return QObject::eventFilter(obj, ev);
                     if (pos >= 0 && pos < textEdit->toPlainText().size()) {
-                        Symbol symbolStart = client_->symbols[pos];
-                        Symbol symbolEnd = symbolStart;
-                        client_->eraseSymbolCRDT(symbolStart, symbolEnd);
+                        std::vector<Symbol> symbolsToErase;
+                        std::vector<std::string> usernameToErase;
+                        std::vector<char> charToErase;
+                        std::vector<std::vector<int>> crdtToErase;
+                        symbolsToErase.push_back(client_->symbols[pos]);
+                        usernameToErase.push_back(client_->symbols[pos].getUsername());
+                        charToErase.push_back(client_->symbols[pos].getCharacter());
+                        crdtToErase.push_back(client_->symbols[pos].getPosizione());
+
+                        client_->eraseSymbolCRDT(symbolsToErase);
 
                         json j = json{
-                                {"operation",     "remove"},
-                                {"usernameStart", symbolStart.getUsername()},
-                                {"charStart",     symbolStart.getCharacter()},
-                                {"crdtStart",     symbolStart.getPosizione()},
-                                {"usernameEnd",   symbolEnd.getUsername()},
-                                {"charEnd",       symbolEnd.getCharacter()},
-                                {"crdtEnd",       symbolEnd.getPosizione()}
+                                {"operation",       "remove"},
+                                {"usernameToErase", usernameToErase},
+                                {"charToErase",     charToErase},
+                                {"crdtToErase",     crdtToErase}
                         };
                         client_->sendAtServer(j);
                     }
@@ -1040,19 +1125,18 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
     return false;
 }
 
-void TextEdit::eraseSymbols(int start, int end) {
+void TextEdit::eraseSymbols(int toErase) {
     QTextCursor cur = textEdit->textCursor();
 
     cur.beginEditBlock();
-
-    cur.setPosition(start);
+    cur.setPosition(toErase - 1);
     int startAlignment = cur.blockFormat().alignment();
 
     /* erase symbols */
-    cur.setPosition(end);
-    cur.setPosition(start + 1, QTextCursor::KeepAnchor);
+    cur.setPosition(toErase - 1);
+    cur.setPosition(toErase, QTextCursor::KeepAnchor);
     cur.removeSelectedText();
-    cur.setPosition(start, QTextCursor::KeepAnchor);
+    cur.setPosition(toErase - 1, QTextCursor::KeepAnchor);
     cur.removeSelectedText();
 
     QTextBlockFormat textBlockFormat;
@@ -1065,8 +1149,8 @@ void TextEdit::eraseSymbols(int start, int end) {
     textEdit->setFocus();
 }
 
-void TextEdit::draw2 (unsigned int position){
-    QTextCursor cursor= QTextCursor(textEdit->textCursor());
+void TextEdit::draw2(unsigned int position) {
+    QTextCursor cursor = QTextCursor(textEdit->textCursor());
     cursor.setPosition(position);
     std::cout << " Preso cursor" << cursor.position() << std::endl;
     QTextCursor tempCursor = QTextCursor(cursor);
@@ -1093,8 +1177,8 @@ QString TextEdit::getFileName() const {
     return fileName;
 }
 
-void TextEdit::drawRemoteCursors(){
-    QTextCursor cursor= QTextCursor(textEdit->textCursor());
+void TextEdit::drawRemoteCursors() {
+    QTextCursor cursor = QTextCursor(textEdit->textCursor());
     QTextCursor tempCursor = QTextCursor(cursor);
     tempCursor.clearSelection();
     tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
@@ -1137,7 +1221,7 @@ void TextEdit::initListParticipant(int participantId, QString username) {
 }
 
 void TextEdit::initRemoteCursors(int participantId, QString color) {
-    if(_listParticipant[participantId] != client_->getUser()) {
+    if (_listParticipant[participantId] != client_->getUser()) {
         CustomCursor remoteCursor = CustomCursor();
         _cursorsVector.insert(std::pair<int, CustomCursor>(participantId, remoteCursor));
         if (_cursorColors.insert(std::pair<int, QColor>(participantId, color)).second) {
@@ -1161,7 +1245,7 @@ void TextEdit::updateCursors() {
     updateCursors(cursor);
 }
 
-void TextEdit::updateCursors(const CustomCursor &cursor){
+void TextEdit::updateCursors(const CustomCursor &cursor) {
     _oldCursor = CustomCursor(_newCursor);
     _newCursor = CustomCursor(cursor);
 }
