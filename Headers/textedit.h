@@ -11,7 +11,7 @@
 #include <QPointer>
 #include "Client.h"
 #include "customcursor.h"
-
+#include <QLabel>
 QT_BEGIN_NAMESPACE
 class QAction;
 class QComboBox;
@@ -102,6 +102,7 @@ private:
     void requestLogout();
     void closingFile();
     void draw2(unsigned int position);
+    void drawGraphicCursor();
     QAction *actionSave;
     QAction *actionTextBold;
     QAction *actionTextUnderline;
@@ -134,6 +135,7 @@ private:
     QString _currentText = QString{};
     std::map<QString, CustomCursor> _cursorsVector;
     std::map<QString, QColor> _listParticipantsAndColors;
+    std::map<QString, QLabel*> _labels;
 };
 
 
