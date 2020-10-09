@@ -109,7 +109,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
             std::string email = js.at("email").get<std::string>();
             QString qEmail = QString::fromUtf8(email.data(), email.size());
             this->setEmail(qEmail);
-
+            this->maxBufferSymbol = js.at("maxBufferSymbol").get<int>();
         }
         emit formResultSuccess(res);
         return type_request;

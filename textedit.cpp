@@ -32,8 +32,6 @@
 #include <QColor>
 #include <QPushButton>
 
-#define maxBufferSymbol 100
-
 #if defined(QT_PRINTSUPPORT_LIB)
 
 #include <QtPrintSupport/qtprintsupportglobal.h>
@@ -931,13 +929,13 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
 
                     int k = 0;
                     int dim = endIndex - startIndex;
-                    int of = dim / maxBufferSymbol;
-                    while ((k + 1) * maxBufferSymbol <= dim) {
+                    int of = dim / client_->maxBufferSymbol;
+                    while ((k + 1) * client_->maxBufferSymbol <= dim) {
                         symbolsToErase.clear();
                         usernameToErase.clear();
                         charToErase.clear();
                         crdtToErase.clear();
-                        for (int i = 0; i < maxBufferSymbol; i++) {
+                        for (int i = 0; i < client_->maxBufferSymbol; i++) {
                             symbolsToErase.push_back(client_->symbols.at(i + startIndex));
                             usernameToErase.push_back(client_->symbols.at(i + startIndex).getUsername());
                             charToErase.push_back(client_->symbols.at(i + startIndex).getCharacter());
@@ -954,12 +952,12 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         client_->sendAtServer(j);
                         k++;
                     }
-                    if ((dim % maxBufferSymbol) > 0) {
+                    if ((dim % client_->maxBufferSymbol) > 0) {
                         symbolsToErase.clear();
                         usernameToErase.clear();
                         charToErase.clear();
                         crdtToErase.clear();
-                        for (int i = 0; i < (dim % maxBufferSymbol); i++) {
+                        for (int i = 0; i < (dim % client_->maxBufferSymbol); i++) {
                             symbolsToErase.push_back(client_->symbols.at(i + startIndex));
                             usernameToErase.push_back(client_->symbols.at(i + startIndex).getUsername());
                             charToErase.push_back(client_->symbols.at(i + startIndex).getCharacter());
@@ -1012,18 +1010,18 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     char c;
 
                     int dim = pastedText.size();
-                    int of = dim / maxBufferSymbol;
+                    int of = dim / client_->maxBufferSymbol;
                     int i = 0;
 
-                    while ((i + 1) * maxBufferSymbol <= dim) {
+                    while ((i + 1) * client_->maxBufferSymbol <= dim) {
                         usernameToPaste.clear();
                         charToPaste.clear();
                         crdtToPaste.clear();
 
-                        for (int k = 0; k < maxBufferSymbol; k++) {
+                        for (int k = 0; k < client_->maxBufferSymbol; k++) {
                             textEdit->setTextCursor(cursor);
                             usernameToPaste.push_back(client_->getUser().toStdString());
-                            c = pastedText.toStdString().c_str()[(i * maxBufferSymbol) + k];
+                            c = pastedText.toStdString().c_str()[(i * client_->maxBufferSymbol) + k];
                             charToPaste.push_back(c);
                             crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
                             crdtToPaste.push_back(crdt);
@@ -1038,15 +1036,15 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         client_->sendAtServer(j);
                         i++;
                     }
-                    if ((dim % maxBufferSymbol) > 0) {
+                    if ((dim % client_->maxBufferSymbol) > 0) {
                         usernameToPaste.clear();
                         charToPaste.clear();
                         crdtToPaste.clear();
 
-                        for (int i = 0; i < (dim % maxBufferSymbol); i++) {
+                        for (int i = 0; i < (dim % client_->maxBufferSymbol); i++) {
                             textEdit->setTextCursor(cursor);
                             usernameToPaste.push_back(client_->getUser().toStdString());
-                            c = pastedText.toStdString().c_str()[(of * maxBufferSymbol) + i];
+                            c = pastedText.toStdString().c_str()[(of * client_->maxBufferSymbol) + i];
                             charToPaste.push_back(c);
                             crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
                             crdtToPaste.push_back(crdt);
