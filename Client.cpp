@@ -130,6 +130,20 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         //emetto per inserimento nel testo
         emit insertSymbol(index, newSymbol.getCharacter());
         return type_request;
+    } else if (type_request == "insert_paste_res") {
+        //prendo il vettore di symbol
+        std::vector<std::string> usernameToPaste = js.at("usernameToPaste").get<std::vector<std::string>>();
+        std::vector<char> charToPaste = js.at("charToPaste").get<std::vector<char>>();
+        std::vector<std::vector<int>> crdtToPaste = js.at("crdtToPaste").get<std::vector<std::vector<int>>>();
+        for (int i = 0; i < usernameToPaste.size(); i++) {
+            //ricreo il simbolo
+            Symbol symbolToPaste(charToPaste[i], usernameToPaste[i], crdtToPaste[i]);
+            int index = this->generateIndexCRDT(symbolToPaste, 0, -1, -1);
+            //aggiungo al crdt
+            this->insertSymbolIndex(symbolToPaste, index);
+            emit insertSymbol(index, charToPaste[i]);
+        }
+        return type_request;
     } else if (type_request == "remove_res") {
         //prendo il vettore di symbol
         std::vector<Symbol> symbolsToErase;

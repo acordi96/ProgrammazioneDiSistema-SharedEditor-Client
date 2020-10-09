@@ -32,7 +32,7 @@
 #include <QColor>
 #include <QPushButton>
 
-#define maxBufferSymbol 2
+#define maxBufferSymbol 100
 
 #if defined(QT_PRINTSUPPORT_LIB)
 
@@ -1004,18 +1004,59 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                 else if (key_ev->text().toStdString().c_str()[0] == 22) {
                     QClipboard *clipboard = QGuiApplication::clipboard();
                     QString pastedText = clipboard->text();
-                    std::cout << "Incollato " << pastedText.length() << " caratteri" << std::endl;
 
-                    for (int i = 0; i < pastedText.length(); i++) {
-                        textEdit->setTextCursor(cursor);
-                        char c = pastedText.toStdString().c_str()[i];
-                        std::vector<int> crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
-                        pos++;
+                    std::vector<std::string> usernameToPaste;
+                    std::vector<char> charToPaste;
+                    std::vector<std::vector<int>> crdtToPaste;
+                    std::vector<int> crdt;
+                    char c;
+
+                    int dim = pastedText.size();
+                    int of = dim / maxBufferSymbol;
+                    int i = 0;
+
+                    while ((i + 1) * maxBufferSymbol <= dim) {
+                        usernameToPaste.clear();
+                        charToPaste.clear();
+                        crdtToPaste.clear();
+
+                        for (int k = 0; k < maxBufferSymbol; k++) {
+                            textEdit->setTextCursor(cursor);
+                            usernameToPaste.push_back(client_->getUser().toStdString());
+                            c = pastedText.toStdString().c_str()[(i * maxBufferSymbol) + k];
+                            charToPaste.push_back(c);
+                            crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
+                            crdtToPaste.push_back(crdt);
+                            pos++;
+                        }
                         json j = json{
-                                {"operation", "insert"},
-                                {"username",  client_->getUser().toStdString()},
-                                {"char",      c},
-                                {"crdt",      crdt}
+                                {"operation", "insert_paste"},
+                                {"usernameToPaste",  usernameToPaste},
+                                {"charToPaste",      charToPaste},
+                                {"crdtToPaste",      crdtToPaste}
+                        };
+                        client_->sendAtServer(j);
+                        i++;
+                    }
+                    if ((dim % maxBufferSymbol) > 0) {
+                        usernameToPaste.clear();
+                        charToPaste.clear();
+                        crdtToPaste.clear();
+
+                        for (int i = 0; i < (dim % maxBufferSymbol); i++) {
+                            textEdit->setTextCursor(cursor);
+                            usernameToPaste.push_back(client_->getUser().toStdString());
+                            c = pastedText.toStdString().c_str()[(of * maxBufferSymbol) + i];
+                            charToPaste.push_back(c);
+                            crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
+                            crdtToPaste.push_back(crdt);
+                            pos++;
+                        }
+                        json j = json{
+                                {"operation", "insert_paste"},
+                                {"usernameToPaste",  usernameToPaste},
+                                {"charToPaste",      charToPaste},
+                                {"crdtToPaste",      crdtToPaste}
                         };
                         client_->sendAtServer(j);
                     }
