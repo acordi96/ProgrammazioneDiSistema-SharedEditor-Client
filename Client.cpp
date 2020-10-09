@@ -193,19 +193,19 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         return type_request;
 
     } else if (type_request == "open_file") {
-        int maxBufferChar = js.at("maxBufferChar");
-        std::string toWrite = js.at("toWrite");
-        int part = js.at("partToWrite");
-
         //prima parte di file deve pulire il testo
         if (this->writing == 0)
                 emit clearEditor();
-        //per ogni carattere ametti di scriverlo
-        for (int i = 0; i < toWrite.length(); i++) {
-            //creo symbol e aggiungo al crdt
-            this->insertSymbolNewCRDT((maxBufferChar * part) + i, toWrite[i], "");
-            //emetto di scrivere il carattere sul testo
-            emit insertSymbol((maxBufferChar * part) + i, toWrite[i]);
+        std::vector<std::string> usernameToInsert = js.at("usernameToInsert").get<std::vector<std::string>>();
+        std::vector<char> charToInsert = js.at("charToInsert").get<std::vector<char>>();
+        std::vector<std::vector<int>> crdtToInsert = js.at("crdtToInsert").get<std::vector<std::vector<int>>>();
+        for (int i = 0; i < usernameToInsert.size(); i++) {
+            //ricreo il simbolo
+            Symbol symbolToInsert(charToInsert[i], usernameToInsert[i], crdtToInsert[i]);
+            int index = this->generateIndexCRDT(symbolToInsert, 0, -1, -1);
+            //aggiungo al crdt
+            this->insertSymbolIndex(symbolToInsert, index);
+            emit insertSymbol(index, charToInsert[i]);
         }
         if (this->writing == js.at("ofPartToWrite")) {
             this->writing = 0;
@@ -213,7 +213,6 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         } else {
             this->writing++;
         }
-
         return type_request;
     } else if (type_request == "invitation_success") {
         std::string name =
