@@ -128,7 +128,8 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         //inserisco symbol nel crdt
         this->insertSymbolIndex(newSymbol, index);
         //emetto per inserimento nel testo
-        emit insertSymbol(index, newSymbol.getCharacter());
+        //emit insertSymbol(index, newSymbol.getCharacter());
+        emit insertSymbolWithId(QString::fromStdString(newSymbol.getUsername()), index, newSymbol.getCharacter());
         return type_request;
     } else if (type_request == "insert_paste_res") {
         //prendo il vettore di symbol
@@ -142,6 +143,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
             //aggiungo al crdt
             this->insertSymbolIndex(symbolToPaste, index);
             emit insertSymbol(index, charToPaste[i]);
+            //TO DO:mettere insertSymbolWithId
         }
         return type_request;
     } else if (type_request == "remove_res") {
@@ -157,6 +159,8 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         //emetto per aggiornamento testo con gli indici
         for (auto &indexToErase : erased)
                 emit eraseSymbols(indexToErase);
+
+        //TO DO: mettere usrt in erase
         return type_request;
     } else if (type_request == "new_file_created") {
         QString res = QString::fromStdString("new_file_created");
@@ -276,19 +280,11 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         othersOnFile = js.at("idList").get<std::vector<int>>();
         colors = js.at("colorsList").get<std::vector<std::string>>();
         usernames = js.at("usernames").get<std::vector<std::string>>();
-        int j = 0;
-        for (auto u:usernames) {
-            QString username = QString::fromStdString(u);
-            emit insertParticipant(othersOnFile[j], username);
-            j++;
+        usersInFile users;
+        for(int i=0; i<usernames.size(); i++){
+            users.insert(std::pair<std::string, std::string>(usernames[i], colors[i]));
         }
-
-        int i = 0;
-        for (auto c:colors) {
-            QString color = QString::fromStdString(c);
-            emit updateCursorParticipant(othersOnFile[i], color);
-            i++;
-        }
+        emit updateUserslist(users);
 
     } else if (type_request == "user_already_logged"){
         QString res = QString::fromUtf8("user_already_logged");
