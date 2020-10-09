@@ -9,6 +9,7 @@
 #include "Libs/json.hpp"
 #include "Libs/md5.h"
 #include <QDesktopWidget>
+#include <QDebug>
 
 using json = nlohmann::json;
 using boost::asio::ip::tcp;
@@ -219,6 +220,7 @@ void stacked::showPopupSuccess(QString result) {
         //ui->stackedWidget->setCurrentIndex(2);
     } else {
         QDialog *dialog = new QDialog();
+        dialog->setWindowTitle(QString::fromUtf8(" Shared Editor "));
         QVBoxLayout *layout = new QVBoxLayout();
         dialog->setLayout(layout);
         if (result == "QUERY_ERROR" || result == "CONNESSION_ERROR" || result == "SIGNUP_ERROR_INSERT_FAILED") {
@@ -226,7 +228,7 @@ void stacked::showPopupSuccess(QString result) {
         } else if (result == "LOGIN_ERROR") {
             layout->addWidget(new QLabel("Invalid username and/or password"));
         } else if (result == "user_already_logged") {
-            layout->addWidget(new QLabel("User already logged"));
+            layout->addWidget(new QLabel("Error! User already logged!"));
         } else if (result == "SIGNUP_ERROR_DUPLICATE_USERNAME") {
             layout->addWidget(new QLabel("Username already registered"));
         } else if (result == "new_file_created") {
@@ -384,6 +386,7 @@ void stacked::logout(){
     ui->user_log_line->clear();
     ui->psw_log_line->clear();
     ui->user_log_line->setFocus();
+    client_->setFiles(std::map<std::pair<std::string, std::string>, std::string>());
     ui->stackedWidget->removeWidget(te);
     ui->stackedWidget->removeWidget(up);
     ui->stackedWidget->setCurrentIndex(0);

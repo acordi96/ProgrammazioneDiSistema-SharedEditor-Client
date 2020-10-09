@@ -2,9 +2,9 @@
 #define STACKED_H
 
 #include <QMainWindow>
-#include "textedit.h"
-#include "userpage.h"
-#include "Client.h"
+#include "Headers/textedit.h"
+#include "Headers/userpage.h"
+#include "Headers/Client.h"
 namespace Ui {
 class stacked;
 }

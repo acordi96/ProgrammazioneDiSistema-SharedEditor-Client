@@ -16,26 +16,28 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    customcursor.cpp \
-    main.cpp \
-    registrationform.cpp \
-    stacked.cpp \
-    textedit.cpp \
-    Client.cpp  \
-    message.cpp \
-    userpage.cpp\
-    lib/md5.cpp \
+        customcursor.cpp \
+        main.cpp \
+        stacked.cpp \
+        textedit.cpp \
+        Client.cpp  \
+        message.cpp \
+        userpage.cpp\
+        Symbol.cpp \
+        MessageSymbol.cpp\
+        Libs/md5.cpp \
 
 HEADERS += \
-    customcursor.h \
-    registrationform.h \
-    stacked.h \
-    textedit.h \
-    Client.h \
-    message.h \
-    userpage.h \
-    json.hpp \
-    lib/md5.h \
+        Headers/Client.h \
+        Headers/customcursor.h \
+        Headers/message.h \
+        Headers/MessageSymbol.h \
+        Headers/stacked.h \
+        Headers/Symbol.h \
+        Headers/textedit.h \
+        Headers/userpage.h \
+        Libs/md5.h \
+        Libs/json.hpp
 
 RESOURCES += \
     project_icons.qrc

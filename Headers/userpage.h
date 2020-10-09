@@ -3,7 +3,7 @@
 
 #include <QLineEdit>
 #include <QMainWindow>
-#include "Client.h"
+#include "Headers/Client.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -30,7 +30,6 @@ private:
     void setupRecentFiles();
 
     void setupUserinfo();
-
     void sendmessage(message mess);
 
     void requestLogout();
@@ -87,6 +86,7 @@ public slots:
 private:
     QPushButton *newFileButton;
     QLineEdit *lineURL;
+    QPushButton *openURLbutton;
 
     bool colorIsDark(QString color);
 };

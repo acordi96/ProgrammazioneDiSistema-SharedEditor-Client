@@ -1,4 +1,3 @@
-#include "Headers/registrationform.h"
 #include "Headers/stacked.h"
 #include <QApplication>
 

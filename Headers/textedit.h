@@ -9,8 +9,8 @@
 #include <QMainWindow>
 #include <QMap>
 #include <QPointer>
-#include "Client.h"
-#include "customcursor.h"
+#include "Headers/Client.h"
+#include "Headers/customcursor.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;

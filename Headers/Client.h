@@ -51,6 +51,7 @@ public:
     void setFiles(const std::vector<std::string> &owners, const std::vector<std::string> &filenames,
                   const std::vector<std::string> &invitations);
 
+
     std::map<std::pair<std::string, std::string>, std::string> files; //<<owner, filename>, invitation>
     std::vector<Symbol> symbols;
 
@@ -75,6 +76,10 @@ public:
     std::vector<int> generatePosBetween(std::vector<int> pos1, std::vector<int> pos2, std::vector<int> newPos);
 
     void sendAtServer(const json &js);
+
+    std::map<std::pair<std::string, std::string>, std::string> getFiles() const;
+
+    void setFiles(const std::map<std::pair<std::string, std::string>, std::string> &value);
 
 signals:
 

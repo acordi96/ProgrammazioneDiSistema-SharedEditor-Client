@@ -276,6 +276,9 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
             i++;
         }
 
+    } else if (type_request == "user_already_logged"){
+        QString res = QString::fromUtf8("user_already_logged");
+        emit formResultSuccess(res);
     }
     return type_request;
 }
@@ -338,12 +341,22 @@ void Client::setColor(const QString &color) {
     Client::color = color;
 }
 
+void Client::setFiles(const std::map<std::pair<std::string, std::string>, std::string> &value)
+{
+    files = value;
+}
+
 void Client::setFiles(const std::vector<std::string> &owners, const std::vector<std::string> &filenames,
                       const std::vector<std::string> &invitations) {
 
     for (int i = 0; i < owners.size(); i++) {
         files.insert({std::pair<std::string, std::string>(owners[i], filenames[i]), invitations[i]});
     }
+}
+
+std::map<std::pair<std::string, std::string>, std::string> Client::getFiles() const
+{
+    return files;
 }
 
 //crea un nuovo symbol e lo inserisce nel crdt in posizione index
