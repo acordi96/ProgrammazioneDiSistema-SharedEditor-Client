@@ -101,7 +101,6 @@ private:
     void setupConnectedUsers();
     void requestLogout();
     void closingFile();
-    void draw2(unsigned int position);
     void drawGraphicCursor();
     QAction *actionSave;
     QAction *actionTextBold;

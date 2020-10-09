@@ -1125,30 +1125,6 @@ void TextEdit::eraseSymbols(QString user, int start, int end) {
     textEdit->setFocus();
 }
 
-void TextEdit::draw2 (unsigned int position){
-    QTextCursor cursor= QTextCursor(textEdit->textCursor());
-    cursor.setPosition(position);
-    std::cout << " Preso cursor" << cursor.position() << std::endl;
-    QTextCursor tempCursor = QTextCursor(cursor);
-    tempCursor.setPosition(position);
-    std::cout << " Preso tempCursor" << tempCursor.position() << std::endl;
-    tempCursor.clearSelection();
-    std::cout << " Preso tempCursor clear" << tempCursor.position() << std::endl;
-
-    tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
-    std::cout << " Preso tempCursor move1" << tempCursor.position() << tempCursor.selectionStart() << std::endl;
-
-    tempCursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor, 1);
-    std::cout << " Preso tempCursor move2" << tempCursor.position() << tempCursor.selectionEnd() << std::endl;
-
-    textEdit->setTextCursor(tempCursor);
-    textEdit->setTextBackgroundColor(QColor(255, 255, 255, 255));
-    textEdit->setTextCursor(cursor);
-    //textEdit->setTextBackgroundColor(client_->getColor());
-    textEdit->setTextBackgroundColor(Qt::red);
-
-}
-
 QString TextEdit::getFileName() const {
     return fileName;
 }
