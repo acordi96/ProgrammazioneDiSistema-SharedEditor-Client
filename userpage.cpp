@@ -204,6 +204,7 @@ void Userpage::setupUserinfo(){
                                                    "QPushButton#openURLbutton:hover{\n"
                                                    "background-color: rgb(255,0,0);\n"
                                                    "}"));
+    connect(openURLbutton,&QPushButton::clicked,this,&Userpage::handleOpenURLbutton);
     QSpacerItem *urlSpacer = new QSpacerItem(20,20,QSizePolicy::Fixed,QSizePolicy::Minimum);
     urlLayout->addItem(urlSpacer);
     urlLayout->addWidget(openURLbutton);
@@ -436,7 +437,7 @@ void Userpage::handleNewFileButton()
     QInputDialog modalWindow;
     QString label = "File name: ";
     modalWindow.setLabelText(label);
-    modalWindow.setWindowTitle("New FIle");
+    modalWindow.setWindowTitle("New File");
     modalWindow.setMinimumSize(QSize(300, 150));
     modalWindow.setSizePolicy(QSizePolicy::MinimumExpanding,
                               QSizePolicy::MinimumExpanding);
@@ -596,8 +597,8 @@ void Userpage::on_openButton_clicked(){
         //nessun file selezionato
         QMessageBox::information(
                 this,
-                tr("Hey!"),
-                tr("Select a file") );
+                tr("Shared Editor"),
+                tr("Hey! Select a file") );
         return;
     }
 
@@ -641,8 +642,8 @@ void Userpage::on_renameButton_clicked() {
         //nessun file selezionato
         QMessageBox::information(
                 this,
-                tr("Hey!"),
-                tr("Select a file") );
+                tr("Shared Editor"),
+                tr("Hey! Select a file") );
         return;
     }
 
@@ -767,8 +768,8 @@ void Userpage::on_deleteButton_clicked() {
         //nessun file selezionato
         QMessageBox::information(
                 this,
-                tr("Hey!"),
-                tr("Select a file") );
+                tr("Shared Editor"),
+                tr("Hey! Select a file") );
         return;
     }
     std::pair<std::string, std::string> parsed = parseFileButton(selectedFile);
@@ -777,6 +778,7 @@ void Userpage::on_deleteButton_clicked() {
 
     if(owner == client_->getUser().toStdString()) { //sei l'owner
         QMessageBox msgBox;
+        msgBox.setWindowTitle(" Shared Editor ");
         msgBox.setText("Do you really want to delete the selected file?");
         //msgBox.setInformativeText("Do you want to save your changes?");
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
@@ -821,6 +823,7 @@ void Userpage::on_deleteButton_clicked() {
 
     } else { //non sei l'owner: rimuovi invito
         QMessageBox msgBox;
+        msgBox.setWindowTitle(" Shared Editor");
         msgBox.setText("Do you really want to remove the file invitation?");
         //msgBox.setInformativeText("Do you want to save your changes?");
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
@@ -915,7 +918,7 @@ void Userpage::updateRecentFiles(QString old, QString newN, QString owner, QStri
         button->setFlat(true);
         page->findChild<QVBoxLayout *>("verticalLayout")->addWidget(button);
         connect(button,SIGNAL(clicked()),SLOT(on_fileName_clicked()));
-
+        lineURL->clear();
         return;
     }
     if(request == "delete_file"){ //aggiorniamo dopo una delete
