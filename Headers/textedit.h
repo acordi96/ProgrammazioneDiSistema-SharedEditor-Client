@@ -9,29 +9,25 @@
 #include <QMainWindow>
 #include <QMap>
 #include <QPointer>
+#include <QLabel>
+
 #include "Headers/Client.h"
 #include "Headers/customcursor.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
-
 class QComboBox;
-
 class QFontComboBox;
-
 class QTextEdit;
-
 class QTextCharFormat;
-
 class QMenu;
-
 class QPrinter;
-
 QT_END_NAMESPACE
 
 class QEvent;
-
-class TextEdit : public QMainWindow {
+typedef  std::map<std::string, std::string> usersInFile;
+class TextEdit : public QMainWindow
+{
 Q_OBJECT
 
 public:
@@ -42,119 +38,76 @@ public:
     QString getFileName() const;
 
 public slots:
-
     void fileNew();
-
     void showSymbol(int pos, QChar c);
-
-    void showSymbolWithId(int id, int pos, QChar c);
-
+    void showSymbolWithId(QString user, int pos, QChar c);
+    void updateRemotePosition(QString user, int pos);
     void eraseSymbols(int toErase);
+    //TO DO:mettere user
     //void show_Symbol(std::pair<int,char> tuple);
 protected:
     void closeEvent(QCloseEvent *e) override;
-
     bool eventFilter(QObject *obj, QEvent *ev) override;
-
 signals:
-
     void logout();
-
     void closeFile();
-
     void closeAll();
-
     void updateCursor();
 
 private slots:
-
     void fileOpen();
-
     bool fileSave();
-
     bool fileSaveAs();
-
     void filePrint();
-
     void filePrintPreview();
-
     void filePrintPdf();
 
     void textBold();
-
     void textUnderline();
-
     void textItalic();
-
     void textFamily(const QString &f);
-
     void textSize(const QString &p);
-
     void textStyle(int styleIndex);
-
     void textColor();
-
     void textAlign(QAction *a);
 
     void currentCharFormatChanged(const QTextCharFormat &format);
-
     void cursorPositionChanged();
-
-    void localInsert();
-
     void clipboardDataChanged();
-
     void about();
-
     void printPreview(QPrinter *);
-
     void drawRemoteCursors();
-
-    void initRemoteCursors(int participantId, QString color);
-
-    void initListParticipant(int participantId, QString username);
-    //void initRemoteCursors(int id_client, QColor remoteColor);
-    //void updateRemoteCursors(int id_client,int pos);
+    void updateListParticipants(usersInFile users);
+    void highlightcharacter();
 private:
     Client *client_;
-
     void setupFileActions();
-
     void setupEditActions();
-
     void setupTextActions();
-
     bool maybeSave();
-
     void setCurrentFileName(const QString &fileName);
 
     void mergeFormatOnWordOrSelection(const QTextCharFormat &format);
-
     void fontChanged(const QFont &f);
-
     void colorChanged(const QColor &c);
-
     void alignmentChanged(Qt::Alignment a);
 
     void resetText();
-
     void resetCursors();
-
     void updateCursors(const CustomCursor &cursor);
-
-    void updateConnectedUsers(QString user, QString color);
+    void updateConnectedUser(QString user, QString color);
+    void updateConnectedUsers(usersInFile users);
 
     void updateCursors();
-
     //for debug
     void setupConnectedUsers();
-
     void requestLogout();
-
     void closingFile();
 
-    void draw2(unsigned int position);
 
+    void drawGraphicCursor();
+    void incrementPosition(int pos, int count);
+    void decreentPosition(int pos, int count);
     QAction *actionSave;
     QAction *actionTextBold;
     QAction *actionTextUnderline;
@@ -185,9 +138,9 @@ private:
     CustomCursor _newCursor = CustomCursor();
     CustomCursor _oldCursor = CustomCursor();
     QString _currentText = QString{};
-    std::map<unsigned int, CustomCursor> _cursorsVector;
-    std::map<unsigned int, QColor> _cursorColors;
-    std::map<unsigned int, QString> _listParticipant;
+    std::map<QString, CustomCursor> _cursorsVector;
+    std::map<QString, QColor> _listParticipantsAndColors;
+    std::map<QString, QLabel*> _labels;
 };
 
 

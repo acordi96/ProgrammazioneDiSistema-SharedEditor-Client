@@ -68,14 +68,21 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
 #endif
     textEdit = new QTextEdit(this);
 
-    connect(this, &TextEdit::updateCursor, this, &TextEdit::drawRemoteCursors);
+    connect(this, &TextEdit::updateCursor, this, &TextEdit::drawGraphicCursor);
 
     connect(client_, &Client::insertSymbol, this, &TextEdit::showSymbol);
     connect(client_, &Client::insertSymbolWithId, this, &TextEdit::showSymbolWithId);
-    connect(client_, &Client::updateCursorParticipant, this, &TextEdit::initRemoteCursors);
-    connect(client_, &Client::insertParticipant, this, &TextEdit::initListParticipant);
+    connect(client_, &Client::updateUserslist, this, &TextEdit::updateListParticipants);
+
     connect(client_, &Client::eraseSymbols, this, &TextEdit::eraseSymbols);
     connect(client_, &Client::clearEditor, textEdit, &QTextEdit::clear);
+    connect(client_, &Client::updateRemotePosition, this, &TextEdit::updateRemotePosition);
+    // controllare che funziona
+    connect(textEdit, &QTextEdit::cursorPositionChanged, this, &TextEdit::cursorPositionChanged);
+    //aggiorno lista
+
+    qRegisterMetaType<usersInFile>("std::map<std::string,std::string>");
+
 
     textEdit->installEventFilter(this);
 
@@ -375,12 +382,14 @@ void TextEdit::setupTextActions() {
     connect(comboSize, QOverload<const QString &>::of(&QComboBox::activated), this, &TextEdit::textSize);
 }
 
-void TextEdit::updateConnectedUsers(QString user, QString color) {
-    QLabel *label = new QLabel(user);
-    label->setStyleSheet("color:" + color);
-    QListWidgetItem *item = new QListWidgetItem();
+void TextEdit::updateConnectedUser(QString user, QString color){
+    QPushButton * label = new QPushButton(user);
+    label->setObjectName(user);
+    label->setStyleSheet("color:"+color);
+    QListWidgetItem * item = new QListWidgetItem();
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
+    connect(label,SIGNAL(clicked()),SLOT(highlightcharacter()));
 }
 
 void TextEdit::setupConnectedUsers() {
@@ -392,27 +401,6 @@ void TextEdit::setupConnectedUsers() {
     QListWidgetItem *item = new QListWidgetItem();
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
-    /*for(auto u : users){
-     *  label = new QLabel(username);
-     *  label->setStyleSheet(QString::fromUtf8("color:#"));
-     *  QListWidgetItem *item = new QListWidgetItem();
-     *  connectedUsers->addItem(item);
-     *  connectedUsers->setItemWidget(item,label);
-     *  }
-     * */
-
-/*
-
-    QLabel *label = new QLabel(client_->getUser());
-    std::cout<< client_->getColor().toStdString() <<std::endl;
-    label->setStyleSheet(QString::fromUtf8("color:#463745"));
-    QListWidgetItem *item = new QListWidgetItem();
-    connectedUsers->addItems(QStringList()
-                            << "angelo96"
-                            << "nick1");
-    connectedUsers->addItem(item);
-    connectedUsers->setItemWidget(item,label);
-    */
     dock->setWidget(connectedUsers);
     dock->setFeatures(QDockWidget::NoDockWidgetFeatures);
     addDockWidget(Qt::RightDockWidgetArea, dock);
@@ -706,7 +694,26 @@ void TextEdit::currentCharFormatChanged(const QTextCharFormat &format) {
     colorChanged(format.foreground().color());
 }
 
+
+void TextEdit::updateRemotePosition(QString user, int pos) {
+    _cursorsVector[user].setPosition(pos);
+    drawGraphicCursor();
+}
+
 void TextEdit::cursorPositionChanged() {
+
+    QTextCursor cursor = textEdit->textCursor();
+    int pos = cursor.position();
+    std::cout << "LA POSIZIONE CAMBIA "  << pos << std::endl;
+
+    json j = json{
+            {"operation", "update_cursorPosition"},
+            {"username",  client_->getUser().toStdString()},
+            {"pos",      pos}
+    };
+    client_->sendAtServer(j);
+
+    /*
     alignmentChanged(textEdit->alignment());
     QTextList *list = textEdit->textCursor().currentList();
     if (list) {
@@ -742,10 +749,10 @@ void TextEdit::cursorPositionChanged() {
     } else {
         int headingLevel = textEdit->textCursor().blockFormat().headingLevel();
         comboStyle->setCurrentIndex(headingLevel ? headingLevel + 8 : 0);
-    }
+    }*/
 }
 
-void TextEdit::showSymbolWithId(int id, int pos, QChar c) {
+void TextEdit::showSymbolWithId(QString user, int pos, QChar c) {
     QTextCharFormat format;
     format.setFontWeight(QFont::Normal);
     format.setFontFamily("Helvetica");
@@ -777,8 +784,18 @@ void TextEdit::showSymbolWithId(int id, int pos, QChar c) {
     cur.endEditBlock();
 
     textEdit->setTextCursor(cur);
-    _cursorsVector[id].setPosition(pos + 1);
-    drawRemoteCursors();
+
+    for(auto list:_listParticipantsAndColors){
+        if(list.first!=user){
+            if(pos<_cursorsVector[list.first].position)
+                _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position + 1);
+        }else{
+            _cursorsVector[user].setPosition(pos + 1);
+        }
+    }
+    //drawRemoteCursors();
+    drawGraphicCursor();
+
     textEdit->setFocus();
 }
 
@@ -858,31 +875,7 @@ void TextEdit::alignmentChanged(Qt::Alignment a) {
         actionAlignJustify->setChecked(true);
 }
 
-void TextEdit::localInsert() {
-    QTextCursor cur = textEdit->textCursor();
-    int oldPos = cur.position();
-    std::pair<int, char> m;
-    char c;
 
-    if (cur.hasSelection()) {
-        //remove char
-        return;
-    } else {
-        //insert char
-        cur.movePosition(QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor, 1);
-        c = cur.selectedText().toStdString().c_str()[0];
-    }
-
-    //TODO: cos'e'?
-    m = std::make_pair(cur.position(), c);
-    json j = json{
-            {"operation", "insert"},
-            {"corpo",     m}
-    };
-    client_->sendAtServer(j);
-
-    textEdit->textCursor().setPosition(oldPos);
-}
 
 bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
     if (ev->type() == QEvent::KeyPress) {
@@ -952,6 +945,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         client_->sendAtServer(j);
                         k++;
                     }
+
                     if ((dim % client_->maxBufferSymbol) > 0) {
                         symbolsToErase.clear();
                         usernameToErase.clear();
@@ -972,6 +966,8 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         };
                         client_->sendAtServer(j);
                     }
+                    decreentPosition(startIndex, dim);
+                    drawGraphicCursor();
                 } else {
                     pos = cursor.position();
                 }
@@ -987,7 +983,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     char c = key_ev->text().toStdString().c_str()[0];
                     std::vector<int> crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
                     textEdit->setTextCursor(cursor);
-                    emit updateCursor();
+                    //emit updateCursor();
 
                     json j = json{
                             {"operation", "insert"},
@@ -996,6 +992,14 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                             {"crdt",      crdt}
                     };
                     client_->sendAtServer(j);
+                    //drawRemoteCursors();
+
+                    incrementPosition(pos, 1);
+                    drawGraphicCursor();
+
+
+
+
                     return QObject::eventFilter(obj, ev);
                 }
                     //*********************PASTE*****************************************
@@ -1008,7 +1012,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     std::vector<std::vector<int>> crdtToPaste;
                     std::vector<int> crdt;
                     char c;
-
+                    int startPos = pos;
                     int dim = pastedText.size();
                     int of = dim / client_->maxBufferSymbol;
                     int i = 0;
@@ -1036,6 +1040,8 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         client_->sendAtServer(j);
                         i++;
                     }
+
+
                     if ((dim % client_->maxBufferSymbol) > 0) {
                         usernameToPaste.clear();
                         charToPaste.clear();
@@ -1058,6 +1064,9 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         };
                         client_->sendAtServer(j);
                     }
+                    //TO DO: probabilente aggiornare cursori anche qui
+                    incrementPosition(startPos, dim);
+                    drawGraphicCursor();
                 }
                     //*********************COPY*****************************************
                 else if (key_ev->text().toStdString().c_str()[0] == 3) {
@@ -1090,6 +1099,10 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                                 {"crdtToErase",     crdtToErase}
                         };
                         client_->sendAtServer(j);
+                        decreentPosition(pos, 1);
+                        drawGraphicCursor();
+                        //TO DO:probabilmente aggiornare
+
                     }
                     return QObject::eventFilter(obj, ev);
                 }
@@ -1116,7 +1129,10 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                                 {"crdtToErase",     crdtToErase}
                         };
                         client_->sendAtServer(j);
+                        //TO DO
                     }
+                    decreentPosition(pos, 1);
+                    drawGraphicCursor();
                     return QObject::eventFilter(obj, ev);
                 }
             }
@@ -1145,32 +1161,13 @@ void TextEdit::eraseSymbols(int toErase) {
     cur.mergeBlockFormat(textBlockFormat);
 
     cur.endEditBlock();
-
+    for(auto list:_listParticipantsAndColors){
+        if(_cursorsVector[list.first].position>toErase)
+            _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position-1);
+    }
+    drawGraphicCursor();
+    //TO DO: inserire controllo sull'user
     textEdit->setFocus();
-}
-
-void TextEdit::draw2(unsigned int position) {
-    QTextCursor cursor = QTextCursor(textEdit->textCursor());
-    cursor.setPosition(position);
-    std::cout << " Preso cursor" << cursor.position() << std::endl;
-    QTextCursor tempCursor = QTextCursor(cursor);
-    tempCursor.setPosition(position);
-    std::cout << " Preso tempCursor" << tempCursor.position() << std::endl;
-    tempCursor.clearSelection();
-    std::cout << " Preso tempCursor clear" << tempCursor.position() << std::endl;
-
-    tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
-    std::cout << " Preso tempCursor move1" << tempCursor.position() << tempCursor.selectionStart() << std::endl;
-
-    tempCursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor, 1);
-    std::cout << " Preso tempCursor move2" << tempCursor.position() << tempCursor.selectionEnd() << std::endl;
-
-    textEdit->setTextCursor(tempCursor);
-    textEdit->setTextBackgroundColor(QColor(255, 255, 255, 255));
-    textEdit->setTextCursor(cursor);
-    //textEdit->setTextBackgroundColor(client_->getColor());
-    textEdit->setTextBackgroundColor(Qt::red);
-
 }
 
 QString TextEdit::getFileName() const {
@@ -1188,7 +1185,7 @@ void TextEdit::drawRemoteCursors() {
     textEdit->setTextCursor(cursor);
 //    textEdit->setTextBackgroundColor(client_->getColor());
     textEdit->setTextBackgroundColor(QColor(255, 255, 255, 255));
-    for (std::pair<unsigned int, CustomCursor> cPair : _cursorsVector) {
+    for (std::pair<QString, CustomCursor> cPair : _cursorsVector) {
         tempCursor.movePosition(QTextCursor::MoveOperation::Start, QTextCursor::MoveMode::MoveAnchor, 1);
         CustomCursor cCursor = cPair.second;
         if (cCursor.hasSelection) {
@@ -1206,7 +1203,7 @@ void TextEdit::drawRemoteCursors() {
             }
         }
         textEdit->setTextCursor(tempCursor);
-        textEdit->setTextBackgroundColor(_cursorColors[cPair.first]);
+        textEdit->setTextBackgroundColor(_listParticipantsAndColors[cPair.first]);
         //_ui->textEdit->setTextCursor(myCursor);
         tempCursor.clearSelection();
         tempCursor.movePosition(QTextCursor::MoveOperation::Start, QTextCursor::MoveMode::MoveAnchor, 1);
@@ -1216,19 +1213,100 @@ void TextEdit::drawRemoteCursors() {
 
 }
 
-void TextEdit::initListParticipant(int participantId, QString username) {
-    _listParticipant.insert(std::pair<int, QString>(participantId, username));
+void TextEdit::highlightcharacter() {
+    QObject *sender = QObject::sender();
+    QString name = sender->objectName();
+    QTextCursor  cursor = textEdit->textCursor();
+    QTextCursor tempCursor = QTextCursor(cursor);
+    int pos;
+    for(auto s: client_->symbols){
+        if(s.getUsername()==name.toStdString()) {
+            for(auto p:s.getPosizione()){
+                std::cout << "Elemeti nel vettore " << p << std::endl;
+            }
+            pos = s.getPosizione().front();
+            tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
+            tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
+            tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
+            textEdit->setTextCursor(tempCursor);
+            textEdit->setTextBackgroundColor(_listParticipantsAndColors[name]);
+        }
+    }
+    textEdit->setTextCursor(cursor);
+    textEdit->setTextBackgroundColor(QColor(255,255,255,255));
+    textEdit->setFocus();
+
+}
+void TextEdit::drawGraphicCursor(){
+
+    for(auto list:_listParticipantsAndColors){
+        QTextCursor cursor = QTextCursor(textEdit->document());
+        cursor.setPosition(_cursorsVector[list.first].position);
+        QRect qRect = textEdit->cursorRect(cursor);
+        QPixmap pix(qRect.width()*2.5, qRect.height());
+        pix.fill(list.second);
+        _labels[list.first]->setPixmap(pix);
+        _labels[list.first]->move(qRect.left(), qRect.top());
+        _labels[list.first]->show();
+    }
 }
 
-void TextEdit::initRemoteCursors(int participantId, QString color) {
-    if (_listParticipant[participantId] != client_->getUser()) {
-        CustomCursor remoteCursor = CustomCursor();
-        _cursorsVector.insert(std::pair<int, CustomCursor>(participantId, remoteCursor));
-        if (_cursorColors.insert(std::pair<int, QColor>(participantId, color)).second) {
-            updateConnectedUsers(_listParticipant[participantId], color);
+void TextEdit::incrementPosition(int pos, int count){
+    for(auto list:_listParticipantsAndColors){
+        if(pos<_cursorsVector[list.first].position) {
+            _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position + count);
         }
     }
 }
+void TextEdit::decreentPosition(int pos, int count) {
+    for(auto list:_listParticipantsAndColors){
+        if(pos<_cursorsVector[list.first].position) {
+            _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position - count);
+        }
+    }
+}
+
+
+
+void TextEdit::updateListParticipants(usersInFile users) {
+    _listParticipantsAndColors.clear();
+    _labels.clear();
+    //NON POSSO ELIMINARLO, contiene la posizione di tutti gli utenti
+    //_cursorsVector.clear();
+    for(auto u:users){
+        if(u.first!=client_->getUser().toStdString()){
+            CustomCursor remoteCursor = CustomCursor();
+            _cursorsVector.insert(std::pair<QString, CustomCursor>(QString::fromStdString(u.first), remoteCursor));
+            _listParticipantsAndColors.insert(std::pair<QString, QColor>(QString::fromStdString(u.first), QString::fromStdString(u.second)));
+            QLabel *labelName = new QLabel(textEdit);
+            if(_labels.insert(std::pair<QString, QLabel*>(QString::fromStdString(u.first), labelName)).second){
+                //nel coso non c'èera in labels ma c'era in _cursorvector, in ogni caso appena qualcuno entra, la posizione è zero
+               // _cursorsVector[QString::fromStdString(u.first)].setPosition(0);
+            }
+        }
+    }
+
+
+    //drawRemoteCursors();
+    drawGraphicCursor();
+    updateConnectedUsers(users);
+
+}
+
+void TextEdit::updateConnectedUsers(usersInFile users) {
+    connectedUsers->clear();
+    //QLabel * label = new QLabel(client_->getUser());
+    QLabel *label = new QLabel(client_->getUser());
+    label->setStyleSheet("font-weight: bold; color: "+client_->getColor());
+    QListWidgetItem * item = new QListWidgetItem();
+    connectedUsers->addItem(item);
+    connectedUsers->setItemWidget(item, label);
+    for(auto u:_listParticipantsAndColors) {
+        if (u.first.toStdString() != client_->getUser().toStdString())
+            updateConnectedUser(u.first, u.second.name());
+    }
+}
+
 
 void TextEdit::resetText() {
     _currentText = QString(textEdit->toPlainText());
@@ -1239,13 +1317,13 @@ void TextEdit::resetCursors() {
     _oldCursor = CustomCursor(QTextCursor(textEdit->textCursor()));
     _newCursor = CustomCursor(QTextCursor(textEdit->textCursor()));
 }
-
+/*
 void TextEdit::updateCursors() {
     CustomCursor cursor = CustomCursor(QTextCursor(textEdit->textCursor()));
     updateCursors(cursor);
 }
-
-void TextEdit::updateCursors(const CustomCursor &cursor) {
+*/
+void TextEdit::updateCursors(const CustomCursor &cursor){
     _oldCursor = CustomCursor(_newCursor);
     _newCursor = CustomCursor(cursor);
 }
