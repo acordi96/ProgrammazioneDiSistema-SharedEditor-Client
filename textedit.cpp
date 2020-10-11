@@ -67,7 +67,10 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
     setUnifiedTitleAndToolBarOnMac(true);
 #endif
     textEdit = new QTextEdit(this);
+    timer = new QTimer(this);
+    timer->setSingleShot(true);
 
+    connect(timer,&QTimer::timeout,this,&TextEdit::clearHighlights);
     connect(this, &TextEdit::updateCursor, this, &TextEdit::drawGraphicCursor);
 
     connect(client_, &Client::insertSymbol, this, &TextEdit::showSymbol);
@@ -124,6 +127,18 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
 #endif
     resetCursors();
     resetText();
+}
+
+void TextEdit::clearHighlights(){
+    std::cout<<"clear highlights!"<<std::endl;
+    QTextCursor  cursor = textEdit->textCursor();
+    QTextCursor tempCursor = QTextCursor(cursor);
+
+    tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
+    tempCursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor, 1);
+    textEdit->setTextCursor(tempCursor);
+    textEdit->setTextBackgroundColor(Qt::white);
+    textEdit->setTextCursor(cursor);
 }
 
 void TextEdit::closeEvent(QCloseEvent *e) {
@@ -704,7 +719,6 @@ void TextEdit::cursorPositionChanged() {
 
     QTextCursor cursor = textEdit->textCursor();
     int pos = cursor.position();
-    std::cout << "LA POSIZIONE CAMBIA "  << pos << std::endl;
 
     json j = json{
             {"operation", "update_cursorPosition"},
@@ -874,8 +888,6 @@ void TextEdit::alignmentChanged(Qt::Alignment a) {
     else if (a & Qt::AlignJustify)
         actionAlignJustify->setChecked(true);
 }
-
-
 
 bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
     if (ev->type() == QEvent::KeyPress) {
@@ -1221,9 +1233,6 @@ void TextEdit::highlightcharacter() {
     int pos;
     for(auto s: client_->symbols){
         if(s.getUsername()==name.toStdString()) {
-            for(auto p:s.getPosizione()){
-                std::cout << "Elemeti nel vettore " << p << std::endl;
-            }
             pos = s.getPosizione().front();
             tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
             tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
@@ -1235,6 +1244,8 @@ void TextEdit::highlightcharacter() {
     textEdit->setTextCursor(cursor);
     textEdit->setTextBackgroundColor(QColor(255,255,255,255));
     textEdit->setFocus();
+
+    timer->start(2000);
 
 }
 void TextEdit::drawGraphicCursor(){

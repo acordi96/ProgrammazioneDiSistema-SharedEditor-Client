@@ -79,6 +79,7 @@ private slots:
     void drawRemoteCursors();
     void updateListParticipants(usersInFile users);
     void highlightcharacter();
+    void clearHighlights();
 private:
     Client *client_;
     void setupFileActions();
@@ -141,6 +142,8 @@ private:
     std::map<QString, CustomCursor> _cursorsVector;
     std::map<QString, QColor> _listParticipantsAndColors;
     std::map<QString, QLabel*> _labels;
+
+    QTimer *timer;
 };
 
 
