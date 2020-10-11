@@ -41,7 +41,7 @@ public slots:
     void fileNew();
     void showSymbol(int pos, QChar c);
     void showSymbolWithId(QString user, int pos, QChar c);
-
+    void updateRemotePosition(QString user, int pos);
     void eraseSymbols(int toErase);
     //TO DO:mettere user
     //void show_Symbol(std::pair<int,char> tuple);
@@ -73,13 +73,12 @@ private slots:
 
     void currentCharFormatChanged(const QTextCharFormat &format);
     void cursorPositionChanged();
-    void localInsert();
     void clipboardDataChanged();
     void about();
     void printPreview(QPrinter *);
     void drawRemoteCursors();
     void updateListParticipants(usersInFile users);
-
+    void highlightcharacter();
 private:
     Client *client_;
     void setupFileActions();
@@ -104,7 +103,11 @@ private:
     void setupConnectedUsers();
     void requestLogout();
     void closingFile();
+
+
     void drawGraphicCursor();
+    void incrementPosition(int pos, int count);
+    void decreentPosition(int pos, int count);
     QAction *actionSave;
     QAction *actionTextBold;
     QAction *actionTextUnderline;

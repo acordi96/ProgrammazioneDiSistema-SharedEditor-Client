@@ -142,7 +142,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
             int index = this->generateIndexCRDT(symbolToPaste, 0, -1, -1);
             //aggiungo al crdt
             this->insertSymbolIndex(symbolToPaste, index);
-            emit insertSymbol(index, charToPaste[i]);
+            emit insertSymbolWithId(QString::fromStdString(usernameToPaste[i]), index, charToPaste[i]);
             //TO DO:mettere insertSymbolWithId
         }
         return type_request;
@@ -274,10 +274,8 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         QString res = QString::fromStdString("error_file_in_use_d");
         emit formResultSuccess(res);
     } else if (type_request == "update_participants") {
-        std::vector<int> othersOnFile;
         std::vector<std::string> colors;
         std::vector<std::string> usernames;
-        othersOnFile = js.at("idList").get<std::vector<int>>();
         colors = js.at("colorsList").get<std::vector<std::string>>();
         usernames = js.at("usernames").get<std::vector<std::string>>();
         usersInFile users;
@@ -289,6 +287,10 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
     } else if (type_request == "user_already_logged"){
         QString res = QString::fromUtf8("user_already_logged");
         emit formResultSuccess(res);
+    } else if(type_request == "update_cursorPosition"){
+        std::string username = js.at("username").get<std::string>();
+        int pos = js.at("pos").get<int>();
+        emit updateRemotePosition(QString::fromStdString(username), pos);
     }
     return type_request;
 }

@@ -96,7 +96,7 @@ signals:
 
     void eraseSymbols(int erased);
 
-    void showSymbol(std::pair<int, char> tuple);
+    void updateRemotePosition(QString user, int pos);
 
     void updateUserslist(usersInFile users);
 
