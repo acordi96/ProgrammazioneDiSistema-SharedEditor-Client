@@ -175,6 +175,8 @@ void Userpage::setupUserinfo(){
     newFileButton->setIconSize(QSize(32, 32));
     newFileButton->setFlat(true);
 
+    connect(newFileButton,&QPushButton::clicked,this,&Userpage::handleNewFileButton);
+
     newFBtnLayout->addWidget(newFileButton);
 
     QSpacerItem *hSpacer2 = new QSpacerItem(100,20,QSizePolicy::MinimumExpanding,QSizePolicy::Minimum);
@@ -351,7 +353,7 @@ void Userpage::setupRecentFiles(){
     openButton->setFlat(true);
 
     connect(openButton,SIGNAL(clicked()),SLOT(on_openButton_clicked()));
-    connect(inviteButton,SIGNAL(clicked()),SLOT(on_inviteButton_clicked()));
+
     grid->addWidget(openButton,0,0,1,1);
 
     renameButton->setObjectName(QString::fromUtf8("renameButton"));
@@ -368,7 +370,7 @@ void Userpage::setupRecentFiles(){
 
     grid->addWidget(renameButton,0,1,1,1);
 
-     connect(renameButton,SIGNAL(clicked()),SLOT(on_renameButton_clicked()));
+    connect(renameButton,SIGNAL(clicked()),SLOT(on_renameButton_clicked()));
 
     deleteButton->setObjectName(QString::fromUtf8("deleteButton"));
     deleteButton->setGeometry(QRect(160, 430, 89, 25));
@@ -397,6 +399,8 @@ void Userpage::setupRecentFiles(){
                                                   "}\n"
                                                   "QPushButton#inviteButton:hover{background-color: rgb(255,0,0);}"));
     inviteButton->setFlat(true);
+
+    connect(inviteButton,SIGNAL(clicked()),SLOT(on_inviteButton_clicked()));
 
     grid->addWidget(inviteButton,1,1,1,1);
 
@@ -625,7 +629,7 @@ void Userpage::on_openButton_clicked(){
         QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
         deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                                 "border:1px;\n"
-                                                "background-color: rgb(0,204,204);\n"
+                                                "background-color:rgb(0,204,204);\n"
                                                 "font: 75 12pt \"Sawasdee Bold\";\n"
                                                 "}"));
 
@@ -633,7 +637,6 @@ void Userpage::on_openButton_clicked(){
     } catch (std::exception& e) {
         std::cerr << "Exception: " << e.what() << "\n";
     }
-
 
 }
 
@@ -658,6 +661,13 @@ void Userpage::on_renameButton_clicked() {
                 this,
                 tr("Hey!"),
                 tr("Only who created the file can rename it") );
+        //deselect button
+        QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
+        deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                                  "border:1px;\n"
+                                                  "background-color:rgb(0,204,204);\n"
+                                                  "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                  "}"));
     }else {
 
         QInputDialog modalWindow;
@@ -749,7 +759,7 @@ void Userpage::on_renameButton_clicked() {
                 QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
                 deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                                           "border:1px;\n"
-                                                          "background-color: blue;\n"
+                                                          "background-color: rgb(0,204,204);\n"
                                                           "font: 75 12pt \"Sawasdee Bold\";\n"
                                                           "}"));
                 selectedFile = "";
@@ -949,6 +959,11 @@ void Userpage::handleOpenURLbutton() {
         msg.encode_header();
         std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
         sendmessage(msg);
+    }else{
+        QMessageBox::information(
+                this,
+                tr("Shared Editor"),
+                tr("Insert a valid invitation code!") );
     }
 }
 
@@ -960,16 +975,16 @@ void Userpage::on_inviteButton_clicked() {
         //nessun file selezionato
         QMessageBox::information(
                 this,
-                tr("Hey!"),
-                tr("Select a file") );
+                tr(" Shared Editor"),
+                tr("Hey!Select a file") );
         return;
     }
     if(owner != client_->getUser().toStdString()){
         //nessun file selezionato
         QMessageBox::information(
                 this,
-                tr("Hey!"),
-                tr("You must be the owner in order to invite") );
+                tr(" Shared Editor "),
+                tr("Hey!You must be the owner in order to invite") );
         return;
     }
     const char * code;
@@ -981,8 +996,14 @@ void Userpage::on_inviteButton_clicked() {
     }
     QMessageBox::information(
             this,
-            tr("Codice Invito:"),
+            tr("Invitation code:"),
             tr(code));
+    QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
+    deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                              "border:1px;\n"
+                                              "background-color: rgb(0,204,204);\n"
+                                              "font: 75 12pt \"Sawasdee Bold\";\n"
+                                              "}"));
 }
 
 std::pair<std::string, std::string> Userpage::parseFileButton(const std::string& button) {

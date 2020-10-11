@@ -243,7 +243,7 @@ void stacked::showPopupSuccess(QString result) {
         } else if (result == "file_opened") {
             setWindowTitle("SharedEditor - " + client_->getUser() + " @ " + client_->getFileName());
             ui->stackedWidget->setCurrentIndex(2);
-            layout->addWidget(new QLabel("File correctly opened"));
+            //layout->addWidget(new QLabel("File correctly opened"));
         } else if (result == "errore_rinomina_file") {
             layout->addWidget(new QLabel("Rename file error"));
         } else if (result == "file_renamed") {
@@ -264,8 +264,7 @@ void stacked::showPopupSuccess(QString result) {
         layout->addWidget(buttonBox);
 
         connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
-
-        dialog->show();
+        if(result != "file_opened") dialog->show();
     }
 }
 
