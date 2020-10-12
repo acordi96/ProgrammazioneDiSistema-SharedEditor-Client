@@ -70,7 +70,7 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
     timer = new QTimer(this);
     timer->setSingleShot(true);
 
-    connect(timer, &QTimer::timeout, this, &TextEdit::clearHighlights);
+    connect(timer,&QTimer::timeout,this,&TextEdit::clearHighlights);
     connect(this, &TextEdit::updateCursor, this, &TextEdit::drawGraphicCursor);
 
     connect(client_, &Client::insertSymbol, this, &TextEdit::showSymbol);
@@ -400,7 +400,7 @@ void TextEdit::setupTextActions() {
 void TextEdit::updateConnectedUser(QString user, QString color) {
     QPushButton *label = new QPushButton(user);
     label->setObjectName(user);
-    label->setStyleSheet("color:" + color);
+    label->setStyleSheet("font-weight: bold; color: " + color);
     QListWidgetItem *item = new QListWidgetItem();
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
@@ -1339,11 +1339,13 @@ void TextEdit::updateListParticipants(usersInFile users) {
 void TextEdit::updateConnectedUsers(usersInFile users) {
     connectedUsers->clear();
     //QLabel * label = new QLabel(client_->getUser());
-    QLabel *label = new QLabel(client_->getUser());
+    QPushButton *label = new QPushButton(client_->getUser());
+    label->setObjectName(client_->getUser());
     label->setStyleSheet("font-weight: bold; color: " + client_->getColor());
     QListWidgetItem *item = new QListWidgetItem();
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
+    connect(label, SIGNAL(clicked()), SLOT(highlightcharacter()));
     for (auto u:_listParticipantsAndColors) {
         if (u.first.toStdString() != client_->getUser().toStdString())
             updateConnectedUser(u.first, u.second.name());

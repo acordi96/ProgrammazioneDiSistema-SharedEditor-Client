@@ -208,13 +208,21 @@ void stacked::showPopupSuccess(QString result) {
         connect(te,&TextEdit::closeFile,this,&stacked::closeFile);
         connect(te,&TextEdit::closeAll,this,&stacked::closeAll);
 
+
         //ui->setupUi(this);
-        ui->stackedWidget->addWidget(te);
-        ui->stackedWidget->addWidget(up);
+//        ui->stackedWidget->addWidget(te);
+//        ui->stackedWidget->addWidget(up);
+
         if (result == "SIGNUP_SUCCESS") {
+            ui->email_line->clear();
+            ui->user_line_form->clear();
+            ui->psw_line_form->clear();
+            ui->confirm_psw_line->clear();
             ui->stackedWidget->setCurrentIndex(0);
         } else {
             setWindowTitle("SharedEditor - Userpage");
+            ui->stackedWidget->addWidget(te);
+            ui->stackedWidget->addWidget(up);
             ui->stackedWidget->setCurrentIndex(3);
         }
         //ui->stackedWidget->setCurrentIndex(2);
@@ -378,6 +386,7 @@ void stacked::on_newFileButton_clicked(){
     //ui->stackedWidget->setCurrentIndex(3);
 }*/
 void stacked::on_form_cancButton_clicked() {
+    ui->psw_log_line->clear();
     ui->stackedWidget->setCurrentIndex(0);
 }
 void stacked::logout(){
