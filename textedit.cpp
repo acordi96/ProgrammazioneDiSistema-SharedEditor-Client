@@ -1175,8 +1175,8 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                 }
             }
         }
-        this->writingInsertBool = false;
-        this->writingConditionVariable.notify_all();
+        client_->writingInsertBool = false;
+        client_->writingConditionVariable.notify_all();
     }
     return QObject::eventFilter(obj, ev);;
 }
