@@ -70,7 +70,7 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
     timer = new QTimer(this);
     timer->setSingleShot(true);
 
-    connect(timer,&QTimer::timeout,this,&TextEdit::clearHighlights);
+    connect(timer, &QTimer::timeout, this, &TextEdit::clearHighlights);
     connect(this, &TextEdit::updateCursor, this, &TextEdit::drawGraphicCursor);
 
     connect(client_, &Client::insertSymbol, this, &TextEdit::showSymbol);
@@ -129,9 +129,9 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
     resetText();
 }
 
-void TextEdit::clearHighlights(){
-    std::cout<<"clear highlights!"<<std::endl;
-    QTextCursor  cursor = textEdit->textCursor();
+void TextEdit::clearHighlights() {
+    std::cout << "clear highlights!" << std::endl;
+    QTextCursor cursor = textEdit->textCursor();
     QTextCursor tempCursor = QTextCursor(cursor);
 
     tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
@@ -725,7 +725,7 @@ void TextEdit::cursorPositionChanged() {
             {"username",  client_->getUser().toStdString()},
             {"pos",       pos}
     };
-    client_->sendAtServer(j);
+    //client_->sendAtServer(j);
 
     /*
     alignmentChanged(textEdit->alignment());
@@ -767,6 +767,10 @@ void TextEdit::cursorPositionChanged() {
 }
 
 void TextEdit::showSymbolWithId(QString user, int pos, QChar c) {
+    std::unique_lock<std::mutex> ul(client_->writingMutex);
+    client_->writingConditionVariable.wait(ul, [this]() {
+        return client_->writingInsertBool;
+    });
     QTextCharFormat format;
     format.setFontWeight(QFont::Normal);
     format.setFontFamily("Helvetica");
@@ -811,6 +815,10 @@ void TextEdit::showSymbolWithId(QString user, int pos, QChar c) {
     drawGraphicCursor();
 
     textEdit->setFocus();
+
+    client_->processingInsertBool = false;
+    client_->writingInsertBool = false;
+    client_->writingConditionVariable.notify_all();
 }
 
 void TextEdit::showSymbol(int pos, QChar c) {
@@ -907,7 +915,18 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
         }
         std::cout << std::endl;
         if (obj == textEdit) {
+
+            std::unique_lock<std::mutex> ul(client_->writingMutex);
+            client_->writingConditionVariable.wait(ul, [this]() {
+                if (!client_->processingInsertBool && !client_->writingInsertBool) {
+                    client_->processingInsertBool = true;
+                    return true;
+                }
+                return false;
+            });
+
             if (!key_ev->text().isEmpty()) {
+
 
                 QTextCursor cursor = textEdit->textCursor();
                 int pos, startIndex, endIndex;
@@ -1005,10 +1024,10 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     std::vector<std::vector<int>> crdtv;
                     crdtv.push_back(crdt);
                     json j = json{
-                            {"operation", "insert"},
-                            {"usernameToInsert",  usernamev},
-                            {"charToInsert",      charv},
-                            {"crdtToInsert",      crdtv}
+                            {"operation",        "insert"},
+                            {"usernameToInsert", usernamev},
+                            {"charToInsert",     charv},
+                            {"crdtToInsert",     crdtv}
                     };
                     client_->sendAtServer(j);
                     //drawRemoteCursors();
@@ -1016,7 +1035,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     incrementPosition(pos, 1);
                     drawGraphicCursor();
 
-                    return QObject::eventFilter(obj, ev);
+                    //return QObject::eventFilter(obj, ev);
                 }
                     //*********************PASTE*****************************************
                 else if (key_ev->text().toStdString().c_str()[0] == 22) {
@@ -1048,7 +1067,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                             pos++;
                         }
                         json j = json{
-                                {"operation",       "insert"},
+                                {"operation",        "insert"},
                                 {"usernameToInsert", usernameToInsert},
                                 {"charToInsert",     charToInsert},
                                 {"crdtToInsert",     crdtToInsert}
@@ -1073,7 +1092,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                             pos++;
                         }
                         json j = json{
-                                {"operation",       "insert"},
+                                {"operation",        "insert"},
                                 {"usernameToInsert", usernameToInsert},
                                 {"charToInsert",     charToInsert},
                                 {"crdtToInsert",     crdtToInsert}
@@ -1094,33 +1113,32 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                 }
                     //*********************BACKSPACE*************************************
                 else if (key == Qt::Key_Backspace) {
-                    if (cursor.hasSelection()) //gia' cancellato
-                        return QObject::eventFilter(obj, ev);
-                    if (pos > 0) {
-                        std::vector<Symbol> symbolsToErase;
-                        std::vector<std::string> usernameToErase;
-                        std::vector<char> charToErase;
-                        std::vector<std::vector<int>> crdtToErase;
-                        symbolsToErase.push_back(client_->symbols[pos - 1]);
-                        usernameToErase.push_back(client_->symbols[pos - 1].getUsername());
-                        charToErase.push_back(client_->symbols[pos - 1].getCharacter());
-                        crdtToErase.push_back(client_->symbols[pos - 1].getPosizione());
+                    if (!cursor.hasSelection()) { //gia' cancellato
+                        //return QObject::eventFilter(obj, ev);
+                        if (pos > 0) {
+                            std::vector<Symbol> symbolsToErase;
+                            std::vector<std::string> usernameToErase;
+                            std::vector<char> charToErase;
+                            std::vector<std::vector<int>> crdtToErase;
+                            symbolsToErase.push_back(client_->symbols[pos - 1]);
+                            usernameToErase.push_back(client_->symbols[pos - 1].getUsername());
+                            charToErase.push_back(client_->symbols[pos - 1].getCharacter());
+                            crdtToErase.push_back(client_->symbols[pos - 1].getPosizione());
 
-                        client_->eraseSymbolCRDT(symbolsToErase);
+                            client_->eraseSymbolCRDT(symbolsToErase);
 
-                        json j = json{
-                                {"operation",       "remove"},
-                                {"usernameToErase", usernameToErase},
-                                {"charToErase",     charToErase},
-                                {"crdtToErase",     crdtToErase}
-                        };
-                        client_->sendAtServer(j);
-                        decreentPosition(pos, 1);
-                        drawGraphicCursor();
-                        //TO DO:probabilmente aggiornare
-
+                            json j = json{
+                                    {"operation",       "remove"},
+                                    {"usernameToErase", usernameToErase},
+                                    {"charToErase",     charToErase},
+                                    {"crdtToErase",     crdtToErase}
+                            };
+                            client_->sendAtServer(j);
+                            decreentPosition(pos, 1);
+                            drawGraphicCursor();
+                        }
                     }
-                    return QObject::eventFilter(obj, ev);
+                    //return QObject::eventFilter(obj, ev);
                 }
                     //**********************CANC****************************/
                 else if (key == Qt::Key_Delete) {
@@ -1149,12 +1167,15 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     }
                     decreentPosition(pos, 1);
                     drawGraphicCursor();
-                    return QObject::eventFilter(obj, ev);
+                    //return QObject::eventFilter(obj, ev);
                 }
             }
         }
+        client_->processingInsertBool = false;
+        client_->writingInsertBool = false;
+        client_->writingConditionVariable.notify_all();
     }
-    return false;
+    return QObject::eventFilter(obj, ev);;
 }
 
 void TextEdit::eraseSymbols(int toErase) {
@@ -1235,15 +1256,17 @@ void TextEdit::highlightcharacter() {
     QTextCursor cursor = textEdit->textCursor();
     QTextCursor tempCursor = QTextCursor(cursor);
     int pos;
-    for(auto s: client_->symbols){
-        if(s.getUsername()==name.toStdString()) {
-            pos = s.getPosizione().front();
+    int i = 0;
+    for (auto s: client_->symbols) {
+        if (s.getUsername() == name.toStdString()) {
+            pos = i;
             tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
             tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
             tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
             textEdit->setTextCursor(tempCursor);
             textEdit->setTextBackgroundColor(_listParticipantsAndColors[name]);
         }
+        i++;
     }
     textEdit->setTextCursor(cursor);
     textEdit->setTextBackgroundColor(QColor(255, 255, 255, 255));
@@ -1285,7 +1308,7 @@ void TextEdit::decreentPosition(int pos, int count) {
 
 
 void TextEdit::updateListParticipants(usersInFile users) {
-    for(auto user:_listParticipantsAndColors){
+    for (auto user:_listParticipantsAndColors) {
         _labels[user.first]->hide();
     }
     _listParticipantsAndColors.clear();

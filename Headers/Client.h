@@ -28,6 +28,16 @@ Q_DECLARE_METATYPE(usersInFile)
 class Client : public QObject {
 Q_OBJECT
 public:
+
+    std::map<std::pair<std::string, std::string>, std::string> files; //<<owner, filename>, invitation>
+    std::vector<Symbol> symbols;
+    int maxBufferSymbol;
+
+    bool processingInsertBool;
+    bool writingInsertBool;
+    std::mutex writingMutex;
+    std::condition_variable writingConditionVariable;
+
     Client();
 
     void write(const message &msg);
@@ -52,11 +62,6 @@ public:
 
     void setFiles(const std::vector<std::string> &owners, const std::vector<std::string> &filenames,
                   const std::vector<std::string> &invitations);
-
-
-    std::map<std::pair<std::string, std::string>, std::string> files; //<<owner, filename>, invitation>
-    std::vector<Symbol> symbols;
-    int maxBufferSymbol;
 
     QString getFileName() const;
 

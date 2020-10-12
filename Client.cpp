@@ -2,8 +2,8 @@
 // Created by Sam on 22/apr/2020.
 //
 
-#define serverRoute "93.43.250.236"
-//#define serverRoute "127.0.0.1"
+//#define serverRoute "93.43.250.236"
+#define serverRoute "127.0.0.1"
 
 #include <QtWidgets/QMessageBox>
 #include "Headers/Client.h"
@@ -15,6 +15,9 @@ Client::Client()
     worker_ = std::thread([&]() {
         io_context_.run(); //boost thread loop start
     });
+    this->processingInsertBool = false;
+    this->writingInsertBool = false;
+    this->maxBufferSymbol = 1;
     do_connect();
 }
 
@@ -119,6 +122,12 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         QString res = QString::fromStdString(type_request);
         emit formResultSuccess(res);
     } else if (type_request == "insert_res") {
+        std::unique_lock<std::mutex> ul(this->writingMutex);
+        this->writingConditionVariable.wait(ul, [this]() {
+            if (!this->processingInsertBool && !this->writingInsertBool)
+                this->processingInsertBool = true;
+            return true;
+        });
         //prendo il vettore di symbol
         std::vector<std::string> usernameToInsert = js.at("usernameToInsert").get<std::vector<std::string>>();
         std::vector<char> charToInsert = js.at("charToInsert").get<std::vector<char>>();
@@ -132,8 +141,16 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
             emit insertSymbolWithId(QString::fromStdString(usernameToInsert[i]), index, charToInsert[i]);
             //TO DO:mettere insertSymbolWithId
         }
+        this->writingInsertBool = true;
+        this->writingConditionVariable.notify_one();
         return type_request;
     } else if (type_request == "remove_res") {
+        std::unique_lock<std::mutex> ul(this->writingMutex);
+        this->writingConditionVariable.wait(ul, [this]() {
+            if (!this->processingInsertBool && !this->writingInsertBool)
+                this->processingInsertBool = true;
+            return true;
+        });
         //prendo il vettore di symbol
         std::vector<Symbol> symbolsToErase;
         std::vector<std::string> usernameToErase = js.at("usernameToErase").get<std::vector<std::string>>();
@@ -145,9 +162,9 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::vector<int> erased = this->eraseSymbolCRDT(symbolsToErase);
         //emetto per aggiornamento testo con gli indici
         for (auto &indexToErase : erased)
-                emit eraseSymbols(indexToErase);
-
-        //TO DO: mettere usrt in erase
+            emit eraseSymbols(indexToErase);
+        this->writingInsertBool = true;
+        this->writingConditionVariable.notify_one();
         return type_request;
     } else if (type_request == "new_file_created") {
         QString res = QString::fromStdString("new_file_created");
