@@ -33,7 +33,6 @@ public:
     std::vector<Symbol> symbols;
     int maxBufferSymbol;
 
-    bool processingInsertBool;
     bool writingInsertBool;
     std::mutex writingMutex;
     std::condition_variable writingConditionVariable;

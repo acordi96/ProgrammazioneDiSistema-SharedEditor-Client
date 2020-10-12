@@ -824,9 +824,6 @@ void TextEdit::showSymbolWithId(QString user, int pos, QChar c) {
 
     textEdit->setFocus();
 
-    client_->processingInsertBool = false;
-    client_->writingInsertBool = false;
-    client_->writingConditionVariable.notify_all();
 }
 
 void TextEdit::showSymbol(int pos, QChar c) {
@@ -923,16 +920,6 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
         }
         std::cout << std::endl;
         if (obj == textEdit) {
-
-            std::unique_lock<std::mutex> ul(client_->writingMutex);
-            client_->writingConditionVariable.wait(ul, [this]() {
-                if (!client_->processingInsertBool && !client_->writingInsertBool) {
-                    client_->processingInsertBool = true;
-                    return true;
-                }
-                return false;
-            });
-
             if (!key_ev->text().isEmpty()) {
 
 
@@ -1179,9 +1166,6 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                 }
             }
         }
-        client_->processingInsertBool = false;
-        client_->writingInsertBool = false;
-        client_->writingConditionVariable.notify_all();
     }
     return QObject::eventFilter(obj, ev);;
 }
