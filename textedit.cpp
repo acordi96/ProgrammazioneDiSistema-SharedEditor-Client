@@ -1285,6 +1285,9 @@ void TextEdit::decreentPosition(int pos, int count) {
 
 
 void TextEdit::updateListParticipants(usersInFile users) {
+    for(auto user:_listParticipantsAndColors){
+        _labels[user.first]->hide();
+    }
     _listParticipantsAndColors.clear();
     _labels.clear();
     //NON POSSO ELIMINARLO, contiene la posizione di tutti gli utenti
