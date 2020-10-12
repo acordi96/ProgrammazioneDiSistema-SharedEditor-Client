@@ -33,8 +33,8 @@ stacked::~stacked() {
 void stacked::closeEvent(QCloseEvent *e) {
     //comunica logout al server
     json j = json{
-            {"operation", "req_logout"},
-            {"username",  ""}
+            {"operation", "req_logout_and_close"},
+            {"username",  client_->getUser().toStdString()}
     };
     client_->sendAtServer(j);
 

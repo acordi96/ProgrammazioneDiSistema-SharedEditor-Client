@@ -397,14 +397,14 @@ void TextEdit::setupTextActions() {
     connect(comboSize, QOverload<const QString &>::of(&QComboBox::activated), this, &TextEdit::textSize);
 }
 
-void TextEdit::updateConnectedUser(QString user, QString color){
-    QPushButton * label = new QPushButton(user);
+void TextEdit::updateConnectedUser(QString user, QString color) {
+    QPushButton *label = new QPushButton(user);
     label->setObjectName(user);
-    label->setStyleSheet("color:"+color);
-    QListWidgetItem * item = new QListWidgetItem();
+    label->setStyleSheet("color:" + color);
+    QListWidgetItem *item = new QListWidgetItem();
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
-    connect(label,SIGNAL(clicked()),SLOT(highlightcharacter()));
+    connect(label, SIGNAL(clicked()), SLOT(highlightcharacter()));
 }
 
 void TextEdit::setupConnectedUsers() {
@@ -723,7 +723,7 @@ void TextEdit::cursorPositionChanged() {
     json j = json{
             {"operation", "update_cursorPosition"},
             {"username",  client_->getUser().toStdString()},
-            {"pos",      pos}
+            {"pos",       pos}
     };
     client_->sendAtServer(j);
 
@@ -799,11 +799,11 @@ void TextEdit::showSymbolWithId(QString user, int pos, QChar c) {
 
     textEdit->setTextCursor(cur);
 
-    for(auto list:_listParticipantsAndColors){
-        if(list.first!=user){
-            if(pos<_cursorsVector[list.first].position)
+    for (auto list:_listParticipantsAndColors) {
+        if (list.first != user) {
+            if (pos < _cursorsVector[list.first].position)
                 _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position + 1);
-        }else{
+        } else {
             _cursorsVector[user].setPosition(pos + 1);
         }
     }
@@ -888,6 +888,7 @@ void TextEdit::alignmentChanged(Qt::Alignment a) {
     else if (a & Qt::AlignJustify)
         actionAlignJustify->setChecked(true);
 }
+
 
 bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
     if (ev->type() == QEvent::KeyPress) {
@@ -997,20 +998,23 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     textEdit->setTextCursor(cursor);
                     //emit updateCursor();
 
+                    std::vector<std::string> usernamev;
+                    usernamev.push_back(client_->getUser().toStdString());
+                    std::vector<char> charv;
+                    charv.push_back(c);
+                    std::vector<std::vector<int>> crdtv;
+                    crdtv.push_back(crdt);
                     json j = json{
                             {"operation", "insert"},
-                            {"username",  client_->getUser().toStdString()},
-                            {"char",      c},
-                            {"crdt",      crdt}
+                            {"usernameToInsert",  usernamev},
+                            {"charToInsert",      charv},
+                            {"crdtToInsert",      crdtv}
                     };
                     client_->sendAtServer(j);
                     //drawRemoteCursors();
 
                     incrementPosition(pos, 1);
                     drawGraphicCursor();
-
-
-
 
                     return QObject::eventFilter(obj, ev);
                 }
@@ -1019,9 +1023,9 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     QClipboard *clipboard = QGuiApplication::clipboard();
                     QString pastedText = clipboard->text();
 
-                    std::vector<std::string> usernameToPaste;
-                    std::vector<char> charToPaste;
-                    std::vector<std::vector<int>> crdtToPaste;
+                    std::vector<std::string> usernameToInsert;
+                    std::vector<char> charToInsert;
+                    std::vector<std::vector<int>> crdtToInsert;
                     std::vector<int> crdt;
                     char c;
                     int startPos = pos;
@@ -1030,24 +1034,24 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     int i = 0;
 
                     while ((i + 1) * client_->maxBufferSymbol <= dim) {
-                        usernameToPaste.clear();
-                        charToPaste.clear();
-                        crdtToPaste.clear();
+                        usernameToInsert.clear();
+                        charToInsert.clear();
+                        crdtToInsert.clear();
 
                         for (int k = 0; k < client_->maxBufferSymbol; k++) {
                             textEdit->setTextCursor(cursor);
-                            usernameToPaste.push_back(client_->getUser().toStdString());
+                            usernameToInsert.push_back(client_->getUser().toStdString());
                             c = pastedText.toStdString().c_str()[(i * client_->maxBufferSymbol) + k];
-                            charToPaste.push_back(c);
+                            charToInsert.push_back(c);
                             crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
-                            crdtToPaste.push_back(crdt);
+                            crdtToInsert.push_back(crdt);
                             pos++;
                         }
                         json j = json{
-                                {"operation", "insert_paste"},
-                                {"usernameToPaste",  usernameToPaste},
-                                {"charToPaste",      charToPaste},
-                                {"crdtToPaste",      crdtToPaste}
+                                {"operation",       "insert"},
+                                {"usernameToInsert", usernameToInsert},
+                                {"charToInsert",     charToInsert},
+                                {"crdtToInsert",     crdtToInsert}
                         };
                         client_->sendAtServer(j);
                         i++;
@@ -1055,24 +1059,24 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
 
 
                     if ((dim % client_->maxBufferSymbol) > 0) {
-                        usernameToPaste.clear();
-                        charToPaste.clear();
-                        crdtToPaste.clear();
+                        usernameToInsert.clear();
+                        charToInsert.clear();
+                        crdtToInsert.clear();
 
                         for (int i = 0; i < (dim % client_->maxBufferSymbol); i++) {
                             textEdit->setTextCursor(cursor);
-                            usernameToPaste.push_back(client_->getUser().toStdString());
+                            usernameToInsert.push_back(client_->getUser().toStdString());
                             c = pastedText.toStdString().c_str()[(of * client_->maxBufferSymbol) + i];
-                            charToPaste.push_back(c);
+                            charToInsert.push_back(c);
                             crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
-                            crdtToPaste.push_back(crdt);
+                            crdtToInsert.push_back(crdt);
                             pos++;
                         }
                         json j = json{
-                                {"operation", "insert_paste"},
-                                {"usernameToPaste",  usernameToPaste},
-                                {"charToPaste",      charToPaste},
-                                {"crdtToPaste",      crdtToPaste}
+                                {"operation",       "insert"},
+                                {"usernameToInsert", usernameToInsert},
+                                {"charToInsert",     charToInsert},
+                                {"crdtToInsert",     crdtToInsert}
                         };
                         client_->sendAtServer(j);
                     }
@@ -1173,9 +1177,9 @@ void TextEdit::eraseSymbols(int toErase) {
     cur.mergeBlockFormat(textBlockFormat);
 
     cur.endEditBlock();
-    for(auto list:_listParticipantsAndColors){
-        if(_cursorsVector[list.first].position>toErase)
-            _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position-1);
+    for (auto list:_listParticipantsAndColors) {
+        if (_cursorsVector[list.first].position > toErase)
+            _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position - 1);
     }
     drawGraphicCursor();
     //TO DO: inserire controllo sull'user
@@ -1228,7 +1232,7 @@ void TextEdit::drawRemoteCursors() {
 void TextEdit::highlightcharacter() {
     QObject *sender = QObject::sender();
     QString name = sender->objectName();
-    QTextCursor  cursor = textEdit->textCursor();
+    QTextCursor cursor = textEdit->textCursor();
     QTextCursor tempCursor = QTextCursor(cursor);
     int pos;
     for(auto s: client_->symbols){
@@ -1242,19 +1246,20 @@ void TextEdit::highlightcharacter() {
         }
     }
     textEdit->setTextCursor(cursor);
-    textEdit->setTextBackgroundColor(QColor(255,255,255,255));
+    textEdit->setTextBackgroundColor(QColor(255, 255, 255, 255));
     textEdit->setFocus();
 
     timer->start(2000);
 
 }
-void TextEdit::drawGraphicCursor(){
 
-    for(auto list:_listParticipantsAndColors){
+void TextEdit::drawGraphicCursor() {
+
+    for (auto list:_listParticipantsAndColors) {
         QTextCursor cursor = QTextCursor(textEdit->document());
         cursor.setPosition(_cursorsVector[list.first].position);
         QRect qRect = textEdit->cursorRect(cursor);
-        QPixmap pix(qRect.width()*2.5, qRect.height());
+        QPixmap pix(qRect.width() * 2.5, qRect.height());
         pix.fill(list.second);
         _labels[list.first]->setPixmap(pix);
         _labels[list.first]->move(qRect.left(), qRect.top());
@@ -1262,21 +1267,21 @@ void TextEdit::drawGraphicCursor(){
     }
 }
 
-void TextEdit::incrementPosition(int pos, int count){
-    for(auto list:_listParticipantsAndColors){
-        if(pos<_cursorsVector[list.first].position) {
+void TextEdit::incrementPosition(int pos, int count) {
+    for (auto list:_listParticipantsAndColors) {
+        if (pos < _cursorsVector[list.first].position) {
             _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position + count);
         }
     }
 }
+
 void TextEdit::decreentPosition(int pos, int count) {
-    for(auto list:_listParticipantsAndColors){
-        if(pos<_cursorsVector[list.first].position) {
+    for (auto list:_listParticipantsAndColors) {
+        if (pos < _cursorsVector[list.first].position) {
             _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position - count);
         }
     }
 }
-
 
 
 void TextEdit::updateListParticipants(usersInFile users) {
@@ -1284,15 +1289,16 @@ void TextEdit::updateListParticipants(usersInFile users) {
     _labels.clear();
     //NON POSSO ELIMINARLO, contiene la posizione di tutti gli utenti
     //_cursorsVector.clear();
-    for(auto u:users){
-        if(u.first!=client_->getUser().toStdString()){
+    for (auto u:users) {
+        if (u.first != client_->getUser().toStdString()) {
             CustomCursor remoteCursor = CustomCursor();
             _cursorsVector.insert(std::pair<QString, CustomCursor>(QString::fromStdString(u.first), remoteCursor));
-            _listParticipantsAndColors.insert(std::pair<QString, QColor>(QString::fromStdString(u.first), QString::fromStdString(u.second)));
+            _listParticipantsAndColors.insert(
+                    std::pair<QString, QColor>(QString::fromStdString(u.first), QString::fromStdString(u.second)));
             QLabel *labelName = new QLabel(textEdit);
-            if(_labels.insert(std::pair<QString, QLabel*>(QString::fromStdString(u.first), labelName)).second){
+            if (_labels.insert(std::pair<QString, QLabel *>(QString::fromStdString(u.first), labelName)).second) {
                 //nel coso non c'èera in labels ma c'era in _cursorvector, in ogni caso appena qualcuno entra, la posizione è zero
-               // _cursorsVector[QString::fromStdString(u.first)].setPosition(0);
+                // _cursorsVector[QString::fromStdString(u.first)].setPosition(0);
             }
         }
     }
@@ -1308,11 +1314,11 @@ void TextEdit::updateConnectedUsers(usersInFile users) {
     connectedUsers->clear();
     //QLabel * label = new QLabel(client_->getUser());
     QLabel *label = new QLabel(client_->getUser());
-    label->setStyleSheet("font-weight: bold; color: "+client_->getColor());
-    QListWidgetItem * item = new QListWidgetItem();
+    label->setStyleSheet("font-weight: bold; color: " + client_->getColor());
+    QListWidgetItem *item = new QListWidgetItem();
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
-    for(auto u:_listParticipantsAndColors) {
+    for (auto u:_listParticipantsAndColors) {
         if (u.first.toStdString() != client_->getUser().toStdString())
             updateConnectedUser(u.first, u.second.name());
     }
@@ -1328,13 +1334,14 @@ void TextEdit::resetCursors() {
     _oldCursor = CustomCursor(QTextCursor(textEdit->textCursor()));
     _newCursor = CustomCursor(QTextCursor(textEdit->textCursor()));
 }
+
 /*
 void TextEdit::updateCursors() {
     CustomCursor cursor = CustomCursor(QTextCursor(textEdit->textCursor()));
     updateCursors(cursor);
 }
 */
-void TextEdit::updateCursors(const CustomCursor &cursor){
+void TextEdit::updateCursors(const CustomCursor &cursor) {
     _oldCursor = CustomCursor(_newCursor);
     _newCursor = CustomCursor(cursor);
 }

@@ -246,7 +246,7 @@ void Userpage::setupRecentFiles(){
     QHBoxLayout *hLayout3 = new QHBoxLayout();
     hLayout3->setObjectName(QString::fromUtf8("hLayout3"));
 
-    QLabel *recentLabel = new QLabel("Recent Files",recent);
+    QLabel *recentLabel = new QLabel("Files",recent);
     recentLabel->setObjectName(QString::fromUtf8("recentLabel"));
     //recentLabel->setGeometry(QRect(10, 0, 281, 31));
     recentLabel->setStyleSheet(QString::fromUtf8("font: 75 25pt \"Sawasdee Bold\";"));
