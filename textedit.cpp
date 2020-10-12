@@ -70,7 +70,7 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
     timer = new QTimer(this);
     timer->setSingleShot(true);
 
-    connect(timer,&QTimer::timeout,this,&TextEdit::clearHighlights);
+    connect(timer, &QTimer::timeout, this, &TextEdit::clearHighlights);
     connect(this, &TextEdit::updateCursor, this, &TextEdit::drawGraphicCursor);
 
     connect(client_, &Client::insertSymbol, this, &TextEdit::showSymbol);
@@ -400,11 +400,13 @@ void TextEdit::setupTextActions() {
 void TextEdit::updateConnectedUser(QString user, QString color) {
     QPushButton *label = new QPushButton(user);
     label->setObjectName(user);
-    label->setStyleSheet("QPushButton{height:50px;border:1px;text-align:left;font-size:22px;font-weight: bold; color: " + color+"}\n"
-                         "QPushButton:hover{background-color:rgb(243,243,243);border:1px;}");
+    label->setStyleSheet(
+            "QPushButton{height:50px;border:1px;text-align:left;font-size:22px;font-weight: bold; color: " + color +
+            "}\n"
+            "QPushButton:hover{background-color:rgb(243,243,243);border:1px;}");
 
     QIcon icon;
-    icon.addFile(rsrcPath+QString::fromUtf8("/eye.png"),QSize(),QIcon::Normal,QIcon::On);
+    icon.addFile(rsrcPath + QString::fromUtf8("/eye.png"), QSize(), QIcon::Normal, QIcon::On);
     label->setIcon(icon);
     label->setIconSize(QSize(16, 16));
     label->setFlat(true);
@@ -920,8 +922,15 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
         }
         std::cout << std::endl;
         if (obj == textEdit) {
+            std::unique_lock<std::mutex> ul(client_->writingMutex);
+            client_->writingConditionVariable.wait(ul, [this]() {
+                if (!client_->writingInsertBool) {
+                    client_->writingInsertBool = true;
+                    return true;
+                }
+                return false;
+            });
             if (!key_ev->text().isEmpty()) {
-
 
                 QTextCursor cursor = textEdit->textCursor();
                 int pos, startIndex, endIndex;
@@ -1166,6 +1175,8 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                 }
             }
         }
+        this->writingInsertBool = false;
+        this->writingConditionVariable.notify_all();
     }
     return QObject::eventFilter(obj, ev);;
 }
@@ -1256,7 +1267,7 @@ void TextEdit::highlightcharacter() {
             tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
             tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
             textEdit->setTextCursor(tempCursor);
-            if(name==client_->getUser())
+            if (name == client_->getUser())
                 textEdit->setTextBackgroundColor(client_->getColor());
             else
                 textEdit->setTextBackgroundColor(_listParticipantsAndColors[name]);
@@ -1337,11 +1348,13 @@ void TextEdit::updateConnectedUsers(usersInFile users) {
     //QLabel * label = new QLabel(client_->getUser());
     QPushButton *label = new QPushButton(client_->getUser());
     label->setObjectName(client_->getUser());
-    label->setStyleSheet("QPushButton{border:1px;text-align:left;font-size:22px;font-weight: bold; color: " + client_->getColor()+"}\n"
-                         "QPushButton:hover{border:1px;background-color:rgb(243,243,243)}");
+    label->setStyleSheet(
+            "QPushButton{border:1px;text-align:left;font-size:22px;font-weight: bold; color: " + client_->getColor() +
+            "}\n"
+            "QPushButton:hover{border:1px;background-color:rgb(243,243,243)}");
 
     QIcon icon;
-    icon.addFile(rsrcPath+QString::fromUtf8("/eye.png"),QSize(),QIcon::Normal,QIcon::On);
+    icon.addFile(rsrcPath + QString::fromUtf8("/eye.png"), QSize(), QIcon::Normal, QIcon::On);
     label->setIcon(icon);
     label->setIconSize(QSize(16, 16));
     label->setFlat(true);
