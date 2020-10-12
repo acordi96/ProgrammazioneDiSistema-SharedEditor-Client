@@ -58,5 +58,7 @@
         <file>images/win/logout.png</file>
         <file>images/mac/logout.png</file>
         <file>images/back-arrow.png</file>
+        <file>images/win/eye.png</file>
+        <file>images/mac/eye.png</file>
     </qresource>
 </RCC>
