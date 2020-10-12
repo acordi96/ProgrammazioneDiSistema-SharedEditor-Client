@@ -400,7 +400,7 @@ void TextEdit::setupTextActions() {
 void TextEdit::updateConnectedUser(QString user, QString color) {
     QPushButton *label = new QPushButton(user);
     label->setObjectName(user);
-    label->setStyleSheet("color:" + color);
+    label->setStyleSheet("font-weight: bold; color: " + color);
     QListWidgetItem *item = new QListWidgetItem();
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
@@ -725,7 +725,7 @@ void TextEdit::cursorPositionChanged() {
             {"username",  client_->getUser().toStdString()},
             {"pos",       pos}
     };
-    client_->sendAtServer(j);
+    //client_->sendAtServer(j);
 
     /*
     alignmentChanged(textEdit->alignment());
@@ -1235,15 +1235,17 @@ void TextEdit::highlightcharacter() {
     QTextCursor cursor = textEdit->textCursor();
     QTextCursor tempCursor = QTextCursor(cursor);
     int pos;
+    int i=0;
     for(auto s: client_->symbols){
         if(s.getUsername()==name.toStdString()) {
-            pos = s.getPosizione().front();
+            pos = i;
             tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
             tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
             tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
             textEdit->setTextCursor(tempCursor);
             textEdit->setTextBackgroundColor(_listParticipantsAndColors[name]);
         }
+        i++;
     }
     textEdit->setTextCursor(cursor);
     textEdit->setTextBackgroundColor(QColor(255, 255, 255, 255));
@@ -1316,11 +1318,13 @@ void TextEdit::updateListParticipants(usersInFile users) {
 void TextEdit::updateConnectedUsers(usersInFile users) {
     connectedUsers->clear();
     //QLabel * label = new QLabel(client_->getUser());
-    QLabel *label = new QLabel(client_->getUser());
+    QPushButton *label = new QPushButton(client_->getUser());
+    label->setObjectName(client_->getUser());
     label->setStyleSheet("font-weight: bold; color: " + client_->getColor());
     QListWidgetItem *item = new QListWidgetItem();
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
+    connect(label, SIGNAL(clicked()), SLOT(highlightcharacter()));
     for (auto u:_listParticipantsAndColors) {
         if (u.first.toStdString() != client_->getUser().toStdString())
             updateConnectedUser(u.first, u.second.name());
