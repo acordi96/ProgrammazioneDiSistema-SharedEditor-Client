@@ -142,6 +142,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
             emit insertSymbolWithId(QString::fromStdString(usernameToInsert[i]), index, charToInsert[i]);
         }
         this->writingInsertBool = false;
+        ul.unlock();
         this->writingConditionVariable.notify_all();
         return type_request;
     } else if (type_request == "remove_res") {

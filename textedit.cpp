@@ -1167,16 +1167,16 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                                 {"crdtToErase",     crdtToErase}
                         };
                         client_->sendAtServer(j);
-                        //TO DO
                     }
                     decreentPosition(pos, 1);
                     drawGraphicCursor();
                     //return QObject::eventFilter(obj, ev);
                 }
             }
+            client_->writingInsertBool = false;
+            ul.unlock();
+            client_->writingConditionVariable.notify_all();
         }
-        client_->writingInsertBool = false;
-        client_->writingConditionVariable.notify_all();
     }
     return QObject::eventFilter(obj, ev);;
 }
