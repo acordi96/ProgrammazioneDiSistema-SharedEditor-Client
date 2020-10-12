@@ -400,7 +400,15 @@ void TextEdit::setupTextActions() {
 void TextEdit::updateConnectedUser(QString user, QString color) {
     QPushButton *label = new QPushButton(user);
     label->setObjectName(user);
-    label->setStyleSheet("font-weight: bold; color: " + color);
+    label->setStyleSheet("QPushButton{height:50px;border:1px;text-align:left;font-size:22px;font-weight: bold; color: " + color+"}\n"
+                         "QPushButton:hover{background-color:rgb(243,243,243);border:1px;}");
+
+    QIcon icon;
+    icon.addFile(rsrcPath+QString::fromUtf8("/eye.png"),QSize(),QIcon::Normal,QIcon::On);
+    label->setIcon(icon);
+    label->setIconSize(QSize(16, 16));
+    label->setFlat(true);
+
     QListWidgetItem *item = new QListWidgetItem();
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
@@ -1243,8 +1251,12 @@ void TextEdit::highlightcharacter() {
             tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
             tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
             textEdit->setTextCursor(tempCursor);
-            textEdit->setTextBackgroundColor(_listParticipantsAndColors[name]);
+            if(name==client_->getUser())
+                textEdit->setTextBackgroundColor(client_->getColor());
+            else
+                textEdit->setTextBackgroundColor(_listParticipantsAndColors[name]);
         }
+
         i++;
     }
     textEdit->setTextCursor(cursor);
@@ -1320,7 +1332,15 @@ void TextEdit::updateConnectedUsers(usersInFile users) {
     //QLabel * label = new QLabel(client_->getUser());
     QPushButton *label = new QPushButton(client_->getUser());
     label->setObjectName(client_->getUser());
-    label->setStyleSheet("font-weight: bold; color: " + client_->getColor());
+    label->setStyleSheet("QPushButton{border:1px;text-align:left;font-size:22px;font-weight: bold; color: " + client_->getColor()+"}\n"
+                         "QPushButton:hover{border:1px;background-color:rgb(243,243,243)}");
+
+    QIcon icon;
+    icon.addFile(rsrcPath+QString::fromUtf8("/eye.png"),QSize(),QIcon::Normal,QIcon::On);
+    label->setIcon(icon);
+    label->setIconSize(QSize(16, 16));
+    label->setFlat(true);
+
     QListWidgetItem *item = new QListWidgetItem();
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
