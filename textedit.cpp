@@ -777,10 +777,7 @@ void TextEdit::cursorPositionChanged() {
 }
 
 void TextEdit::showSymbolWithId(QString user, int pos, QChar c) {
-    std::unique_lock<std::mutex> ul(client_->writingMutex);
-    client_->writingConditionVariable.wait(ul, [this]() {
-        return client_->writingInsertBool;
-    });
+
     QTextCharFormat format;
     format.setFontWeight(QFont::Normal);
     format.setFontFamily("Helvetica");

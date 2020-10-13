@@ -165,10 +165,12 @@ void Userpage::setupUserinfo(){
                                                    "background-color:#84ACD7;\n"
                                                    "border:1px;\n"
                                                    "border-radius:5px;\n"
+                                                   "color:#FFFFFF;\n"
                                                    "font: 75 12pt \"Sawasdee Bold\";\n"
                                                    "}\n"
                                                    "QPushButton#newFileButton:hover{\n"
                                                    "background-color:#68DFBB;\n"
+                                                   "border-radius:5px;\n"
                                                    "}"));
 
     QIcon icon;
@@ -204,10 +206,12 @@ void Userpage::setupUserinfo(){
                                                    "background-color:#84ACD7;\n"
                                                    "border:1px;\n"
                                                    "border-radius:5px;\n"
+                                                   "color:#FFFFFF;\n"
                                                    "font: 75 12pt \"Sawasdee Bold\";\n"
                                                    "}\n"
                                                    "QPushButton#openURLbutton:hover{\n"
                                                     "background-color:#68DFBB;\n"
+                                                   "border-radius:5px;\n"
                                                    "}"));
     connect(openURLbutton,&QPushButton::clicked,this,&Userpage::handleOpenURLbutton);
     QSpacerItem *urlSpacer = new QSpacerItem(20,20,QSizePolicy::Fixed,QSizePolicy::Minimum);
@@ -357,6 +361,7 @@ void Userpage::setupRecentFiles(){
                                                 "}\n"
                                                 "QPushButton#openButton:hover{\n"
                                                 "background-color:#68DFBB;\n"
+                                                "border-radius:5px;\n"
                                                 "}"));
     openButton->setFlat(true);
 
@@ -375,6 +380,7 @@ void Userpage::setupRecentFiles(){
                                                   "}\n"
                                                   "QPushButton#renameButton:hover{\n"
                                                   "background-color:#68DFBB;\n"
+                                                  "border-radius:5px;\n"
                                                   "}"));
     renameButton->setFlat(true);
 
@@ -393,6 +399,7 @@ void Userpage::setupRecentFiles(){
                                                   "}\n"
                                                   "QPushButton#deleteButton:hover{\n"
                                                   "background-color:#68DFBB;\n"
+                                                  "border-radius:5px;\n"
                                                   "}"));
     deleteButton->setFlat(true);
 
@@ -413,6 +420,7 @@ void Userpage::setupRecentFiles(){
                                                   "}\n"
                                                   "QPushButton#inviteButton:hover{\n"
                                                   "background-color:#68DFBB;\n"
+                                                  "border-radius:5px;\n"
                                                   "}"));
     inviteButton->setFlat(true);
 
@@ -461,8 +469,8 @@ void Userpage::handleNewFileButton()
     modalWindow.setMinimumSize(QSize(300, 150));
     modalWindow.setSizePolicy(QSizePolicy::MinimumExpanding,
                               QSizePolicy::MinimumExpanding);
-    modalWindow.setCancelButtonText("cancel");
-    modalWindow.setOkButtonText("create");
+    modalWindow.setCancelButtonText("Cancel");
+    modalWindow.setOkButtonText("Create");
 
     if ( modalWindow.exec() == 1)
     {
@@ -470,6 +478,7 @@ void Userpage::handleNewFileButton()
         while (modalWindow.textValue() == ""){
 
             QDialog *dialog = new QDialog();
+            dialog->setWindowTitle("Shared Editor");
             QVBoxLayout *layout = new QVBoxLayout();
             dialog->setLayout(layout);
             layout->addWidget(new QLabel("Insert a name for the new file"));
@@ -496,6 +505,7 @@ void Userpage::handleNewFileButton()
                modalWindow.textValue().toStdString().find_first_of('|')!=std::string::npos
                 ){
             QDialog *dialog = new QDialog();
+            dialog->setWindowTitle("Shared Editor");
             QVBoxLayout *layout = new QVBoxLayout();
             dialog->setLayout(layout);
             layout->addWidget(new QLabel("Error! characters \\,/,:,*,?,\",<,>,| are not allowed in a file's name"));
@@ -510,6 +520,7 @@ void Userpage::handleNewFileButton()
         while (modalWindow.textValue().length() > 100){
 
             QDialog *dialog = new QDialog();
+            dialog->setWindowTitle("Shared Editor");
             QVBoxLayout *layout = new QVBoxLayout();
             dialog->setLayout(layout);
             layout->addWidget(new QLabel("Error! The max length of a file's name is 100 characters"));
@@ -606,9 +617,9 @@ void Userpage::on_fileName_clicked(int i){
     QPushButton *b = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
     b->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                        "border:1px;\n"
+                                       "border-radius:5px;\n"
                                        "background-color:#C97064;\n"
                                        "color:#FFFFFF;\n"
-                                       "border-radius:5px;\n"
                                        "font: 75 12pt \"Sawasdee Bold\";\n"
                                        "}"));
 
@@ -680,7 +691,7 @@ void Userpage::on_renameButton_clicked() {
 
         QMessageBox::information(
                 this,
-                tr("Hey!"),
+                tr("Shared Editor"),
                 tr("Only who created the file can rename it") );
         //deselect button
         QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
@@ -700,8 +711,8 @@ void Userpage::on_renameButton_clicked() {
         modalWindow.setMinimumSize(QSize(300, 150));
         modalWindow.setSizePolicy(QSizePolicy::MinimumExpanding,
                                   QSizePolicy::MinimumExpanding);
-        modalWindow.setCancelButtonText("cancel");
-        modalWindow.setOkButtonText("rename");
+        modalWindow.setCancelButtonText("Cancel");
+        modalWindow.setOkButtonText("Rename");
 
         if (modalWindow.exec() == 1) {
 
@@ -748,6 +759,7 @@ void Userpage::on_renameButton_clicked() {
             while (modalWindow.textValue().length() > 100) {
 
                 QDialog *dialog = new QDialog();
+                dialog->setWindowTitle("Shared Editor");
                 QVBoxLayout *layout = new QVBoxLayout();
                 dialog->setLayout(layout);
                 layout->addWidget(new QLabel("Error! The max length of a file's name is 100 characters"));
