@@ -40,7 +40,7 @@ public:
 public slots:
     void fileNew();
     void showSymbol(int pos, QChar c);
-    void showSymbolWithId(QString user, int pos, QChar c);
+    void showSymbolWithId(char c, QString username, QVector<int> crdt);
     void updateRemotePosition(QString user, int pos);
     void eraseSymbols(int toErase);
     //TO DO:mettere user

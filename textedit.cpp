@@ -776,15 +776,23 @@ void TextEdit::cursorPositionChanged() {
     }*/
 }
 
-void TextEdit::showSymbolWithId(QString user, int pos, QChar c) {
+void TextEdit::showSymbolWithId(char c, QString user, QVector<int> crdt) {
+    std::cout << "aaa" << std::endl;
     std::unique_lock<std::mutex> ul(client_->writingMutex);
+    std::cout << "CLIENT SHOWSYMBOLWITHID START" << std::endl;
     client_->writingConditionVariable.wait(ul, [this]() {
-        if (!client_->writingInsertBool && client_->writingInsertInt > 0) {
+        if (!client_->writingInsertBool) {
+            client_->writingInsertBool = true;
             return true;
         }
-        std::cout << "TEXTEDIT SHOWSYMBOLWITHID SLEEP" << std::endl;
+        std::cout << "CLIENT SHOWSYMBOLWITHID SLEEP" << std::endl;
         return false;
     });
+
+    Symbol symbolToInsert(c, user.toStdString(), crdt.toStdVector());
+    int pos = client_->generateIndexCRDT(symbolToInsert, 0, -1, -1);
+    client_->insertSymbolIndex(symbolToInsert, pos);
+
     QTextCharFormat format;
     format.setFontWeight(QFont::Normal);
     format.setFontFamily("Helvetica");
@@ -830,10 +838,10 @@ void TextEdit::showSymbolWithId(QString user, int pos, QChar c) {
 
     textEdit->setFocus();
 
-    client_->writingInsertInt--;
+    client_->writingInsertBool = false;
     ul.unlock();
     client_->writingConditionVariable.notify_all();
-    std::cout << "TEXTEDIT SHOWSYMBOLWITHID FINISHED" << std::endl;
+    std::cout << "CLIENT SHOWSYMBOLWITHID FINISHED" << std::endl;
 }
 
 void TextEdit::showSymbol(int pos, QChar c) {
@@ -931,8 +939,9 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
         std::cout << std::endl;
         if (obj == textEdit) {
             std::unique_lock<std::mutex> ul(client_->writingMutex);
+            std::cout << "CLIENT INSERT START" << std::endl;
             client_->writingConditionVariable.wait(ul, [this]() {
-                if (!client_->writingInsertBool && client_->writingInsertInt == 0) {
+                if (!client_->writingInsertBool) {
                     client_->writingInsertBool = true;
                     return true;
                 }

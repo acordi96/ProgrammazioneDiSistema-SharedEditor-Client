@@ -34,7 +34,6 @@ public:
     int maxBufferSymbol;
 
     bool writingInsertBool;
-    int writingInsertInt;
     std::mutex writingMutex;
     std::condition_variable writingConditionVariable;
 
@@ -97,7 +96,7 @@ signals:
 
     void insertSymbol(int pos, QChar c);
 
-    void insertSymbolWithId(QString username, int pos, QChar c);
+    void insertSymbolWithId(char c, QString user, QVector<int> crdt);
 
     void eraseSymbols(int erased);
 

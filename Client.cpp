@@ -16,7 +16,6 @@ Client::Client()
         io_context_.run(); //boost thread loop start
     });
     this->writingInsertBool = false;
-    this->writingInsertInt = 0;
     this->maxBufferSymbol = 1;
     do_connect();
 }
@@ -122,43 +121,15 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         QString res = QString::fromStdString(type_request);
         emit formResultSuccess(res);
     } else if (type_request == "insert_res") {
-        std::unique_lock<std::mutex> ul(this->writingMutex);
-        this->writingConditionVariable.wait(ul, [this]() {
-            if (!this->writingInsertBool && this->writingInsertInt == 0) {
-                this->writingInsertBool = true;
-                return true;
-            }
-            std::cout << "CLIENT INSERT_RES SLEEP" << std::endl;
-            return false;
-        });
         //prendo il vettore di symbol
         std::vector<std::string> usernameToInsert = js.at("usernameToInsert").get<std::vector<std::string>>();
         std::vector<char> charToInsert = js.at("charToInsert").get<std::vector<char>>();
         std::vector<std::vector<int>> crdtToInsert = js.at("crdtToInsert").get<std::vector<std::vector<int>>>();
         for (int i = 0; i < usernameToInsert.size(); i++) {
-            //ricreo il simbolo
-            Symbol symbolToInsert(charToInsert[i], usernameToInsert[i], crdtToInsert[i]);
-            int index = this->generateIndexCRDT(symbolToInsert, 0, -1, -1);
-            //aggiungo al crdt
-            this->insertSymbolIndex(symbolToInsert, index);
-            this->writingInsertInt++;
-            emit insertSymbolWithId(QString::fromStdString(usernameToInsert[i]), index, charToInsert[i]);
+            emit insertSymbolWithId(charToInsert[i], QString::fromStdString(usernameToInsert[i]), QVector<int>::fromStdVector(crdtToInsert[i]));
         }
-        this->writingInsertBool = false;
-        ul.unlock();
-        this->writingConditionVariable.notify_all();
-        std::cout << "CLIENT INSERT_RES FINISHED" << std::endl;
         return type_request;
     } else if (type_request == "remove_res") {
-        std::unique_lock<std::mutex> ul(this->writingMutex);
-        this->writingConditionVariable.wait(ul, [this]() {
-            if (!this->writingInsertBool && this->writingInsertInt == 0) {
-                this->writingInsertBool = true;
-                return true;
-            }
-            std::cout << "CLIENT REMOVE_RES SLEEP" << std::endl;
-            return false;
-        });
         //prendo il vettore di symbol
         std::vector<Symbol> symbolsToErase;
         std::vector<std::string> usernameToErase = js.at("usernameToErase").get<std::vector<std::string>>();
@@ -170,14 +141,8 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::vector<int> erased = this->eraseSymbolCRDT(symbolsToErase);
         //emetto per aggiornamento testo con gli indici
         for (auto &indexToErase : erased) {
-            this->writingInsertInt++;
             emit eraseSymbols(indexToErase);
-
         }
-        this->writingInsertBool = false;
-        ul.unlock();
-        this->writingConditionVariable.notify_all();
-        std::cout << "CLIENT REMOVE_RES FINISHED" << std::endl;
         return type_request;
     } else if (type_request == "new_file_created") {
         QString res = QString::fromStdString("new_file_created");
