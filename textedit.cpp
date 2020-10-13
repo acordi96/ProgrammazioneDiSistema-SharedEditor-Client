@@ -170,6 +170,7 @@ void TextEdit::closingFile() {
 
 void TextEdit::setupFileActions() {
     QToolBar *tb = addToolBar(tr("File Actions"));
+    tb->setStyleSheet(QString::fromUtf8("QToolButton:hover {background-color:#E6E7E8;border:1px;}"));
 
     const QIcon backIcon = QIcon::fromTheme("go-back", QIcon(rsrcPath + "/left-arrow.png"));
     QAction *a = tb->addAction(backIcon, tr("&Close File"), this, [=]() {
@@ -228,7 +229,6 @@ void TextEdit::setupFileActions() {
         emit this->logout();
     });
     a->setShortcut(Qt::CTRL + Qt::Key_Q);
-
 
 //    const QIcon profileIcon = QIcon::fromTheme("profile",QIcon(rsrcPath + "/user.png"));
 //    a = tb->addAction(profileIcon,tr("&Userpage"),this,[=](){emit this->closeFile();});
@@ -720,7 +720,6 @@ void TextEdit::currentCharFormatChanged(const QTextCharFormat &format) {
     colorChanged(format.foreground().color());
 }
 
-
 void TextEdit::updateRemotePosition(QString user, int pos) {
     _cursorsVector[user].setPosition(pos);
     drawGraphicCursor();
@@ -906,7 +905,6 @@ void TextEdit::alignmentChanged(Qt::Alignment a) {
     else if (a & Qt::AlignJustify)
         actionAlignJustify->setChecked(true);
 }
-
 
 bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
     if (ev->type() == QEvent::KeyPress) {
@@ -1309,7 +1307,6 @@ void TextEdit::decreentPosition(int pos, int count) {
     }
 }
 
-
 void TextEdit::updateListParticipants(usersInFile users) {
     for (auto user:_listParticipantsAndColors) {
         _labels[user.first]->hide();
@@ -1364,7 +1361,6 @@ void TextEdit::updateConnectedUsers(usersInFile users) {
             updateConnectedUser(u.first, u.second.name());
     }
 }
-
 
 void TextEdit::resetText() {
     _currentText = QString(textEdit->toPlainText());

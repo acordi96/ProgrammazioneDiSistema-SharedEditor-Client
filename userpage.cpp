@@ -166,7 +166,7 @@ void Userpage::setupUserinfo(){
                                                    "border:1px;\n"
                                                    "border-radius:5px;\n"
                                                    "color:#FFFFFF;\n"
-                                                   "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                   "font: 75 14pt \"Sawasdee Bold\";\n"
                                                    "}\n"
                                                    "QPushButton#newFileButton:hover{\n"
                                                    "background-color:#68DFBB;\n"
@@ -195,23 +195,23 @@ void Userpage::setupUserinfo(){
 
     lineURL=new QLineEdit(userinfo);
     lineURL->setObjectName(QString::fromUtf8("lineURL"));
-    lineURL->setGeometry(QRect(80,480,211,25));
+    //lineURL->setGeometry(QRect(80,480,211,25));
     lineURL->setPlaceholderText(QString::fromUtf8("Insert URL here..."));
     urlLayout->addWidget(lineURL);
 
     openURLbutton = new QPushButton("Accept",userinfo);
     openURLbutton->setObjectName(QString::fromUtf8("openURLbutton"));
-    openURLbutton->setGeometry(QRect(310,480,71,25));
+    //openURLbutton->setGeometry(QRect(310,480,71,25));
     openURLbutton->setStyleSheet(QString::fromUtf8("QPushButton#openURLbutton{\n"
                                                    "background-color:#84ACD7;\n"
                                                    "border:1px;\n"
                                                    "border-radius:5px;\n"
                                                    "color:#FFFFFF;\n"
-                                                   "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                   "font: 75 16pt \"Sawasdee Bold\";\n"
                                                    "}\n"
                                                    "QPushButton#openURLbutton:hover{\n"
                                                     "background-color:#68DFBB;\n"
-                                                   "border-radius:5px;\n"
+                                                    "border-radius:5px;\n"
                                                    "}"));
     connect(openURLbutton,&QPushButton::clicked,this,&Userpage::handleOpenURLbutton);
     QSpacerItem *urlSpacer = new QSpacerItem(20,20,QSizePolicy::Fixed,QSizePolicy::Minimum);
@@ -1027,6 +1027,16 @@ void Userpage::on_inviteButton_clicked() {
                 this,
                 tr(" Shared Editor "),
                 tr("Hey!You must be the owner in order to invite") );
+
+        QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
+        deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                                  "background-color:#84ACD7;\n"
+                                                  "border:1px;\n"
+                                                  "border-radius:5px;\n"
+                                                  "color:#FFFFFF;\n"
+                                                  "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                  "}"));
+
         return;
     }
     const char * code;
