@@ -133,7 +133,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         //prendo il vettore di symbol
         std::vector<Symbol> symbolsToErase;
         std::vector<std::string> usernameToErase = js.at("usernameToErase").get<std::vector<std::string>>();
-        std::vector<char> charToErase = js.at("charToErase").get<std::vector<char>>();
+        std::vector<wchar_t > charToErase = js.at("charToErase").get<std::vector<wchar_t >>();
         std::vector<std::vector<int>> crdtToErase = js.at("crdtToErase").get<std::vector<std::vector<int>>>();
         for (int i = 0; i < usernameToErase.size(); i++)
             symbolsToErase.emplace_back(charToErase[i], usernameToErase[i], crdtToErase[i]);

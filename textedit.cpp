@@ -988,7 +988,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
 
                     std::vector<Symbol> symbolsToErase;
                     std::vector<std::string> usernameToErase;
-                    std::vector<char> charToErase;
+                    std::vector<wchar_t > charToErase;
                     std::vector<std::vector<int>> crdtToErase;
 
                     int k = 0;
@@ -1157,7 +1157,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         if (pos > 0) {
                             std::vector<Symbol> symbolsToErase;
                             std::vector<std::string> usernameToErase;
-                            std::vector<char> charToErase;
+                            std::vector<wchar_t > charToErase;
                             std::vector<std::vector<int>> crdtToErase;
                             symbolsToErase.push_back(client_->symbols[pos - 1]);
                             usernameToErase.push_back(client_->symbols[pos - 1].getUsername());
@@ -1186,7 +1186,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     if (pos >= 0 && pos < textEdit->toPlainText().size()) {
                         std::vector<Symbol> symbolsToErase;
                         std::vector<std::string> usernameToErase;
-                        std::vector<char> charToErase;
+                        std::vector<wchar_t > charToErase;
                         std::vector<std::vector<int>> crdtToErase;
                         symbolsToErase.push_back(client_->symbols[pos]);
                         usernameToErase.push_back(client_->symbols[pos].getUsername());
