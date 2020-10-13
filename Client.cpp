@@ -141,8 +141,8 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
             int index = this->generateIndexCRDT(symbolToInsert, 0, -1, -1);
             //aggiungo al crdt
             this->insertSymbolIndex(symbolToInsert, index);
-            emit insertSymbolWithId(QString::fromStdString(usernameToInsert[i]), index, charToInsert[i]);
             this->writingInsertInt++;
+            emit insertSymbolWithId(QString::fromStdString(usernameToInsert[i]), index, charToInsert[i]);
         }
         this->writingInsertBool = false;
         ul.unlock();
@@ -170,8 +170,9 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::vector<int> erased = this->eraseSymbolCRDT(symbolsToErase);
         //emetto per aggiornamento testo con gli indici
         for (auto &indexToErase : erased) {
-            emit eraseSymbols(indexToErase);
             this->writingInsertInt++;
+            emit eraseSymbols(indexToErase);
+
         }
         this->writingInsertBool = false;
         ul.unlock();
@@ -184,6 +185,9 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         emit clearEditor();
         std::string name = std::to_string(this->getUser().size()) + '_' + this->getUser().toStdString() +
                            js.at("filename").get<std::string>() + js.at("invitation").get<std::string>();
+        std::pair<std::string,std::string> p = std::make_pair<std::string,std::string>(this->getUser().toStdString(),js.at("filename").get<std::string>());
+        this->files.insert(std::pair<std::pair<std::string,std::string>,std::string>(p,js.at("invitation").get<std::string>()));
+
         emit updateFile("", QString::fromStdString(name), "", QString::fromStdString("add_new_file"));
         return type_request;
     } else if (type_request == "new_file_already_exist") {
