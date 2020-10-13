@@ -1028,9 +1028,8 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     };
                     client_->sendAtServer(j);
                     //drawRemoteCursors();
-
-                    incrementPosition(pos, 1);
                     drawGraphicCursor();
+                    incrementPosition(pos, 1);
 
                     //return QObject::eventFilter(obj, ev);
                 }
@@ -1097,8 +1096,8 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         client_->sendAtServer(j);
                     }
                     //TO DO: probabilente aggiornare cursori anche qui
-                    incrementPosition(startPos, dim);
                     drawGraphicCursor();
+                    incrementPosition(startPos, dim);
                 }
                     //*********************COPY*****************************************
                 else if (key_ev->text().toStdString().c_str()[0] == 3) {
@@ -1309,6 +1308,7 @@ void TextEdit::decreentPosition(int pos, int count) {
 
 void TextEdit::updateListParticipants(usersInFile users) {
     for (auto user:_listParticipantsAndColors) {
+        _labels[user.first]->move(0,0);
         _labels[user.first]->hide();
     }
     _listParticipantsAndColors.clear();
