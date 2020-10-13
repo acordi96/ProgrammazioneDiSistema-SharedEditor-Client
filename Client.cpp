@@ -2,8 +2,8 @@
 // Created by Sam on 22/apr/2020.
 //
 
-#define serverRoute "93.43.250.236"
-//#define serverRoute "127.0.0.1"
+//#define serverRoute "93.43.250.236"
+#define serverRoute "127.0.0.1"
 
 #include <QtWidgets/QMessageBox>
 #include "Headers/Client.h"
@@ -15,7 +15,6 @@ Client::Client()
     worker_ = std::thread([&]() {
         io_context_.run(); //boost thread loop start
     });
-    this->writingInsertBool = false;
     this->maxBufferSymbol = 1;
     do_connect();
 }
@@ -126,23 +125,19 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::vector<char> charToInsert = js.at("charToInsert").get<std::vector<char>>();
         std::vector<std::vector<int>> crdtToInsert = js.at("crdtToInsert").get<std::vector<std::vector<int>>>();
         for (int i = 0; i < usernameToInsert.size(); i++) {
-            emit insertSymbolWithId(charToInsert[i], QString::fromStdString(usernameToInsert[i]), QVector<int>::fromStdVector(crdtToInsert[i]));
+            Symbol symbolToInsert(charToInsert[i], usernameToInsert[i], crdtToInsert[i]);
+            emit insertSymbolWithId(symbolToInsert);
         }
         return type_request;
     } else if (type_request == "remove_res") {
-        //prendo il vettore di symbol
-        std::vector<Symbol> symbolsToErase;
         std::vector<std::string> usernameToErase = js.at("usernameToErase").get<std::vector<std::string>>();
         std::vector<char> charToErase = js.at("charToErase").get<std::vector<char>>();
         std::vector<std::vector<int>> crdtToErase = js.at("crdtToErase").get<std::vector<std::vector<int>>>();
-        for (int i = 0; i < usernameToErase.size(); i++)
+        std::vector<Symbol> symbolsToErase;
+        for (int i = 0; i < usernameToErase.size(); i++) {
             symbolsToErase.emplace_back(charToErase[i], usernameToErase[i], crdtToErase[i]);
-        //cancello dal crdt symbols compresi tra i due e prendo indici
-        std::vector<int> erased = this->eraseSymbolCRDT(symbolsToErase);
-        //emetto per aggiornamento testo con gli indici
-        for (auto &indexToErase : erased) {
-            emit eraseSymbols(indexToErase);
         }
+        emit eraseSymbols(symbolsToErase);
         return type_request;
     } else if (type_request == "new_file_created") {
         QString res = QString::fromStdString("new_file_created");
@@ -150,8 +145,10 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         emit clearEditor();
         std::string name = std::to_string(this->getUser().size()) + '_' + this->getUser().toStdString() +
                            js.at("filename").get<std::string>() + js.at("invitation").get<std::string>();
-        std::pair<std::string,std::string> p = std::make_pair<std::string,std::string>(this->getUser().toStdString(),js.at("filename").get<std::string>());
-        this->files.insert(std::pair<std::pair<std::string,std::string>,std::string>(p,js.at("invitation").get<std::string>()));
+        std::pair<std::string, std::string> p = std::make_pair<std::string, std::string>(this->getUser().toStdString(),
+                                                                                         js.at("filename").get<std::string>());
+        this->files.insert(
+                std::pair<std::pair<std::string, std::string>, std::string>(p, js.at("invitation").get<std::string>()));
 
         emit updateFile("", QString::fromStdString(name), "", QString::fromStdString("add_new_file"));
         return type_request;

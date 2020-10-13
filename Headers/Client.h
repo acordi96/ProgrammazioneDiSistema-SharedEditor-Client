@@ -33,10 +33,6 @@ public:
     std::vector<Symbol> symbols;
     int maxBufferSymbol;
 
-    bool writingInsertBool;
-    std::mutex writingMutex;
-    std::condition_variable writingConditionVariable;
-
     Client();
 
     void write(const message &msg);
@@ -96,9 +92,9 @@ signals:
 
     void insertSymbol(int pos, QChar c);
 
-    void insertSymbolWithId(char c, QString user, QVector<int> crdt);
+    void insertSymbolWithId(Symbol symbolToInsert);
 
-    void eraseSymbols(int erased);
+    void eraseSymbols(std::vector<Symbol> symbolsToErase);
 
     void updateRemotePosition(QString user, int pos);
 

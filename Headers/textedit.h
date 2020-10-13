@@ -40,9 +40,9 @@ public:
 public slots:
     void fileNew();
     void showSymbol(int pos, QChar c);
-    void showSymbolWithId(char c, QString username, QVector<int> crdt);
+    void showSymbolWithId(Symbol symbolToInsert);
     void updateRemotePosition(QString user, int pos);
-    void eraseSymbols(int toErase);
+    void eraseSymbols(std::vector<Symbol> symbolsToErase);
     //TO DO:mettere user
     //void show_Symbol(std::pair<int,char> tuple);
 protected:

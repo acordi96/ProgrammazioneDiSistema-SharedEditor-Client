@@ -85,7 +85,8 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
     //aggiorno lista
 
     qRegisterMetaType<usersInFile>("std::map<std::string,std::string>");
-
+    qRegisterMetaType<Symbol>("Symbol");
+    qRegisterMetaType<std::vector<Symbol>>("std::vector<Symbol>");
 
     textEdit->installEventFilter(this);
 
@@ -776,22 +777,12 @@ void TextEdit::cursorPositionChanged() {
     }*/
 }
 
-void TextEdit::showSymbolWithId(char c, QString user, QVector<int> crdt) {
-    std::cout << "aaa" << std::endl;
-    std::unique_lock<std::mutex> ul(client_->writingMutex);
-    std::cout << "CLIENT SHOWSYMBOLWITHID START" << std::endl;
-    client_->writingConditionVariable.wait(ul, [this]() {
-        if (!client_->writingInsertBool) {
-            client_->writingInsertBool = true;
-            return true;
-        }
-        std::cout << "CLIENT SHOWSYMBOLWITHID SLEEP" << std::endl;
-        return false;
-    });
+void TextEdit::showSymbolWithId(Symbol symbolToInsert) {
 
-    Symbol symbolToInsert(c, user.toStdString(), crdt.toStdVector());
     int pos = client_->generateIndexCRDT(symbolToInsert, 0, -1, -1);
     client_->insertSymbolIndex(symbolToInsert, pos);
+    char c = symbolToInsert.getCharacter();
+    QString user = QString::fromStdString(symbolToInsert.getUsername());
 
     QTextCharFormat format;
     format.setFontWeight(QFont::Normal);
@@ -838,10 +829,6 @@ void TextEdit::showSymbolWithId(char c, QString user, QVector<int> crdt) {
 
     textEdit->setFocus();
 
-    client_->writingInsertBool = false;
-    ul.unlock();
-    client_->writingConditionVariable.notify_all();
-    std::cout << "CLIENT SHOWSYMBOLWITHID FINISHED" << std::endl;
 }
 
 void TextEdit::showSymbol(int pos, QChar c) {
@@ -925,7 +912,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
     if (ev->type() == QEvent::KeyPress) {
         QKeyEvent *key_ev = static_cast<QKeyEvent *>(ev);
         int key = key_ev->key();
-        std::cout << "CRDT: " << std::flush;
+        /*std::cout << "CRDT: " << std::flush; //print crdt
         for (auto iterPositions = client_->symbols.begin(); iterPositions != client_->symbols.end(); ++iterPositions) {
             if (iterPositions->getCharacter() != 10 && iterPositions->getCharacter() != 13)
                 std::cout << "[" << (int) iterPositions->getCharacter() << "(" << iterPositions->getCharacter()
@@ -936,18 +923,8 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                 std::cout << std::to_string(iterPositions->getPosizione()[i]) << std::flush;
             std::cout << "]" << std::flush;
         }
-        std::cout << std::endl;
+        std::cout << std::endl;*/
         if (obj == textEdit) {
-            std::unique_lock<std::mutex> ul(client_->writingMutex);
-            std::cout << "CLIENT INSERT START" << std::endl;
-            client_->writingConditionVariable.wait(ul, [this]() {
-                if (!client_->writingInsertBool) {
-                    client_->writingInsertBool = true;
-                    return true;
-                }
-                std::cout << "CLIENT INSERT SLEEP" << std::endl;
-                return false;
-            });
             if (!key_ev->text().isEmpty()) {
 
                 QTextCursor cursor = textEdit->textCursor();
@@ -1191,42 +1168,42 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     //return QObject::eventFilter(obj, ev);
                 }
             }
-            client_->writingInsertBool = false;
-            ul.unlock();
-            client_->writingConditionVariable.notify_all();
-            std::cout << "CLIENT INSERT FINISHED" << std::endl;
         }
     }
     return QObject::eventFilter(obj, ev);;
 }
 
-void TextEdit::eraseSymbols(int toErase) {
-    QTextCursor cur = textEdit->textCursor();
+void TextEdit::eraseSymbols(std::vector<Symbol> symbolsToErase) {
 
-    cur.beginEditBlock();
-    cur.setPosition(toErase - 1);
-    int startAlignment = cur.blockFormat().alignment();
+    std::vector<int> erased = client_->eraseSymbolCRDT(symbolsToErase);
 
-    /* erase symbols */
-    cur.setPosition(toErase - 1);
-    cur.setPosition(toErase, QTextCursor::KeepAnchor);
-    cur.removeSelectedText();
-    cur.setPosition(toErase - 1, QTextCursor::KeepAnchor);
-    cur.removeSelectedText();
+    for(auto &toErase : erased) {
+        QTextCursor cur = textEdit->textCursor();
 
-    QTextBlockFormat textBlockFormat;
-    textBlockFormat = cur.blockFormat();
-    textBlockFormat.setAlignment(static_cast<Qt::AlignmentFlag>(startAlignment));
-    cur.mergeBlockFormat(textBlockFormat);
+        cur.beginEditBlock();
+        cur.setPosition(toErase - 1);
+        int startAlignment = cur.blockFormat().alignment();
 
-    cur.endEditBlock();
-    for (auto list:_listParticipantsAndColors) {
-        if (_cursorsVector[list.first].position > toErase)
-            _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position - 1);
+        /* erase symbols */
+        cur.setPosition(toErase - 1);
+        cur.setPosition(toErase, QTextCursor::KeepAnchor);
+        cur.removeSelectedText();
+        cur.setPosition(toErase - 1, QTextCursor::KeepAnchor);
+        cur.removeSelectedText();
+
+        QTextBlockFormat textBlockFormat;
+        textBlockFormat = cur.blockFormat();
+        textBlockFormat.setAlignment(static_cast<Qt::AlignmentFlag>(startAlignment));
+        cur.mergeBlockFormat(textBlockFormat);
+
+        cur.endEditBlock();
+        for (auto list:_listParticipantsAndColors) {
+            if (_cursorsVector[list.first].position > toErase)
+                _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position - 1);
+        }
+        drawGraphicCursor();
+        textEdit->setFocus();
     }
-    drawGraphicCursor();
-    //TO DO: inserire controllo sull'user
-    textEdit->setFocus();
 }
 
 QString TextEdit::getFileName() const {

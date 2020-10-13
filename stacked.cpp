@@ -23,7 +23,7 @@ stacked::stacked(QWidget *parent) :
     QObject::connect(client_, &Client::formResultSuccess, this, &stacked::showPopupSuccess);
 
     ui->setupUi(this);
-    setWindowTitle("SharedEditor - Login or Register");
+    setWindowTitle("SharedEditor - Login or Signup");
 }
 
 stacked::~stacked() {
@@ -277,7 +277,7 @@ void stacked::showPopupSuccess(QString result) {
 }
 
 void stacked::on_reglogButton_clicked() {
-    setWindowTitle("SharedEditor - Login or Register");
+    setWindowTitle("SharedEditor - Login or Signup");
     ui->stackedWidget->setCurrentIndex(1);
 
 }
@@ -390,7 +390,7 @@ void stacked::on_form_cancButton_clicked() {
     ui->stackedWidget->setCurrentIndex(0);
 }
 void stacked::logout(){
-    setWindowTitle("SharedEditor - Login or Register");
+    setWindowTitle("SharedEditor - Login or Signup");
     ui->user_log_line->clear();
     ui->psw_log_line->clear();
     ui->user_log_line->setFocus();
