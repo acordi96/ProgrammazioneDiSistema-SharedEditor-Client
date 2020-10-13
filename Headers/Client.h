@@ -96,7 +96,7 @@ signals:
 
     void insertSymbol(int pos, QChar c);
 
-    void insertSymbolWithId(QString username, int pos, wchar_t c);
+    void insertSymbolWithId(wchar_t c, QString user, QVector<int> crdt);
 
     void eraseSymbols(int erased);
 

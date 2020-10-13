@@ -43,7 +43,7 @@ public:
 public slots:
     void fileNew();
     void showSymbol(int pos, QChar c);
-    void showSymbolWithId(QString user, int pos, myChar c);
+    void showSymbolWithId(wchar_t c, QString username, QVector<int> crdt);
     void updateRemotePosition(QString user, int pos);
     void eraseSymbols(int toErase);
     //TO DO:mettere user
@@ -107,7 +107,6 @@ private:
     void setupConnectedUsers();
     void requestLogout();
     void closingFile();
-
 
     void drawGraphicCursor();
     void incrementPosition(int pos, int count);

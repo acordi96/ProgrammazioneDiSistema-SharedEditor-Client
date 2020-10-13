@@ -89,6 +89,7 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
     qRegisterMetaType<usersInFile>("std::map<std::string,std::string>");
     qRegisterMetaType<myChar >("wchar_t");
 
+    qRegisterMetaType<QVector<int>>("QVector<int>");
 
     textEdit->installEventFilter(this);
 
@@ -724,8 +725,13 @@ void TextEdit::currentCharFormatChanged(const QTextCharFormat &format) {
 
 
 void TextEdit::updateRemotePosition(QString user, int pos) {
-    _cursorsVector[user].setPosition(pos);
-    drawGraphicCursor();
+    std::cout<<"SONO IN UPDATE REMOTE POSTION " << pos << std::endl;
+    QTextCursor cursor = textEdit->textCursor();
+    QTextCursor tempCursor = QTextCursor(cursor);
+    tempCursor.setPosition(pos);
+    _cursorsVector[user].setPosition(tempCursor.position());
+    //drawGraphicCursor();
+    textEdit->setTextCursor(cursor);
 }
 
 void TextEdit::cursorPositionChanged() {
@@ -779,7 +785,22 @@ void TextEdit::cursorPositionChanged() {
     }*/
 }
 
-void TextEdit::showSymbolWithId(QString user, int pos, wchar_t c) {
+void TextEdit::showSymbolWithId(wchar_t c, QString user, QVector<int> crdt) {
+    std::cout << "aaa" << std::endl;
+    std::unique_lock<std::mutex> ul(client_->writingMutex);
+    std::cout << "CLIENT SHOWSYMBOLWITHID START" << std::endl;
+    client_->writingConditionVariable.wait(ul, [this]() {
+        if (!client_->writingInsertBool) {
+            client_->writingInsertBool = true;
+            return true;
+        }
+        std::cout << "CLIENT SHOWSYMBOLWITHID SLEEP" << std::endl;
+        return false;
+    });
+
+    Symbol symbolToInsert(c, user.toStdString(), crdt.toStdVector());
+    int pos = client_->generateIndexCRDT(symbolToInsert, 0, -1, -1);
+    client_->insertSymbolIndex(symbolToInsert, pos);
 
     QTextCharFormat format;
     format.setFontWeight(QFont::Normal);
@@ -792,17 +813,15 @@ void TextEdit::showSymbolWithId(QString user, int pos, wchar_t c) {
     int endIndex;
     cur.hasSelection() ? endIndex = cur.selectionEnd() : endIndex = -90;
     int oldPos = pos < cur.position() ? cur.position() + 1 : cur.position();
-    std::cout << "Carattere da inserire " << c << std::endl;
-    std::cout << "Carattere da inserire 2 " << static_cast<QString>(c).toStdString() << std::endl;
-    std::cout << "Carattere da inserire 3 " << QString::fromWCharArray(&c).toStdString() << std::endl;
+
     if (cur.hasSelection() && pos == endIndex) {
 
         int startIndex = cur.selectionStart();
 
         cur.setPosition(pos);
         cur.setCharFormat(format);
-        //cur.insertText(static_cast<QString>(c));
         cur.insertText(static_cast<QString>(c));
+
         cur.setPosition(oldPos == startIndex ? endIndex : startIndex, QTextCursor::MoveAnchor);
         cur.setPosition(oldPos == startIndex ? endIndex : startIndex, QTextCursor::KeepAnchor);
     } else {
@@ -817,8 +836,9 @@ void TextEdit::showSymbolWithId(QString user, int pos, wchar_t c) {
 
     for (auto list:_listParticipantsAndColors) {
         if (list.first != user) {
-            if (pos < _cursorsVector[list.first].position)
+            if (pos < _cursorsVector[list.first].position) {
                 _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position + 1);
+            }
         } else {
             _cursorsVector[user].setPosition(pos + 1);
         }
@@ -828,8 +848,19 @@ void TextEdit::showSymbolWithId(QString user, int pos, wchar_t c) {
 
     textEdit->setFocus();
 
+    client_->writingInsertBool = false;
+    ul.unlock();
+    client_->writingConditionVariable.notify_all();
+    std::cout << "CLIENT SHOWSYMBOLWITHID FINISHED" << std::endl;
 }
-
+void TextEdit::remotePositionChanged(QString user, int pos){
+    json j = json{
+            {"operation", "update_cursorPosition"},
+            {"username",  user.toStdString()},
+            {"pos",       pos}
+    };
+    client_->sendAtServer(j);
+}
 void TextEdit::showSymbol(int pos, QChar c) {
     QTextCharFormat format;
     format.setFontWeight(QFont::Normal);
@@ -925,11 +956,13 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
         std::cout << std::endl;
         if (obj == textEdit) {
             std::unique_lock<std::mutex> ul(client_->writingMutex);
+            std::cout << "CLIENT INSERT START" << std::endl;
             client_->writingConditionVariable.wait(ul, [this]() {
                 if (!client_->writingInsertBool) {
                     client_->writingInsertBool = true;
                     return true;
                 }
+                std::cout << "CLIENT INSERT SLEEP" << std::endl;
                 return false;
             });
             if (!key_ev->text().isEmpty()) {
@@ -1178,6 +1211,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
             client_->writingInsertBool = false;
             ul.unlock();
             client_->writingConditionVariable.notify_all();
+            std::cout << "CLIENT INSERT FINISHED" << std::endl;
         }
     }
     return QObject::eventFilter(obj, ev);;
@@ -1204,8 +1238,9 @@ void TextEdit::eraseSymbols(int toErase) {
 
     cur.endEditBlock();
     for (auto list:_listParticipantsAndColors) {
-        if (_cursorsVector[list.first].position > toErase)
+        if (_cursorsVector[list.first].position > toErase) {
             _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position - 1);
+        }
     }
     drawGraphicCursor();
     //TO DO: inserire controllo sull'user
@@ -1301,15 +1336,26 @@ void TextEdit::drawGraphicCursor() {
 
 void TextEdit::incrementPosition(int pos, int count) {
     for (auto list:_listParticipantsAndColors) {
-        if (pos < _cursorsVector[list.first].position) {
-            _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position + count);
+        if (list.first != client_->getUser()) {
+            if (pos < _cursorsVector[list.first].position) {
+                int i =0;
+                for(auto s:client_->symbols){
+                    if(s.getUsername()==list.first.toStdString())
+                        pos = i;
+                i++;
+                }
+                //_cursorsVector[list.first].setPosition(_cursorsVector[list.first].position + count);
+                _cursorsVector[list.first].setPosition(pos);
+            }
+        } else {
+            //_cursorsVector[].setPosition(pos + 1);
         }
     }
 }
 
 void TextEdit::decreentPosition(int pos, int count) {
     for (auto list:_listParticipantsAndColors) {
-        if (pos < _cursorsVector[list.first].position) {
+        if (pos <= _cursorsVector[list.first].position) {
             _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position - count);
         }
     }
@@ -1318,7 +1364,7 @@ void TextEdit::decreentPosition(int pos, int count) {
 
 void TextEdit::updateListParticipants(usersInFile users) {
     for (auto user:_listParticipantsAndColors) {
-        _labels[user.first]->hide();
+        _labels[user.first]->clear();
     }
     _listParticipantsAndColors.clear();
     _labels.clear();
