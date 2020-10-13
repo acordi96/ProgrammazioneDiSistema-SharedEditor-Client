@@ -131,7 +131,6 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
 }
 
 void TextEdit::clearHighlights() {
-    std::cout << "clear highlights!" << std::endl;
     QTextCursor cursor = textEdit->textCursor();
     QTextCursor tempCursor = QTextCursor(cursor);
 
@@ -935,9 +934,6 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     endIndex = cursor.selectionEnd();
                     pos = startIndex;
 
-                    std::cout << "SELECTION: " << std::to_string(startIndex) << " - " << std::to_string(endIndex)
-                              << std::endl;
-
                     cursor.beginEditBlock();
                     cursor.setPosition(startIndex, QTextCursor::MoveAnchor);
                     cursor.setPosition(endIndex, QTextCursor::KeepAnchor);
@@ -1005,7 +1001,9 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     key != Qt::Key_Delete &&
                     key != Qt::Key_Escape &&
                     key_ev->text().toStdString().c_str()[0] != 22 && //paste
+                    key_ev->text().toStdString().c_str()[0] != 24 && //cut
                     key_ev->text().toStdString().c_str()[0] != 3 && //copy
+                    key_ev->text().toStdString().c_str()[0] != 26 && //ctrl+z
                     key_ev->text().toStdString().c_str()[0] != 1) { //ctrl+a
                     //caso carattere normale (lettere e spazio)
 
@@ -1104,6 +1102,10 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                 else if (key_ev->text().toStdString().c_str()[0] == 3) {
                     //do nothing
                 }
+                    //*********************CUT*****************************************
+                else if (key_ev->text().toStdString().c_str()[0] == 24) {
+                    //do nothing
+                }
                     //*********************CTRL+A*****************************************
                 else if (key_ev->text().toStdString().c_str()[0] == 1) {
                     //do nothing
@@ -1175,7 +1177,7 @@ void TextEdit::eraseSymbols(std::vector<Symbol> symbolsToErase) {
 
     std::vector<int> erased = client_->eraseSymbolCRDT(symbolsToErase);
 
-    for(auto &toErase : erased) {
+    for (auto &toErase : erased) {
         QTextCursor cur = textEdit->textCursor();
 
         cur.beginEditBlock();
