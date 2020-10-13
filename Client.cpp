@@ -377,7 +377,7 @@ std::map<std::pair<std::string, std::string>, std::string> Client::getFiles() co
 }
 
 //crea un nuovo symbol e lo inserisce nel crdt in posizione index
-std::vector<int> Client::insertSymbolNewCRDT(int index, char character, const std::string &username) {
+std::vector<int> Client::insertSymbolNewCRDT(int index, wchar_t character, const std::string &username) {
     std::vector<int> vector;
     if (this->symbols.empty()) {
         vector = {0};

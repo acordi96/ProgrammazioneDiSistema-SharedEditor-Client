@@ -70,7 +70,7 @@ public:
 
     void setEmail(const QString &value);
 
-    std::vector<int> insertSymbolNewCRDT(int index, char character, const std::string &username);
+    std::vector<int> insertSymbolNewCRDT(int index, wchar_t character, const std::string &username);
 
     int generateIndexCRDT(Symbol symbol, int iter, int start, int end);
 

@@ -792,15 +792,17 @@ void TextEdit::showSymbolWithId(QString user, int pos, wchar_t c) {
     int endIndex;
     cur.hasSelection() ? endIndex = cur.selectionEnd() : endIndex = -90;
     int oldPos = pos < cur.position() ? cur.position() + 1 : cur.position();
-
+    std::cout << "Carattere da inserire " << c << std::endl;
+    std::cout << "Carattere da inserire 2 " << static_cast<QString>(c).toStdString() << std::endl;
+    std::cout << "Carattere da inserire 3 " << QString::fromWCharArray(&c).toStdString() << std::endl;
     if (cur.hasSelection() && pos == endIndex) {
 
         int startIndex = cur.selectionStart();
 
         cur.setPosition(pos);
         cur.setCharFormat(format);
+        //cur.insertText(static_cast<QString>(c));
         cur.insertText(static_cast<QString>(c));
-
         cur.setPosition(oldPos == startIndex ? endIndex : startIndex, QTextCursor::MoveAnchor);
         cur.setPosition(oldPos == startIndex ? endIndex : startIndex, QTextCursor::KeepAnchor);
     } else {
@@ -1016,7 +1018,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     key_ev->text().toStdString().c_str()[0] != 1) { //ctrl+a
                     //caso carattere normale (lettere e spazio)
 
-                    wchar_t c = key_ev->text().toStdString().c_str()[0];
+                    wchar_t c = key_ev->text().toStdWString().c_str()[0];
                     std::vector<int> crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
                     textEdit->setTextCursor(cursor);
                     //emit updateCursor();
