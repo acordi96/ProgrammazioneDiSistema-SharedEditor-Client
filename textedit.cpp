@@ -777,7 +777,14 @@ void TextEdit::cursorPositionChanged() {
 }
 
 void TextEdit::showSymbolWithId(QString user, int pos, QChar c) {
-
+    std::unique_lock<std::mutex> ul(client_->writingMutex);
+    client_->writingConditionVariable.wait(ul, [this]() {
+        if (!client_->writingInsertBool && client_->writingInsertInt > 0) {
+            return true;
+        }
+        std::cout << "TEXTEDIT SHOWSYMBOLWITHID SLEEP" << std::endl;
+        return false;
+    });
     QTextCharFormat format;
     format.setFontWeight(QFont::Normal);
     format.setFontFamily("Helvetica");
@@ -823,6 +830,10 @@ void TextEdit::showSymbolWithId(QString user, int pos, QChar c) {
 
     textEdit->setFocus();
 
+    client_->writingInsertInt--;
+    ul.unlock();
+    client_->writingConditionVariable.notify_all();
+    std::cout << "TEXTEDIT SHOWSYMBOLWITHID FINISHED" << std::endl;
 }
 
 void TextEdit::showSymbol(int pos, QChar c) {
@@ -921,10 +932,11 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
         if (obj == textEdit) {
             std::unique_lock<std::mutex> ul(client_->writingMutex);
             client_->writingConditionVariable.wait(ul, [this]() {
-                if (!client_->writingInsertBool) {
+                if (!client_->writingInsertBool && client_->writingInsertInt == 0) {
                     client_->writingInsertBool = true;
                     return true;
                 }
+                std::cout << "CLIENT INSERT SLEEP" << std::endl;
                 return false;
             });
             if (!key_ev->text().isEmpty()) {
@@ -1173,6 +1185,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
             client_->writingInsertBool = false;
             ul.unlock();
             client_->writingConditionVariable.notify_all();
+            std::cout << "CLIENT INSERT FINISHED" << std::endl;
         }
     }
     return QObject::eventFilter(obj, ev);;

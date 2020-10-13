@@ -16,6 +16,7 @@ Client::Client()
         io_context_.run(); //boost thread loop start
     });
     this->writingInsertBool = false;
+    this->writingInsertInt = 0;
     this->maxBufferSymbol = 1;
     do_connect();
 }
@@ -123,10 +124,11 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
     } else if (type_request == "insert_res") {
         std::unique_lock<std::mutex> ul(this->writingMutex);
         this->writingConditionVariable.wait(ul, [this]() {
-            if (!this->writingInsertBool) {
+            if (!this->writingInsertBool && this->writingInsertInt == 0) {
                 this->writingInsertBool = true;
                 return true;
             }
+            std::cout << "CLIENT INSERT_RES SLEEP" << std::endl;
             return false;
         });
         //prendo il vettore di symbol
@@ -140,18 +142,21 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
             //aggiungo al crdt
             this->insertSymbolIndex(symbolToInsert, index);
             emit insertSymbolWithId(QString::fromStdString(usernameToInsert[i]), index, charToInsert[i]);
+            this->writingInsertInt++;
         }
         this->writingInsertBool = false;
         ul.unlock();
         this->writingConditionVariable.notify_all();
+        std::cout << "CLIENT INSERT_RES FINISHED" << std::endl;
         return type_request;
     } else if (type_request == "remove_res") {
         std::unique_lock<std::mutex> ul(this->writingMutex);
         this->writingConditionVariable.wait(ul, [this]() {
-            if (!this->writingInsertBool) {
+            if (!this->writingInsertBool && this->writingInsertInt == 0) {
                 this->writingInsertBool = true;
                 return true;
             }
+            std::cout << "CLIENT REMOVE_RES SLEEP" << std::endl;
             return false;
         });
         //prendo il vettore di symbol
@@ -164,10 +169,14 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         //cancello dal crdt symbols compresi tra i due e prendo indici
         std::vector<int> erased = this->eraseSymbolCRDT(symbolsToErase);
         //emetto per aggiornamento testo con gli indici
-        for (auto &indexToErase : erased)
+        for (auto &indexToErase : erased) {
             emit eraseSymbols(indexToErase);
+            this->writingInsertInt++;
+        }
         this->writingInsertBool = false;
+        ul.unlock();
         this->writingConditionVariable.notify_all();
+        std::cout << "CLIENT REMOVE_RES FINISHED" << std::endl;
         return type_request;
     } else if (type_request == "new_file_created") {
         QString res = QString::fromStdString("new_file_created");

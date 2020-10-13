@@ -34,6 +34,7 @@ public:
     int maxBufferSymbol;
 
     bool writingInsertBool;
+    int writingInsertInt;
     std::mutex writingMutex;
     std::condition_variable writingConditionVariable;
 
