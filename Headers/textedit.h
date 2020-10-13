@@ -10,6 +10,8 @@
 #include <QMap>
 #include <QPointer>
 #include <QLabel>
+#include <QMetaType>
+
 
 #include "Headers/Client.h"
 #include "Headers/customcursor.h"
@@ -26,6 +28,7 @@ QT_END_NAMESPACE
 
 class QEvent;
 typedef  std::map<std::string, std::string> usersInFile;
+typedef wchar_t myChar;
 class TextEdit : public QMainWindow
 {
 Q_OBJECT
@@ -40,7 +43,7 @@ public:
 public slots:
     void fileNew();
     void showSymbol(int pos, QChar c);
-    void showSymbolWithId(QString user, int pos, QChar c);
+    void showSymbolWithId(QString user, int pos, myChar c);
     void updateRemotePosition(QString user, int pos);
     void eraseSymbols(int toErase);
     //TO DO:mettere user
@@ -98,7 +101,7 @@ private:
     void updateCursors(const CustomCursor &cursor);
     void updateConnectedUser(QString user, QString color);
     void updateConnectedUsers(usersInFile users);
-
+    void remotePositionChanged(QString user, int pos);
     void updateCursors();
     //for debug
     void setupConnectedUsers();

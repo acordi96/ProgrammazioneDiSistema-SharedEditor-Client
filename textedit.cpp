@@ -26,11 +26,13 @@
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QMimeData>
+#include <QMetaType>
 #include <QTextBlockFormat>
 #include <QDockWidget>
 #include <QLabel>
 #include <QColor>
 #include <QPushButton>
+#include <QShortcut>
 
 #if defined(QT_PRINTSUPPORT_LIB)
 
@@ -85,6 +87,7 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
     //aggiorno lista
 
     qRegisterMetaType<usersInFile>("std::map<std::string,std::string>");
+    qRegisterMetaType<myChar >("wchar_t");
 
 
     textEdit->installEventFilter(this);
@@ -776,11 +779,8 @@ void TextEdit::cursorPositionChanged() {
     }*/
 }
 
-void TextEdit::showSymbolWithId(QString user, int pos, QChar c) {
-    std::unique_lock<std::mutex> ul(client_->writingMutex);
-    client_->writingConditionVariable.wait(ul, [this]() {
-        return client_->writingInsertBool;
-    });
+void TextEdit::showSymbolWithId(QString user, int pos, wchar_t c) {
+
     QTextCharFormat format;
     format.setFontWeight(QFont::Normal);
     format.setFontFamily("Helvetica");
@@ -1016,14 +1016,14 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     key_ev->text().toStdString().c_str()[0] != 1) { //ctrl+a
                     //caso carattere normale (lettere e spazio)
 
-                    char c = key_ev->text().toStdString().c_str()[0];
+                    wchar_t c = key_ev->text().toStdString().c_str()[0];
                     std::vector<int> crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
                     textEdit->setTextCursor(cursor);
                     //emit updateCursor();
 
                     std::vector<std::string> usernamev;
                     usernamev.push_back(client_->getUser().toStdString());
-                    std::vector<char> charv;
+                    std::vector<wchar_t > charv;
                     charv.push_back(c);
                     std::vector<std::vector<int>> crdtv;
                     crdtv.push_back(crdt);
@@ -1047,10 +1047,10 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     QString pastedText = clipboard->text();
 
                     std::vector<std::string> usernameToInsert;
-                    std::vector<char> charToInsert;
+                    std::vector<wchar_t > charToInsert;
                     std::vector<std::vector<int>> crdtToInsert;
                     std::vector<int> crdt;
-                    char c;
+                    wchar_t c;
                     int startPos = pos;
                     int dim = pastedText.size();
                     int of = dim / client_->maxBufferSymbol;
