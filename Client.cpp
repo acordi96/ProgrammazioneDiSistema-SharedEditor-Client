@@ -194,6 +194,8 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
             //ricreo il simbolo
             Symbol symbolToInsert(charToInsert[i], usernameToId.at(usernameToInsert[i]), crdtToInsert[i]);
             int index = this->generateIndexCRDT(symbolToInsert, 0, -1, -1);
+            //segno modifica
+            this->insertIntoUsernameModified(usernameToId.at(usernameToInsert[i]), index);
             //aggiungo al crdt
             this->insertSymbolIndex(symbolToInsert, index);
             emit insertSymbol(index, charToInsert[i]);
@@ -505,4 +507,14 @@ void Client::sendAtServer(const json &js) {
     mess.encode_header();
     std::cout << "Messaggio da inviare al server: " << mess.body() << std::endl;
     this->write(mess);
+}
+
+void Client::insertIntoUsernameModified(const std::string &username, int localIndex) {
+    if(this->usernameModified.find(username) == this->usernameModified.end()) {
+        std::vector<int> newV;
+        newV.push_back(localIndex);
+        this->usernameModified.insert({username, newV});
+    } else {
+        this->usernameModified.at(username).push_back(localIndex);
+    }
 }

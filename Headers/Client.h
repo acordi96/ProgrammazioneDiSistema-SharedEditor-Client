@@ -32,6 +32,7 @@ public:
     std::map<std::pair<std::string, std::string>, std::string> files; //<<owner, filename>, invitation>
     std::vector<Symbol> symbols;
     int maxBufferSymbol;
+    std::map<std::string, std::vector<int>> usernameModified;
 
     Client();
 
@@ -83,6 +84,8 @@ public:
     std::map<std::pair<std::string, std::string>, std::string> getFiles() const;
 
     void setFiles(const std::map<std::pair<std::string, std::string>, std::string> &value);
+
+    void insertIntoUsernameModified(const std::string &username, int localIndex);
 
 signals:
 
