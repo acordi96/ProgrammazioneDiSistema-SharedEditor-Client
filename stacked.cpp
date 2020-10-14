@@ -43,8 +43,9 @@ void stacked::closeEvent(QCloseEvent *e) {
  *  indici
  *  0 = loginpage
  *  1 = registration form
- *  2 = texteditor
- *  3 = userpage
+ *  2 = editprofile
+ *  3 = textedit
+ *  4 = userpage
  *
  * */
 void stacked::on_loginButton_clicked() {
@@ -199,7 +200,10 @@ void stacked::on_form_regButton_clicked() {
  *
  * */
 void stacked::showPopupSuccess(QString result) {
-
+    QDialog *dialog = new QDialog();
+    dialog->setWindowTitle(QString::fromUtf8(" Shared Editor "));
+    QVBoxLayout *layout = new QVBoxLayout();
+    dialog->setLayout(layout);
     if (result == "LOGIN_SUCCESS" || result == "SIGNUP_SUCCESS") {
         up = new Userpage(this, client_);
         te = new TextEdit(client_);
@@ -207,7 +211,7 @@ void stacked::showPopupSuccess(QString result) {
         connect(up,&Userpage::upLogout,this,&stacked::logout);
         connect(te,&TextEdit::closeFile,this,&stacked::closeFile);
         connect(te,&TextEdit::closeAll,this,&stacked::closeAll);
-
+        connect(up,&Userpage::goToEdit,this,&stacked::editPage);
 
         //ui->setupUi(this);
 //        ui->stackedWidget->addWidget(te);
@@ -218,19 +222,23 @@ void stacked::showPopupSuccess(QString result) {
             ui->user_line_form->clear();
             ui->psw_line_form->clear();
             ui->confirm_psw_line->clear();
+
+            layout->addWidget(new QLabel("Signup completed. Welcome in Shared Editor!"));
+            QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+            layout->addWidget(buttonBox);
+
+            connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+            dialog->show();
             ui->stackedWidget->setCurrentIndex(0);
         } else {
             setWindowTitle("SharedEditor - Userpage");
             ui->stackedWidget->addWidget(te);
             ui->stackedWidget->addWidget(up);
-            ui->stackedWidget->setCurrentIndex(3);
+            ui->stackedWidget->setCurrentIndex(4);
         }
         //ui->stackedWidget->setCurrentIndex(2);
     } else {
-        QDialog *dialog = new QDialog();
-        dialog->setWindowTitle(QString::fromUtf8(" Shared Editor "));
-        QVBoxLayout *layout = new QVBoxLayout();
-        dialog->setLayout(layout);
+
         if (result == "QUERY_ERROR" || result == "CONNESSION_ERROR" || result == "SIGNUP_ERROR_INSERT_FAILED") {
             layout->addWidget(new QLabel("Error with the DB, try again"));
         } else if (result == "LOGIN_ERROR") {
@@ -244,13 +252,13 @@ void stacked::showPopupSuccess(QString result) {
             layout->addWidget(new QLabel("File correctly created"));
             //index 2 = text editor
             setWindowTitle("SharedEditor - " + client_->getUser() + " @ " + client_->getFileName());
-            ui->stackedWidget->setCurrentIndex(2);
+            ui->stackedWidget->setCurrentIndex(3);
             //ui->stackedWidget->setCurrentIndex(3);
         } else if (result == "new_file_already_exist") {
             layout->addWidget(new QLabel("File already exists"));
         } else if (result == "file_opened") {
             setWindowTitle("SharedEditor - " + client_->getUser() + " @ " + client_->getFileName());
-            ui->stackedWidget->setCurrentIndex(2);
+            ui->stackedWidget->setCurrentIndex(3);
             //layout->addWidget(new QLabel("File correctly opened"));
         } else if (result == "errore_rinomina_file") {
             layout->addWidget(new QLabel("Rename file error"));
@@ -404,7 +412,7 @@ void stacked::logout(){
 void stacked::closeFile() {
     setWindowTitle("SharedEditor - Userpage");
     up->clearLineURL();
-    ui->stackedWidget->setCurrentIndex(3);
+    ui->stackedWidget->setCurrentIndex(4);
 }
 
 void stacked::closeAll() {
@@ -413,4 +421,25 @@ void stacked::closeAll() {
 
 void stacked::on_psw_log_line_returnPressed() {
     on_loginButton_clicked();
+}
+
+void stacked::editPage(){
+    ui->edit_email_line->setText(client_->getEmail());
+    ui->edit_user_line->setText(client_->getUser());
+    ui->edit_icon->setStyleSheet(QString::fromUtf8("background-color:")+client_->getColor());
+    ui->stackedWidget->setCurrentIndex(2);
+}
+
+void stacked::on_edit_backButton_clicked(){
+    ui->stackedWidget->setCurrentIndex(4);
+}
+void stacked::on_colorPicker_clicked(){
+    QColorDialog *colorDialog = new QColorDialog();
+    colorDialog->setOption(QColorDialog::DontUseNativeDialog,false);
+    colorDialog->setOption(QColorDialog::NoButtons,false);
+    colorDialog->show();
+    QObject::connect(colorDialog,&QColorDialog::colorSelected,this,[=](){
+        ui->edit_icon->setStyleSheet(QString::fromUtf8("background-color:")+colorDialog->selectedColor().name());
+        client_->setColor(colorDialog->selectedColor().name());
+    });
 }

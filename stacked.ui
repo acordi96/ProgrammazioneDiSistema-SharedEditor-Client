@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>998</width>
+    <width>1086</width>
     <height>587</height>
    </rect>
   </property>
@@ -424,9 +424,9 @@
                     <colorrole role="PlaceholderText">
                      <brush brushstyle="NoBrush">
                       <color alpha="128">
-                       <red>0</red>
-                       <green>0</green>
-                       <blue>0</blue>
+                       <red>255</red>
+                       <green>255</green>
+                       <blue>255</blue>
                       </color>
                      </brush>
                     </colorrole>
@@ -554,9 +554,9 @@
                     <colorrole role="PlaceholderText">
                      <brush brushstyle="NoBrush">
                       <color alpha="128">
-                       <red>0</red>
-                       <green>0</green>
-                       <blue>0</blue>
+                       <red>255</red>
+                       <green>255</green>
+                       <blue>255</blue>
                       </color>
                      </brush>
                     </colorrole>
@@ -664,9 +664,9 @@ QPushButton#reglogButton:hover{
                     <colorrole role="PlaceholderText">
                      <brush brushstyle="NoBrush">
                       <color alpha="128">
-                       <red>0</red>
-                       <green>0</green>
-                       <blue>0</blue>
+                       <red>255</red>
+                       <green>255</green>
+                       <blue>255</blue>
                       </color>
                      </brush>
                     </colorrole>
@@ -794,9 +794,9 @@ QPushButton#reglogButton:hover{
                     <colorrole role="PlaceholderText">
                      <brush brushstyle="NoBrush">
                       <color alpha="128">
-                       <red>0</red>
-                       <green>0</green>
-                       <blue>0</blue>
+                       <red>255</red>
+                       <green>255</green>
+                       <blue>255</blue>
                       </color>
                      </brush>
                     </colorrole>
@@ -1338,6 +1338,553 @@ background-color:#68DFBB;
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="editprofile">
+       <layout class="QVBoxLayout" name="verticalLayout_12">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_8">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+           <widget class="QWidget" name="widget_2" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color:white;
+</string>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_10">
+             <item>
+              <spacer name="horizontalSpacer_16">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>180</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_9">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_11">
+                 <item>
+                  <widget class="QPushButton" name="edit_backButton">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>32</width>
+                     <height>32</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton#edit_backButton{
+background-color: #84ACD7;
+border: 1px;
+border-radius:5px;
+}
+QPushButton#edit_backButton:hover{
+	background-color:#68DFBB;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset>
+                     <normalon>:/images/back-arrow.png</normalon>
+                    </iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>32</width>
+                     <height>32</height>
+                    </size>
+                   </property>
+                   <property name="flat">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_13">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::MinimumExpanding</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>180</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="editLabel">
+                   <property name="styleSheet">
+                    <string notr="true">font: 75 25pt &quot;Sawasdee Bold&quot;;</string>
+                   </property>
+                   <property name="text">
+                    <string>Edit Profile</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_17">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::MinimumExpanding</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>200</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_13">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_12">
+                 <property name="spacing">
+                  <number>1</number>
+                 </property>
+                 <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_13">
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>6</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>6</number>
+                   </property>
+                   <item>
+                    <spacer name="verticalSpacer_19">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeType">
+                      <enum>QSizePolicy::Fixed</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="widget_4" native="true">
+                     <widget class="QWidget" name="edit_icon" native="true">
+                      <property name="geometry">
+                       <rect>
+                        <x>130</x>
+                        <y>10</y>
+                        <width>80</width>
+                        <height>80</height>
+                       </rect>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">background-color: rgb(114, 159, 207);</string>
+                      </property>
+                     </widget>
+                    </widget>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_17">
+                     <property name="spacing">
+                      <number>1</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <spacer name="horizontalSpacer_20">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="colorPicker">
+                       <property name="styleSheet">
+                        <string notr="true">QPushButton#colorPicker{
+background-color: #84ACD7;
+border: 1px;
+color:#FFFFFF;
+border-radius:5px;
+font: 12pt &quot;Sawasdee Bold&quot;;
+}
+QPushButton#colorPicker:hover{
+background-color:#68DFBB;
+}</string>
+                       </property>
+                       <property name="text">
+                        <string>Modify your color</string>
+                       </property>
+                       <property name="icon">
+                        <iconset>
+                         <normalon>:/images/win/color-picker.png</normalon>
+                        </iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <spacer name="horizontalSpacer_21">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <spacer name="verticalSpacer_14">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeType">
+                      <enum>QSizePolicy::Fixed</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>110</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_11">
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>6</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>6</number>
+                   </property>
+                   <item>
+                    <spacer name="verticalSpacer_15">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeType">
+                      <enum>QSizePolicy::Fixed</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="edit_email_label">
+                     <property name="styleSheet">
+                      <string notr="true">font: 11pt &quot;Sawasdee Bold&quot;;</string>
+                     </property>
+                     <property name="text">
+                      <string>Email</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="edit_email_line"/>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="edit_user_label">
+                     <property name="styleSheet">
+                      <string notr="true">font: 11pt &quot;Sawasdee Bold&quot;;</string>
+                     </property>
+                     <property name="text">
+                      <string>Username</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="edit_user_line"/>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="edit_oldPasswordLabel">
+                     <property name="styleSheet">
+                      <string notr="true">font: 11pt &quot;Sawasdee Bold&quot;;</string>
+                     </property>
+                     <property name="text">
+                      <string>Old Password</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="edit_oldpsw_line"/>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="edit_newpsw_label">
+                     <property name="styleSheet">
+                      <string notr="true">font: 11pt &quot;Sawasdee Bold&quot;;</string>
+                     </property>
+                     <property name="text">
+                      <string>New Password</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="edit_newpsw_line">
+                     <property name="styleSheet">
+                      <string notr="true">lineedit-password-mask-delay:0.5;</string>
+                     </property>
+                     <property name="echoMode">
+                      <enum>QLineEdit::Password</enum>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="edit_confnewpsw_label">
+                     <property name="styleSheet">
+                      <string notr="true">font: 11pt &quot;Sawasdee Bold&quot;;</string>
+                     </property>
+                     <property name="text">
+                      <string>Confirm New Password</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="edit_confnewpsw_line">
+                     <property name="styleSheet">
+                      <string notr="true">lineedit-password-mask-delay:0.1;</string>
+                     </property>
+                     <property name="echoMode">
+                      <enum>QLineEdit::Password</enum>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="verticalSpacer_16">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeType">
+                      <enum>QSizePolicy::Fixed</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>30</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_17">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_13">
+                 <property name="spacing">
+                  <number>1</number>
+                 </property>
+                 <item>
+                  <spacer name="horizontalSpacer_18">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::Expanding</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>256</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="edit_saveButton">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>251</width>
+                     <height>25</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton#edit_saveButton{
+background-color: #84ACD7;
+border: 1px;
+color:#FFFFFF;
+border-radius:5px;
+font: 20pt &quot;Sawasdee Bold&quot;;
+}
+QPushButton#edit_saveButton:hover{
+background-color:#68DFBB;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Save</string>
+                   </property>
+                   <property name="flat">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_22">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>256</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_19">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>180</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_20">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
     <item>
@@ -1363,7 +1910,7 @@ background-color:#68DFBB;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>998</width>
+     <width>1086</width>
      <height>22</height>
     </rect>
    </property>

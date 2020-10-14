@@ -63,7 +63,7 @@ private slots:
 signals:
 
     void upLogout();
-
+    void goToEdit();
 public slots:
 
     //void customMenuRequested(QPoint pos);
