@@ -1296,7 +1296,6 @@ void TextEdit::drawGraphicCursor() {
         _labels[list.first]->setPixmap(pix);
         _labels[list.first]->move(qRect.left(), qRect.top());
         _labels[list.first]->show();
-        textEdit->setTextCursor(cursor);
     }
 }
 
