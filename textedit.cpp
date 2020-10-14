@@ -1288,13 +1288,15 @@ void TextEdit::drawGraphicCursor() {
 
     for (auto list:_listParticipantsAndColors) {
         QTextCursor cursor = QTextCursor(textEdit->document());
-        cursor.setPosition(_cursorsVector[list.first].position);
-        QRect qRect = textEdit->cursorRect(cursor);
+        QTextCursor tempCur = QTextCursor(cursor);
+        tempCur.setPosition(_cursorsVector[list.first].position);
+        QRect qRect = textEdit->cursorRect(tempCur);
         QPixmap pix(qRect.width() * 2.5, qRect.height());
         pix.fill(list.second);
         _labels[list.first]->setPixmap(pix);
         _labels[list.first]->move(qRect.left(), qRect.top());
         _labels[list.first]->show();
+        textEdit->setTextCursor(cursor);
     }
 }
 
