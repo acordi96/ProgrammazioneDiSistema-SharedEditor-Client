@@ -2,8 +2,8 @@
 // Created by Sam on 22/apr/2020.
 //
 
-#define serverRoute "93.43.250.236"
-//#define serverRoute "127.0.0.1"
+//#define serverRoute "93.43.250.236"
+#define serverRoute "127.0.0.1"
 
 #include <QtWidgets/QMessageBox>
 #include "Headers/Client.h"
@@ -180,20 +180,25 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
 
     } else if (type_request == "open_file") {
         //prima parte di file deve pulire il testo
-        if (this->writing == 0)
-                emit clearEditor();
-        std::vector<std::string> usernameToInsert = js.at("usernameToInsert").get<std::vector<std::string>>();
+        if (this->writing == 0) {
+            emit clearEditor();
+        }
+        std::vector<int> usernameToInsert = js.at("usernameToInsert").get<std::vector<int>>();
         std::vector<char> charToInsert = js.at("charToInsert").get<std::vector<char>>();
         std::vector<std::vector<int>> crdtToInsert = js.at("crdtToInsert").get<std::vector<std::vector<int>>>();
+        std::vector<std::string> idToUsername = js.at("idToUsername").get<std::vector<std::string>>();
+        std::map<int, std::string> usernameToId;
+        for(int i = 0; i < idToUsername.size(); i++)
+            usernameToId.insert({i, idToUsername[i]});
         for (int i = 0; i < usernameToInsert.size(); i++) {
             //ricreo il simbolo
-            Symbol symbolToInsert(charToInsert[i], usernameToInsert[i], crdtToInsert[i]);
+            Symbol symbolToInsert(charToInsert[i], usernameToId.at(usernameToInsert[i]), crdtToInsert[i]);
             int index = this->generateIndexCRDT(symbolToInsert, 0, -1, -1);
             //aggiungo al crdt
             this->insertSymbolIndex(symbolToInsert, index);
             emit insertSymbol(index, charToInsert[i]);
         }
-        if (this->writing == js.at("ofPartToWrite")) {
+        if (js.contains("endOpenFile")) {
             this->writing = 0;
             emit formResultSuccess(QString::fromStdString("file_opened"));
         } else {
