@@ -55,3 +55,11 @@ std::vector<int> Symbol::getPosizione() {
 void Symbol::setPosizione(const std::vector<int> &pos) {
     this->posizione = pos;
 }
+
+const Style &Symbol::getSymbolStyle() const {
+    return symbolStyle;
+}
+
+void Symbol::setSymbolStyle(const Style &symbolStyle) {
+    Symbol::symbolStyle = symbolStyle;
+}

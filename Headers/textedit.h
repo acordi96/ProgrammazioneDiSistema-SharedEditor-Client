@@ -109,6 +109,15 @@ private:
     void drawGraphicCursor();
     void incrementPosition(int pos, int count);
     void decreentPosition(int pos, int count);
+
+    //funzioni per lo stile
+    void requestFontSizeChanged(int fontSize);
+    void requestFontFamilyChanged(std::string fontFamily);
+
+
+
+
+
     QAction *actionSave;
     QAction *actionTextBold;
     QAction *actionTextUnderline;

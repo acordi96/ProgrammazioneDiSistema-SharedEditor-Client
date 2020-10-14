@@ -1391,3 +1391,46 @@ void TextEdit::updateCursors(const CustomCursor &cursor) {
     _oldCursor = CustomCursor(_newCursor);
     _newCursor = CustomCursor(cursor);
 }
+
+
+
+//richieste di cambio stile
+void TextEdit::requestFontSizeChanged(int fontSize){
+    QTextCursor cursor = textEdit->textCursor();
+    if(cursor.hasSelection()) {
+        int startIndex = cursor.selectionStart();
+        int endIndex = cursor.selectionEnd();
+
+        //Update symbols of the client
+        //mi devo prendere i syboli che vanno da quella dimensione a quella
+        std::vector<Symbol> symbols = client_->symbols;
+        //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
+        //Serialize data
+        json j = json{
+                {"operation","fontSizeChanged"},
+                {"symbols", " "},
+                {"fontSize",     fontSize}
+        };
+        client_->sendAtServer(j);
+    }
+}
+
+void TextEdit::requestFontFamilyChanged(std::string fontFamily) {
+    QTextCursor cursor = textEdit->textCursor();
+    if(cursor.hasSelection()) {
+        int startIndex = cursor.selectionStart();
+        int endIndex = cursor.selectionEnd();
+
+        //Update symbols of the client
+        //mi devo prendere i syboli che vanno da quella dimensione a quella
+        std::vector<Symbol> symbols = client_->symbols;
+        //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
+        //Serialize data
+        json j = json{
+                {"operation","fontSizeChanged"},
+                {"symbols", " "},
+                {"fontFamily",     fontFamily}
+        };
+        client_->sendAtServer(j);
+    }
+}
