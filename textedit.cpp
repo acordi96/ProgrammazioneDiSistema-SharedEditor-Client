@@ -909,7 +909,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
     if (ev->type() == QEvent::KeyPress) {
         QKeyEvent *key_ev = static_cast<QKeyEvent *>(ev);
         int key = key_ev->key();
-        /*std::cout << "CRDT: " << std::flush; //print crdt
+        std::cout << "CRDT: " << std::flush; //print crdt
         for (auto iterPositions = client_->symbols.begin(); iterPositions != client_->symbols.end(); ++iterPositions) {
             if (iterPositions->getCharacter() != 10 && iterPositions->getCharacter() != 13)
                 std::cout << "[" << (int) iterPositions->getCharacter() << "(" << iterPositions->getCharacter()
@@ -920,7 +920,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                 std::cout << std::to_string(iterPositions->getPosizione()[i]) << std::flush;
             std::cout << "]" << std::flush;
         }
-        std::cout << std::endl;*/
+        std::cout << std::endl;
         if (obj == textEdit) {
             if (!key_ev->text().isEmpty()) {
 
@@ -1176,7 +1176,9 @@ void TextEdit::eraseSymbols(std::vector<Symbol> symbolsToErase) {
 
     std::vector<int> erased = client_->eraseSymbolCRDT(symbolsToErase);
 
-    for (auto &toErase : erased) {
+    for (int i = 0; i < erased.size(); i++) {
+        int toErase = erased[i];
+        std::string username = symbolsToErase[i].getUsername();
         QTextCursor cur = textEdit->textCursor();
 
         cur.beginEditBlock();
@@ -1197,8 +1199,12 @@ void TextEdit::eraseSymbols(std::vector<Symbol> symbolsToErase) {
 
         cur.endEditBlock();
         for (auto list:_listParticipantsAndColors) {
-            if (_cursorsVector[list.first].position > toErase)
-                _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position - 1);
+            if(list.first.toStdString()!=username) {
+                if (_cursorsVector[list.first].position > toErase)
+                    _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position - 1);
+            }else{
+                _cursorsVector[QString::fromStdString(username)].setPosition(toErase - 1);
+            }
         }
         drawGraphicCursor();
         textEdit->setFocus();
