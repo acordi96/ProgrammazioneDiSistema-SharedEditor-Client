@@ -73,7 +73,7 @@ public:
 
     std::vector<int> eraseSymbolCRDT(std::vector<Symbol> symbolsToErase);
 
-    void insertSymbolIndex(const Symbol &symbol, int index);
+    void insertSymbolIndex(Symbol Symbol, int index);
 
     std::vector<int> generatePos(int index);
 
@@ -86,6 +86,8 @@ public:
     void setFiles(const std::map<std::pair<std::string, std::string>, std::string> &value);
 
     void insertIntoUsernameModified(const std::string &username, int localIndex);
+
+    void removeFromUsernameModified(const std::string &username, int localIndex);
 
 signals:
 

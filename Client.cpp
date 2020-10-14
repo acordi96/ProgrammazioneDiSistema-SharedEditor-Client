@@ -186,16 +186,14 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::vector<int> usernameToInsert = js.at("usernameToInsert").get<std::vector<int>>();
         std::vector<char> charToInsert = js.at("charToInsert").get<std::vector<char>>();
         std::vector<std::vector<int>> crdtToInsert = js.at("crdtToInsert").get<std::vector<std::vector<int>>>();
-        std::vector<std::string> idToUsername = js.at("idToUsername").get<std::vector<std::string>>();
+        std::vector<std::string> idToUsername = js.at("usernameToId").get<std::vector<std::string>>();
         std::map<int, std::string> usernameToId;
-        for(int i = 0; i < idToUsername.size(); i++)
+        for (int i = 0; i < idToUsername.size(); i++)
             usernameToId.insert({i, idToUsername[i]});
         for (int i = 0; i < usernameToInsert.size(); i++) {
             //ricreo il simbolo
             Symbol symbolToInsert(charToInsert[i], usernameToId.at(usernameToInsert[i]), crdtToInsert[i]);
             int index = this->generateIndexCRDT(symbolToInsert, 0, -1, -1);
-            //segno modifica
-            this->insertIntoUsernameModified(usernameToId.at(usernameToInsert[i]), index);
             //aggiungo al crdt
             this->insertSymbolIndex(symbolToInsert, index);
             emit insertSymbol(index, charToInsert[i]);
@@ -375,6 +373,7 @@ std::vector<int> Client::insertSymbolNewCRDT(int index, char character, const st
 
     this->symbols.insert(this->symbols.begin() + index, s);
 
+    this->insertIntoUsernameModified(username, index);
     return vector;
 }
 
@@ -423,7 +422,9 @@ std::vector<int> Client::eraseSymbolCRDT(std::vector<Symbol> symbolsToErase) {
             lastFound -= 2;
         for (auto iterSymbols = this->symbols.begin() + lastFound; iterSymbols != this->symbols.end(); ++iterSymbols) {
             if (*iterSymbolsToErase == *iterSymbols) {
-                erased.push_back(generateIndexCRDT(*iterSymbols, 0, -1, -1));
+                int index = generateIndexCRDT(*iterSymbols, 0, -1, -1);
+                erased.push_back(index);
+                this->removeFromUsernameModified(iterSymbols->getUsername(), index);
                 this->symbols.erase(iterSymbols);
                 lastFound = count;
                 foundSecondPart = true;
@@ -435,7 +436,9 @@ std::vector<int> Client::eraseSymbolCRDT(std::vector<Symbol> symbolsToErase) {
             for (auto iterSymbols = this->symbols.begin();
                  iterSymbols != this->symbols.begin() + lastFound; ++iterSymbols) {
                 if (*iterSymbolsToErase == *iterSymbols) {
-                    erased.push_back(generateIndexCRDT(*iterSymbols, 0, -1, -1));
+                    int index = generateIndexCRDT(*iterSymbols, 0, -1, -1);
+                    erased.push_back(index);
+                    this->removeFromUsernameModified(iterSymbols->getUsername(), index);
                     this->symbols.erase(iterSymbols);
                     lastFound = count;
                     break;
@@ -447,7 +450,7 @@ std::vector<int> Client::eraseSymbolCRDT(std::vector<Symbol> symbolsToErase) {
     return erased;
 }
 
-void Client::insertSymbolIndex(const Symbol &symbol, int index) {
+void Client::insertSymbolIndex(Symbol symbol, int index) {
     int i = 0;
     for (auto iterPositions = this->symbols.begin(); iterPositions != this->symbols.end(); ++iterPositions) {
         if (index == i) {
@@ -457,6 +460,7 @@ void Client::insertSymbolIndex(const Symbol &symbol, int index) {
         i++;
     }
     this->symbols.insert(this->symbols.end(), symbol);
+    this->insertIntoUsernameModified(symbol.getUsername(), index);
 }
 
 //genera nuovo vettore posizione per un nuovo symbol
@@ -510,11 +514,33 @@ void Client::sendAtServer(const json &js) {
 }
 
 void Client::insertIntoUsernameModified(const std::string &username, int localIndex) {
-    if(this->usernameModified.find(username) == this->usernameModified.end()) {
+    for (auto &pair : this->usernameModified)
+        for (auto &pos : pair.second)
+            if (pos >= localIndex)
+                pos++;
+    if (this->usernameModified.find(username) == this->usernameModified.end()) {
         std::vector<int> newV;
         newV.push_back(localIndex);
         this->usernameModified.insert({username, newV});
     } else {
         this->usernameModified.at(username).push_back(localIndex);
     }
+}
+
+void Client::removeFromUsernameModified(const std::string &username, int localIndex) {
+    if (this->usernameModified.find(username) != this->usernameModified.end()) {
+        for (auto it = this->usernameModified.at(username).begin();
+             it != this->usernameModified.at(username).end(); ++it) {
+            if (*it == localIndex) {
+                this->usernameModified.at(username).erase(it);
+                break;
+            }
+        }
+    }
+    if (this->usernameModified.at(username).empty())
+        this->usernameModified.erase(username);
+    for (auto &pair : this->usernameModified)
+        for (auto &pos : pair.second)
+            if (pos > localIndex)
+                pos--;
 }

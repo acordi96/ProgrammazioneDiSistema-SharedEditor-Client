@@ -918,6 +918,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                 std::cout << "[" << (int) iterPositions->getCharacter() << "(\\n) - " << std::flush;
             for (int i = 0; i < iterPositions->getPosizione().size(); i++)
                 std::cout << std::to_string(iterPositions->getPosizione()[i]) << std::flush;
+            std::cout << " - " << iterPositions->getUsername() << std::flush;
             std::cout << "]" << std::flush;
         }
         std::cout << std::endl;
@@ -1199,10 +1200,10 @@ void TextEdit::eraseSymbols(std::vector<Symbol> symbolsToErase) {
 
         cur.endEditBlock();
         for (auto list:_listParticipantsAndColors) {
-            if(list.first.toStdString()!=username) {
+            if (list.first.toStdString() != username) {
                 if (_cursorsVector[list.first].position > toErase)
                     _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position - 1);
-            }else{
+            } else {
                 _cursorsVector[QString::fromStdString(username)].setPosition(toErase - 1);
             }
         }
@@ -1259,28 +1260,29 @@ void TextEdit::highlightcharacter() {
     QString name = sender->objectName();
     QTextCursor cursor = textEdit->textCursor();
     QTextCursor tempCursor = QTextCursor(cursor);
-    int pos;
+    /*int pos;
     int i = 0;
-    for (auto s: client_->symbols) {
-        if (s.getUsername() == name.toStdString()) {
-            pos = i;
-            tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
-            tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
-            tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
-            textEdit->setTextCursor(tempCursor);
-            if (name == client_->getUser())
-                textEdit->setTextBackgroundColor(client_->getColor());
-            else
-                textEdit->setTextBackgroundColor(_listParticipantsAndColors[name]);
-        }
-
-        i++;
+    for(auto s: client_->symbols) {
+        if(s.getUsername() == name.toStdString()) {*/
+    for (auto &pos : client_->usernameModified.at(name.toStdString())) {
+        tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
+        tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
+        tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
+        textEdit->setTextCursor(tempCursor);
+        if (name == client_->getUser())
+            textEdit->setTextBackgroundColor(client_->getColor());
+        else
+            textEdit->setTextBackgroundColor(_listParticipantsAndColors[name]);
     }
+    /*}
+    i++;
+}*/
+
     textEdit->setTextCursor(cursor);
     textEdit->setTextBackgroundColor(QColor(255, 255, 255, 255));
     textEdit->setFocus();
 
-    timer->start(2000);
+    timer->start(3500);
 
 }
 
@@ -1317,7 +1319,7 @@ void TextEdit::decreentPosition(int pos, int count) {
 
 void TextEdit::updateListParticipants(usersInFile users) {
     for (auto user:_listParticipantsAndColors) {
-        _labels[user.first]->move(0,0);
+        _labels[user.first]->move(0, 0);
         _labels[user.first]->hide();
     }
     _listParticipantsAndColors.clear();
