@@ -122,7 +122,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
     } else if (type_request == "insert_res") {
         //prendo il vettore di symbol
         std::vector<std::string> usernameToInsert = js.at("usernameToInsert").get<std::vector<std::string>>();
-        std::vector<char> charToInsert = js.at("charToInsert").get<std::vector<char>>();
+        std::vector<wchar_t> charToInsert = js.at("charToInsert").get<std::vector<wchar_t>>();
         std::vector<std::vector<int>> crdtToInsert = js.at("crdtToInsert").get<std::vector<std::vector<int>>>();
         for (int i = 0; i < usernameToInsert.size(); i++) {
             Symbol symbolToInsert(charToInsert[i], usernameToInsert[i], crdtToInsert[i]);
@@ -131,7 +131,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         return type_request;
     } else if (type_request == "remove_res") {
         std::vector<std::string> usernameToErase = js.at("usernameToErase").get<std::vector<std::string>>();
-        std::vector<char> charToErase = js.at("charToErase").get<std::vector<char>>();
+        std::vector<wchar_t> charToErase = js.at("charToErase").get<std::vector<wchar_t>>();
         std::vector<std::vector<int>> crdtToErase = js.at("crdtToErase").get<std::vector<std::vector<int>>>();
         std::vector<Symbol> symbolsToErase;
         for (int i = 0; i < usernameToErase.size(); i++) {
@@ -184,7 +184,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
             emit clearEditor();
         }
         std::vector<int> usernameToInsert = js.at("usernameToInsert").get<std::vector<int>>();
-        std::vector<char> charToInsert = js.at("charToInsert").get<std::vector<char>>();
+        std::vector<wchar_t> charToInsert = js.at("charToInsert").get<std::vector<wchar_t>>();
         std::vector<std::vector<int>> crdtToInsert = js.at("crdtToInsert").get<std::vector<std::vector<int>>>();
         std::vector<std::string> idToUsername = js.at("usernameToId").get<std::vector<std::string>>();
         std::map<int, std::string> usernameToId;
@@ -357,7 +357,7 @@ std::map<std::pair<std::string, std::string>, std::string> Client::getFiles() co
 }
 
 //crea un nuovo symbol e lo inserisce nel crdt in posizione index
-std::vector<int> Client::insertSymbolNewCRDT(int index, char character, const std::string &username) {
+std::vector<int> Client::insertSymbolNewCRDT(int index, wchar_t character, const std::string &username) {
     std::vector<int> vector;
     if (this->symbols.empty()) {
         vector = {0};

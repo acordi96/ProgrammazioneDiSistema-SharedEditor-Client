@@ -779,7 +779,7 @@ void TextEdit::showSymbolWithId(Symbol symbolToInsert) {
 
     int pos = client_->generateIndexCRDT(symbolToInsert, 0, -1, -1);
     client_->insertSymbolIndex(symbolToInsert, pos);
-    char c = symbolToInsert.getCharacter();
+    wchar_t c = symbolToInsert.getCharacter();
     QString user = QString::fromStdString(symbolToInsert.getUsername());
 
     QTextCharFormat format;
@@ -912,10 +912,10 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
         std::cout << "FILE CRDT: " << std::flush; //print crdt
         for (auto iterPositions = client_->symbols.begin(); iterPositions != client_->symbols.end(); ++iterPositions) {
             if (iterPositions->getCharacter() != 10 && iterPositions->getCharacter() != 13)
-                std::cout << "[" << (int) iterPositions->getCharacter() << "(" << iterPositions->getCharacter()
+                std::wcout << "[" << (int) iterPositions->getCharacter() << "(" << iterPositions->getCharacter()
                           << ") - " << std::flush;
             else
-                std::cout << "[" << (int) iterPositions->getCharacter() << "(\\n) - " << std::flush;
+                std::wcout << "[" << (int) iterPositions->getCharacter() << "(\\n) - " << std::flush;
             for (int i = 0; i < iterPositions->getPosizione().size(); i++)
                 std::cout << std::to_string(iterPositions->getPosizione()[i]) << std::flush;
             std::cout << " - " << iterPositions->getUsername() << std::flush;
@@ -943,7 +943,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
 
                     std::vector<Symbol> symbolsToErase;
                     std::vector<std::string> usernameToErase;
-                    std::vector<char> charToErase;
+                    std::vector<wchar_t> charToErase;
                     std::vector<std::vector<int>> crdtToErase;
 
                     int k = 0;
@@ -1008,14 +1008,14 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     key_ev->text().toStdString().c_str()[0] != 1) { //ctrl+a
                     //caso carattere normale (lettere e spazio)
 
-                    char c = key_ev->text().toStdString().c_str()[0];
+                    wchar_t c = key_ev->text().toStdWString().c_str()[0];
                     std::vector<int> crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
                     textEdit->setTextCursor(cursor);
                     //emit updateCursor();
 
                     std::vector<std::string> usernamev;
                     usernamev.push_back(client_->getUser().toStdString());
-                    std::vector<char> charv;
+                    std::vector<wchar_t> charv;
                     charv.push_back(c);
                     std::vector<std::vector<int>> crdtv;
                     crdtv.push_back(crdt);
@@ -1038,10 +1038,10 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     QString pastedText = clipboard->text();
 
                     std::vector<std::string> usernameToInsert;
-                    std::vector<char> charToInsert;
+                    std::vector<wchar_t> charToInsert;
                     std::vector<std::vector<int>> crdtToInsert;
                     std::vector<int> crdt;
-                    char c;
+                    wchar_t c;
                     int startPos = pos;
                     int dim = pastedText.size();
                     int of = dim / client_->maxBufferSymbol;
@@ -1055,7 +1055,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         for (int k = 0; k < client_->maxBufferSymbol; k++) {
                             textEdit->setTextCursor(cursor);
                             usernameToInsert.push_back(client_->getUser().toStdString());
-                            c = pastedText.toStdString().c_str()[(i * client_->maxBufferSymbol) + k];
+                            c = pastedText.toStdWString().c_str()[(i * client_->maxBufferSymbol) + k];
                             charToInsert.push_back(c);
                             crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
                             crdtToInsert.push_back(crdt);
@@ -1080,7 +1080,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         for (int i = 0; i < (dim % client_->maxBufferSymbol); i++) {
                             textEdit->setTextCursor(cursor);
                             usernameToInsert.push_back(client_->getUser().toStdString());
-                            c = pastedText.toStdString().c_str()[(of * client_->maxBufferSymbol) + i];
+                            c = pastedText.toStdWString().c_str()[(of * client_->maxBufferSymbol) + i];
                             charToInsert.push_back(c);
                             crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
                             crdtToInsert.push_back(crdt);
@@ -1117,7 +1117,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         if (pos > 0) {
                             std::vector<Symbol> symbolsToErase;
                             std::vector<std::string> usernameToErase;
-                            std::vector<char> charToErase;
+                            std::vector<wchar_t> charToErase;
                             std::vector<std::vector<int>> crdtToErase;
                             symbolsToErase.push_back(client_->symbols[pos - 1]);
                             usernameToErase.push_back(client_->symbols[pos - 1].getUsername());
@@ -1146,7 +1146,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     if (pos >= 0 && pos < textEdit->toPlainText().size()) {
                         std::vector<Symbol> symbolsToErase;
                         std::vector<std::string> usernameToErase;
-                        std::vector<char> charToErase;
+                        std::vector<wchar_t> charToErase;
                         std::vector<std::vector<int>> crdtToErase;
                         symbolsToErase.push_back(client_->symbols[pos]);
                         usernameToErase.push_back(client_->symbols[pos].getUsername());
