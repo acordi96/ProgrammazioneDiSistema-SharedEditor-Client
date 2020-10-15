@@ -79,6 +79,8 @@ public slots:
 
     void updateRecentFiles(QString old, QString newN, QString owner, QString request);
 
+    void updateUserFile(QString old, QString newN);
+
     void handleOpenURLbutton();
 
     //void updateFiles();

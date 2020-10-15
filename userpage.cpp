@@ -43,6 +43,7 @@ Userpage::Userpage(QWidget *parent,Client *c):
 
     setCentralWidget(page);
     QObject::connect(client_, &Client::updateFile, this, &Userpage::updateRecentFiles);
+    QObject::connect(client_, &Client::updateUser, this, &Userpage::updateUserFile);
     //QObject::connect(page, &stacked::updateRecentFiles, this, &Userpage::updateFiles);
 }
 
@@ -1136,4 +1137,8 @@ std::string Userpage::generateFileButton(const std::string& owner, const std::st
 
 void Userpage::clearLineURL(){
     lineURL->clear();
+}
+
+void Userpage::updateUserFile(QString old, QString newN) {
+    //aggiornare interfaccia grafica
 }

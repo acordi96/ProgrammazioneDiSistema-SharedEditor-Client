@@ -148,6 +148,17 @@ void stacked::on_form_regButton_clicked() {
         connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
 
         dialog->show();
+    }else if(user.length()>10){
+        QDialog *dialog = new QDialog();
+        QVBoxLayout *layout = new QVBoxLayout();
+        dialog->setLayout(layout);
+        layout->addWidget(new QLabel("User length max 10 char "));
+        QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+        layout->addWidget(buttonBox);
+
+        connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+
+        dialog->show();
     } else {
         try {
 
@@ -272,8 +283,30 @@ void stacked::showPopupSuccess(QString result) {
             layout->addWidget(new QLabel("Delete file error"));
         } else if (result == "error_file_in_use") {
             layout->addWidget(new QLabel("File in use, rename failed"));
-        } else if (result == "error_file_in_use") {
-            layout->addWidget(new QLabel("File in use, delete failed"));
+        } else if (result == "email_update_success"){
+            ui->stackedWidget->setCurrentIndex(4);
+            layout->addWidget(new QLabel("Mail correctly updates"));
+        } else if (result == "user_update_success"){
+            ui->stackedWidget->setCurrentIndex(4);
+            layout->addWidget(new QLabel("User correctly updates"));
+        } else if (result == "password_update_success"){
+            ui->stackedWidget->setCurrentIndex(4);
+            layout->addWidget(new QLabel("Password correctly updates"));
+        } else if (result == "user_email_update_success"){
+            ui->stackedWidget->setCurrentIndex(4);
+            layout->addWidget(new QLabel("User and mail correctly update"));
+        } else if (result == "password_email_update_success"){
+            ui->stackedWidget->setCurrentIndex(4);
+            layout->addWidget(new QLabel("Password and mail correctly update"));
+        } else if (result == "password_user_update_success"){
+            ui->stackedWidget->setCurrentIndex(4);
+            layout->addWidget(new QLabel("Password and user correctly update"));
+        } else if (result == "profile_update_success"){
+            ui->stackedWidget->setCurrentIndex(4);
+            layout->addWidget(new QLabel("Profile correctly update"));
+        } else if (result == "profile_update_failed"){
+            ui->stackedWidget->setCurrentIndex(4);
+            layout->addWidget(new QLabel("Error in update profile"));
         }
 
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
@@ -442,4 +475,100 @@ void stacked::on_colorPicker_clicked(){
         ui->edit_icon->setStyleSheet(QString::fromUtf8("background-color:")+colorDialog->selectedColor().name());
         client_->setColor(colorDialog->selectedColor().name());
     });
+}
+
+void stacked::on_edit_saveButton_clicked(){
+    QRegularExpression email_regex("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$");
+    QRegularExpression psw_regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})");
+
+    QString email = ui->edit_email_line->text();
+    QString user = ui->edit_user_line->text();
+    QString oldUser = client_->getUser();
+    QString oldPsw = ui->edit_oldpsw_line->text();
+    QString newPsw1 = ui->edit_newpsw_line->text();
+    QString newPsw2 = ui->edit_confnewpsw_line->text();
+
+    //controllo formato mail
+    if (!email_regex.match(email).hasMatch()) {
+        QDialog *dialog = new QDialog();
+        QVBoxLayout *layout = new QVBoxLayout();
+        dialog->setLayout(layout);
+        layout->addWidget(new QLabel("Wrong email format"));
+        QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+        layout->addWidget(buttonBox);
+
+        connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+
+        dialog->show();
+        //controllo formato nuova password
+    }else if (!psw_regex.match(newPsw1).hasMatch()) {
+        // check password
+        QDialog *dialog = new QDialog();
+        QVBoxLayout *layout = new QVBoxLayout();
+        dialog->setLayout(layout);
+        layout->addWidget(new QLabel("Password must be at least 8 characters long "
+                                     "and include at least one upper case letter, "
+                                     "a number and a special character"));
+        QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+        layout->addWidget(buttonBox);
+
+        connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+
+        dialog->show();
+        //ui->stackedWidget->setCurrentIndex(3);
+        //controllo che le password corrispondano
+    } else if (!(newPsw1 == newPsw2)) {
+        QDialog *dialog = new QDialog();
+        QVBoxLayout *layout = new QVBoxLayout();
+        dialog->setLayout(layout);
+        layout->addWidget(new QLabel("Non matching password!"));
+        QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+        layout->addWidget(buttonBox);
+
+        connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+
+        dialog->show();
+    }else if(user.length()>10){
+        QDialog *dialog = new QDialog();
+        QVBoxLayout *layout = new QVBoxLayout();
+        dialog->setLayout(layout);
+        layout->addWidget(new QLabel("User length max 10 char "));
+        QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+        layout->addWidget(buttonBox);
+
+        connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+
+        dialog->show();
+    }else {
+        if (user==oldUser)
+            user = "";
+        if (email == client_->getEmail())
+            email == "";
+
+        try {
+
+            json j = json{
+                    {"operation", "request_update_profile"},
+                    {"email",     email.toStdString()},
+                    {"username",  user.toStdString()},
+                    {"oldUsername",  oldUser.toStdString()},
+                    {"oldPassword",  md5(oldPsw.toUtf8().constData())},
+                    {"newPassword",  md5(newPsw1.toUtf8().constData())}
+            };
+            /*
+             *  PRENDI I DATI E INVIA A SERVER
+             * */
+            std::string mess = j.dump().c_str();
+            message msg;
+            msg.body_length(mess.size());
+            std::memcpy(msg.body(), mess.data(), msg.body_length());
+            msg.body()[msg.body_length()] = '\0';
+            msg.encode_header();
+            std::cout <<"Richiesta da inviare al server "<< msg.body() << std::endl;
+            sendmessage(msg);
+
+        } catch (std::exception &e) {
+            std::cerr << "Exception: " << e.what() << "\n";
+        }
+    }
 }

@@ -34,6 +34,7 @@ private slots:
    void on_psw_log_line_returnPressed();
    void on_edit_backButton_clicked();
    void on_colorPicker_clicked();
+   void on_edit_saveButton_clicked();
    //void on_fileButton_clicked();
    //void on_newFileButton_clicked();
    void logout();
