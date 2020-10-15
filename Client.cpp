@@ -2,8 +2,8 @@
 // Created by Sam on 22/apr/2020.
 //
 
-//#define serverRoute "93.43.250.236"
-#define serverRoute "127.0.0.1"
+#define serverRoute "93.43.250.236"
+//#define serverRoute "127.0.0.1"
 
 #include <QtWidgets/QMessageBox>
 #include "Headers/Client.h"
@@ -373,7 +373,6 @@ std::vector<int> Client::insertSymbolNewCRDT(int index, wchar_t character, const
 
     this->symbols.insert(this->symbols.begin() + index, s);
 
-    this->insertIntoUsernameModified(username, index);
     return vector;
 }
 
@@ -422,9 +421,7 @@ std::vector<int> Client::eraseSymbolCRDT(std::vector<Symbol> symbolsToErase) {
             lastFound -= 2;
         for (auto iterSymbols = this->symbols.begin() + lastFound; iterSymbols != this->symbols.end(); ++iterSymbols) {
             if (*iterSymbolsToErase == *iterSymbols) {
-                int index = generateIndexCRDT(*iterSymbols, 0, -1, -1);
-                erased.push_back(index);
-                this->removeFromUsernameModified(iterSymbols->getUsername(), index);
+                erased.push_back(generateIndexCRDT(*iterSymbols, 0, -1, -1));
                 this->symbols.erase(iterSymbols);
                 lastFound = count;
                 foundSecondPart = true;
@@ -436,9 +433,7 @@ std::vector<int> Client::eraseSymbolCRDT(std::vector<Symbol> symbolsToErase) {
             for (auto iterSymbols = this->symbols.begin();
                  iterSymbols != this->symbols.begin() + lastFound; ++iterSymbols) {
                 if (*iterSymbolsToErase == *iterSymbols) {
-                    int index = generateIndexCRDT(*iterSymbols, 0, -1, -1);
-                    erased.push_back(index);
-                    this->removeFromUsernameModified(iterSymbols->getUsername(), index);
+                    erased.push_back(generateIndexCRDT(*iterSymbols, 0, -1, -1));
                     this->symbols.erase(iterSymbols);
                     lastFound = count;
                     break;
@@ -460,7 +455,6 @@ void Client::insertSymbolIndex(Symbol symbol, int index) {
         i++;
     }
     this->symbols.insert(this->symbols.end(), symbol);
-    this->insertIntoUsernameModified(symbol.getUsername(), index);
 }
 
 //genera nuovo vettore posizione per un nuovo symbol
@@ -511,36 +505,4 @@ void Client::sendAtServer(const json &js) {
     mess.encode_header();
     std::cout << "Messaggio da inviare al server: " << mess.body() << std::endl;
     this->write(mess);
-}
-
-void Client::insertIntoUsernameModified(const std::string &username, int localIndex) {
-    for (auto &pair : this->usernameModified)
-        for (auto &pos : pair.second)
-            if (pos >= localIndex)
-                pos++;
-    if (this->usernameModified.find(username) == this->usernameModified.end()) {
-        std::vector<int> newV;
-        newV.push_back(localIndex);
-        this->usernameModified.insert({username, newV});
-    } else {
-        this->usernameModified.at(username).push_back(localIndex);
-    }
-}
-
-void Client::removeFromUsernameModified(const std::string &username, int localIndex) {
-    if (this->usernameModified.find(username) != this->usernameModified.end()) {
-        for (auto it = this->usernameModified.at(username).begin();
-             it != this->usernameModified.at(username).end(); ++it) {
-            if (*it == localIndex) {
-                this->usernameModified.at(username).erase(it);
-                break;
-            }
-        }
-    }
-    if (this->usernameModified.at(username).empty())
-        this->usernameModified.erase(username);
-    for (auto &pair : this->usernameModified)
-        for (auto &pos : pair.second)
-            if (pos > localIndex)
-                pos--;
 }

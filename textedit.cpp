@@ -913,7 +913,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
         for (auto iterPositions = client_->symbols.begin(); iterPositions != client_->symbols.end(); ++iterPositions) {
             if (iterPositions->getCharacter() != 10 && iterPositions->getCharacter() != 13)
                 std::wcout << "[" << (int) iterPositions->getCharacter() << "(" << iterPositions->getCharacter()
-                          << ") - " << std::flush;
+                           << ") - " << std::flush;
             else
                 std::wcout << "[" << (int) iterPositions->getCharacter() << "(\\n) - " << std::flush;
             for (int i = 0; i < iterPositions->getPosizione().size(); i++)
@@ -1260,23 +1260,21 @@ void TextEdit::highlightcharacter() {
     QString name = sender->objectName();
     QTextCursor cursor = textEdit->textCursor();
     QTextCursor tempCursor = QTextCursor(cursor);
-    /*int pos;
-    int i = 0;
-    for(auto s: client_->symbols) {
-        if(s.getUsername() == name.toStdString()) {*/
-    for (auto &pos : client_->usernameModified.at(name.toStdString())) {
-        tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
-        tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
-        tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
-        textEdit->setTextCursor(tempCursor);
-        if (name == client_->getUser())
-            textEdit->setTextBackgroundColor(client_->getColor());
-        else
-            textEdit->setTextBackgroundColor(_listParticipantsAndColors[name]);
+    int pos = 0;
+    for (auto s: client_->symbols) {
+        if (s.getUsername() == name.toStdString()) {
+            tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
+            tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
+            tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
+            textEdit->setTextCursor(tempCursor);
+            if (name == client_->getUser())
+                textEdit->setTextBackgroundColor(client_->getColor());
+            else
+                textEdit->setTextBackgroundColor(_listParticipantsAndColors[name]);
+
+        }
+        pos++;
     }
-    /*}
-    i++;
-}*/
 
     textEdit->setTextCursor(cursor);
     textEdit->setTextBackgroundColor(QColor(255, 255, 255, 255));
