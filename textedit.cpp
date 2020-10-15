@@ -80,6 +80,8 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
     connect(client_, &Client::eraseSymbols, this, &TextEdit::eraseSymbols);
     connect(client_, &Client::clearEditor, textEdit, &QTextEdit::clear);
     connect(client_, &Client::updateRemotePosition, this, &TextEdit::updateRemotePosition);
+    //stile
+    connect(client_, &Client::changeStyle, this, &TextEdit::changeStyle);
     // controllare che funziona
     connect(textEdit, &QTextEdit::cursorPositionChanged, this, &TextEdit::cursorPositionChanged);
     //aggiorno lista
@@ -616,6 +618,9 @@ void TextEdit::textFamily(const QString &f) {
     QTextCharFormat fmt;
     fmt.setFontFamily(f);
     mergeFormatOnWordOrSelection(fmt);
+    std::string fontFamily = textEdit->fontFamily().toStdString();
+    requestStyleChanged(fontFamily, 0, 2, 2);
+
 }
 
 void TextEdit::textSize(const QString &p) {
@@ -625,6 +630,9 @@ void TextEdit::textSize(const QString &p) {
         fmt.setFontPointSize(pointSize);
         mergeFormatOnWordOrSelection(fmt);
     }
+    int size = textEdit->fontPointSize();
+    requestStyleChanged("", pointSize, 2, 2);
+
 }
 
 void TextEdit::textStyle(int styleIndex) {
@@ -1390,4 +1398,60 @@ void TextEdit::updateCursors() {
 void TextEdit::updateCursors(const CustomCursor &cursor) {
     _oldCursor = CustomCursor(_newCursor);
     _newCursor = CustomCursor(cursor);
+}
+void TextEdit::requestStyleChanged(std::string fontFamily, int fontSize, int bold, int underlined) {
+    QTextCursor cursor = textEdit->textCursor();
+    if(cursor.hasSelection()) {
+        int startIndex = cursor.selectionStart();
+        int endIndex = cursor.selectionEnd();
+
+        //Update symbols of the client
+        //mi devo prendere i syboli che vanno da quella dimensione a quella
+        std::vector<Symbol> symbols = client_->symbols;
+        std::vector<std::string> usernameToChange;
+        std::vector<char> charToChange;
+        std::vector<std::vector<int>> crdtToChange;
+        //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
+        //Serialize data
+        Style style;
+        style.setFontFamily(fontFamily);
+        for(int i=startIndex; i<=endIndex; i++){
+            usernameToChange.push_back(symbols[i].getUsername());
+            charToChange.push_back(symbols[i].getCharacter());
+            crdtToChange.push_back(symbols[i].getPosizione());
+            symbols[i].setSymbolStyle(style);
+        }
+
+        json j = json{
+                {"operation","styleChanged"},
+                {"usernameToChange", usernameToChange},
+                {"charToChange",     charToChange},
+                {"crdtToChange",     crdtToChange},
+                {"fontFamily",     fontFamily},
+                {"fontSize", fontSize},
+                {"bold", bold},
+                {"underlined", underlined}
+        };
+        client_->sendAtServer(j);
+    }
+}
+void TextEdit::changeStyle(int startIndex, int endIndex, Style style)  {
+    QTextCursor cursor = textEdit->textCursor();
+    QTextCharFormat newFormat;
+    QFont f;
+    cursor.beginEditBlock();
+    while(endIndex > startIndex) {
+        cursor.setPosition(--endIndex);
+        cursor.setPosition(endIndex+1, QTextCursor::KeepAnchor); //to select the char to be updated
+        f.setFamily(QString::fromStdString(style.getFontFamily()));
+        f.setBold(style.getBold());
+        f.setItalic(cursor.charFormat().font().italic());
+        f.setUnderline(style.getUnderlined());
+        f.setPointSize(style.getFontSize());
+        newFormat.setFont(f);
+        cursor.mergeCharFormat(newFormat);
+    }
+    cursor.endEditBlock();
+
+    textEdit->setFocus();
 }

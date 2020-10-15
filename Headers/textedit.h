@@ -45,6 +45,8 @@ public slots:
     void eraseSymbols(std::vector<Symbol> symbolsToErase);
     //TO DO:mettere user
     //void show_Symbol(std::pair<int,char> tuple);
+    //stile
+    void changeStyle(int startIndex, int endIndex, Style style);
 protected:
     void closeEvent(QCloseEvent *e) override;
     bool eventFilter(QObject *obj, QEvent *ev) override;
@@ -106,9 +108,14 @@ private:
     void closingFile();
 
 
+    //cursori
     void drawGraphicCursor();
     void incrementPosition(int pos, int count);
     void decreentPosition(int pos, int count);
+
+    //debug
+    void requestStyleChanged(std::string fontFamily, int fontSize, int bold, int underlined);
+
     QAction *actionSave;
     QAction *actionTextBold;
     QAction *actionTextUnderline;

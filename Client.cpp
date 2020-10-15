@@ -273,6 +273,31 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::string username = js.at("username").get<std::string>();
         int pos = js.at("pos").get<int>();
         emit updateRemotePosition(QString::fromStdString(username), pos);
+    }else if(type_request == "styleChanged"){
+        std::vector<std::string> usernameToChange = js.at("usernameToChange").get<std::vector<std::string>>();
+        std::vector<char> charToChange = js.at("charToChange").get<std::vector<char>>();
+        std::vector<std::vector<int>> crdtToChange = js.at("crdtToChange").get<std::vector<std::vector<int>>>();
+        std::string fontFamily = js.at("fontFamily").get<std::string>();
+        int fontSize = js.at("fontSize").get<int>();
+        int bold = js.at("bold").get<int>();
+        int underlined = js.at("underlined").get<int>();
+        //TO DO: devo scorrere il mio vettore e trovarci quei caratteri e settargli in get style, quel setfontFamily
+        int startIndex = crdtToChange.front().front(); //posizione 1
+        int endIndex = crdtToChange.back().front(); //posizione finale
+        Style style;
+        if(fontFamily!="")
+            style.setFontFamily(fontFamily);
+        if(fontSize!=0)
+            style.setFontSize(fontSize);
+        if(bold!=2)
+            style.setBold(bold);
+        if(underlined!=2)
+            style.setUnderlined(underlined);
+        for(int i=startIndex; i<=endIndex; i++){
+            symbols[i].setSymbolStyle(style);
+        }
+        emit changeStyle(startIndex, endIndex, style);
+
     }
     return type_request;
 }

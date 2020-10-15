@@ -101,6 +101,8 @@ signals:
     void updateUserslist(usersInFile users);
 
     void clearEditor();
+    //stile
+    void changeStyle(int startIndex, int endIndex, Style style);
 
 private:
     void do_connect();
