@@ -42,8 +42,8 @@ private slots:
    void logout();
    void closeAll();
    void closeFile();
-    void editPage();
-    void showLoading(bool active);
+   void editPage();
+   void showLoading(bool active);
 /*signals:
     void updateRecentFiles();*/
 private:

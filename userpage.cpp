@@ -180,7 +180,7 @@ void Userpage::setupUserinfo(){
     usernameLabel->setAlignment(Qt::AlignLeading|Qt::AlignCenter|Qt::AlignVCenter);
     labelsLayout->addWidget(usernameLabel);
 
-    QLabel *email_lab = new QLabel(client_->getEmail(),userinfo);
+    email_lab = new QLabel(client_->getEmail(),userinfo);
     email_lab->setObjectName(QString::fromUtf8("email_lab"));
     email_lab->setStyleSheet(QString::fromUtf8("font: 13pt \"Sawasdee\";"));
     email_lab->setAlignment(Qt::AlignLeading|Qt::AlignCenter|Qt::AlignVCenter);
@@ -1141,4 +1141,9 @@ void Userpage::clearLineURL(){
 
 void Userpage::updateUserFile(QString old, QString newN) {
     //aggiornare interfaccia grafica
+}
+
+void Userpage::updateInfo(){
+    email_lab->setText(client_->getEmail());
+    myIcon->setStyleSheet(QString::fromUtf8("background-color:")+client_->getColor());
 }

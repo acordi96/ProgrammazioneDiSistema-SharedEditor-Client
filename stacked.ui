@@ -112,7 +112,7 @@
              <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::Preferred</enum>
+             <enum>QSizePolicy::Fixed</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -869,7 +869,7 @@ background-color:#68DFBB;
              <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::Preferred</enum>
+             <enum>QSizePolicy::Fixed</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1589,7 +1589,7 @@ QPushButton#edit_backButton:hover{
                      <widget class="QWidget" name="edit_icon" native="true">
                       <property name="geometry">
                        <rect>
-                        <x>130</x>
+                        <x>120</x>
                         <y>10</y>
                         <width>80</width>
                         <height>80</height>
@@ -1740,6 +1740,9 @@ background-color:#68DFBB;
                    </item>
                    <item>
                     <widget class="QLineEdit" name="edit_oldpsw_line">
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
                      <property name="echoMode">
                       <enum>QLineEdit::Password</enum>
                      </property>

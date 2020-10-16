@@ -213,11 +213,6 @@ void stacked::on_form_regButton_clicked() {
 // type_request=="QUERY_ERROR"    LOGIN_ERROR
 // || type_request=="CONNESSION_ERROR" || SIGNUP_ERROR_DUPLICATE_USERNAME || SIGNUP_ERROR_INSERT_FAILED)
 
-/*
- * TO DO:
- *  verifica client_->getFileName/setFileName
- *
- * */
 void stacked::showPopupSuccess(QString result) {
     QDialog *dialog = new QDialog();
     dialog->setWindowTitle(QString::fromUtf8(" Shared Editor "));
@@ -292,30 +287,15 @@ void stacked::showPopupSuccess(QString result) {
             layout->addWidget(new QLabel("Delete file error"));
         } else if (result == "error_file_in_use") {
             layout->addWidget(new QLabel("File in use, rename failed"));
-        } else if (result == "email_update_success") {
+        } else if (result == "wrong_old_password"){
+            layout->addWidget(new QLabel("Wrong old password!"));
+        }else if (result == "edit_success"){
+            up->updateInfo();
             ui->stackedWidget->setCurrentIndex(4);
-            layout->addWidget(new QLabel("Mail correctly updates"));
-        } else if (result == "user_update_success") {
+            layout->addWidget(new QLabel("Profile updated!"));
+        }else if (result == "edit_failed") {
             ui->stackedWidget->setCurrentIndex(4);
-            layout->addWidget(new QLabel("User correctly updates"));
-        } else if (result == "password_update_success") {
-            ui->stackedWidget->setCurrentIndex(4);
-            layout->addWidget(new QLabel("Password correctly updates"));
-        } else if (result == "user_email_update_success") {
-            ui->stackedWidget->setCurrentIndex(4);
-            layout->addWidget(new QLabel("User and mail correctly update"));
-        } else if (result == "password_email_update_success") {
-            ui->stackedWidget->setCurrentIndex(4);
-            layout->addWidget(new QLabel("Password and mail correctly update"));
-        } else if (result == "password_user_update_success") {
-            ui->stackedWidget->setCurrentIndex(4);
-            layout->addWidget(new QLabel("Password and user correctly update"));
-        } else if (result == "profile_update_success") {
-            ui->stackedWidget->setCurrentIndex(4);
-            layout->addWidget(new QLabel("Profile correctly update"));
-        } else if (result == "profile_update_failed") {
-            ui->stackedWidget->setCurrentIndex(4);
-            layout->addWidget(new QLabel("Error in update profile"));
+            layout->addWidget(new QLabel("Error in update profile."));
         }
 
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
@@ -331,110 +311,6 @@ void stacked::on_reglogButton_clicked() {
     ui->stackedWidget->setCurrentIndex(1);
 
 }
-/*
-void stacked::on_fileButton_clicked(){
-
-    ui->stackedWidget->setCurrentIndex(3);
-}*/
-/*
-void stacked::on_newFileButton_clicked(){
-
-    QInputDialog modalWindow;
-    QString label = "File name: ";
-    modalWindow.setLabelText(label);
-    modalWindow.setWindowTitle("New FIle");
-    modalWindow.setMinimumSize(QSize(300, 150));
-    modalWindow.setSizePolicy(QSizePolicy::MinimumExpanding,
-                              QSizePolicy::MinimumExpanding);
-    modalWindow.setCancelButtonText("cancel");
-    modalWindow.setOkButtonText("create");
-
-    if ( modalWindow.exec() == 1)
-    {
-
-        while (modalWindow.textValue() == ""){
-
-            QDialog *dialog = new QDialog();
-            QVBoxLayout *layout = new QVBoxLayout();
-            dialog->setLayout(layout);
-            layout->addWidget(new QLabel("Insert a name for the new file"));
-            QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-            layout->addWidget(buttonBox);
-
-            connect(buttonBox,&QDialogButtonBox::accepted,dialog,&QDialog::accept);
-
-            dialog->exec();
-
-            if(modalWindow.exec()==0)
-                break;
-
-        }
-        //controllo valdità formato nome file
-        while( modalWindow.textValue().toStdString().find_first_of('\\')!=std::string::npos ||
-               modalWindow.textValue().toStdString().find_first_of('/')!=std::string::npos ||
-               modalWindow.textValue().toStdString().find_first_of(':')!=std::string::npos ||
-               modalWindow.textValue().toStdString().find_first_of('*')!=std::string::npos ||
-               modalWindow.textValue().toStdString().find_first_of('?')!=std::string::npos ||
-               modalWindow.textValue().toStdString().find_first_of('"')!=std::string::npos ||
-               modalWindow.textValue().toStdString().find_first_of('<')!=std::string::npos ||
-               modalWindow.textValue().toStdString().find_first_of('>')!=std::string::npos ||
-               modalWindow.textValue().toStdString().find_first_of('|')!=std::string::npos
-                ){
-            QDialog *dialog = new QDialog();
-            QVBoxLayout *layout = new QVBoxLayout();
-            dialog->setLayout(layout);
-            layout->addWidget(new QLabel("Error! characters \\,/,:,*,?,\",<,>,| are not allowed in a file's name"));
-            QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-            layout->addWidget(buttonBox);
-            connect(buttonBox,&QDialogButtonBox::accepted,dialog,&QDialog::accept);
-            dialog->exec();
-            if(modalWindow.exec()==0)
-                break;
-        }
-
-        while (modalWindow.textValue().length() > 100){
-
-            QDialog *dialog = new QDialog();
-            QVBoxLayout *layout = new QVBoxLayout();
-            dialog->setLayout(layout);
-            layout->addWidget(new QLabel("Error! The max length of a file's name is 100 characters"));
-            QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-            layout->addWidget(buttonBox);
-            connect(buttonBox,&QDialogButtonBox::accepted,dialog,&QDialog::accept);
-            dialog->exec();
-            if(modalWindow.exec()==0)
-                break;
-        }
-
-        //invio al server la richiesta per creare un nuovo file
-        try {
-            json j = json{
-                    {"operation","request_new_file"},
-                    {"name",modalWindow.textValue().toStdString()},
-                    {"username",client_->getUser().toStdString()}
-            };
-
-              //PRENDI I DATI E INVIA A SERVER
-
-            std::string mess = j.dump().c_str();
-            message msg;
-            msg.body_length(mess.size());
-            std::memcpy(msg.body(), mess.data(), msg.body_length());
-            msg.body()[msg.body_length()] = '\0';
-            msg.encode_header();
-            std::cout <<"Richiesta da inviare al server "<< msg.body() << std::endl;
-            sendmessage(msg);
-
-        } catch (std::exception& e) {
-            std::cerr << "Exception: " << e.what() << "\n";
-        }
-
-        QString testo = modalWindow.textValue();
-        std::cout << "CLICK SUL PULSANTE CREATE " << testo.toStdString() ;
-    }
-    //modalWindow.exec();
-    //ui->stackedWidget->setCurrentIndex(3);
-}*/
 void stacked::on_form_cancButton_clicked() {
     ui->psw_log_line->clear();
     ui->stackedWidget->setCurrentIndex(0);
@@ -502,7 +378,13 @@ void stacked::editPage() {
     ui->edit_email_line->setText(client_->getEmail());
     ui->edit_user_label->setText(client_->getUser());
     ui->edit_icon->setStyleSheet(QString::fromUtf8("background-color:") + client_->getColor());
+    ui->edit_oldpsw_line->clear();
+    ui->edit_oldpsw_line->setStyleSheet("");
+    ui->edit_newpsw_line->clear();
+    ui->edit_confnewpsw_line->clear();
+    ui->edit_oldpsw_line->setFocus();
     ui->stackedWidget->setCurrentIndex(2);
+
 }
 
 void stacked::on_edit_backButton_clicked() {
@@ -531,23 +413,36 @@ void stacked::on_edit_saveButton_clicked() {
     QString newPsw2 = ui->edit_confnewpsw_line->text();
     QString pswChecked, emailChecked, newColor;
 
+    if(oldPsw.isEmpty()){
+         QMessageBox::warning(this,tr(" Shared Editor"),tr("Insert old password to validate changes."));
+         ui->edit_oldpsw_line->setStyleSheet(QString::fromUtf8("QLineEdit#edit_oldpsw_line{\n"
+                                                               "border-radius: 3px;\n"
+                                                               "border-style: solid;\n"
+                                                               "border-width: 1px;\n"
+                                                               "border-color: red}"));
+         return;
+    }
+
     if (!newPsw1.isEmpty() && !newPsw2.isEmpty()) {
         if (!psw_regex.match(newPsw1).hasMatch()) {
             // check password
             QDialog *dialog = new QDialog();
+            dialog->setWindowTitle("Shared Editor");
             QVBoxLayout *layout = new QVBoxLayout();
             dialog->setLayout(layout);
-            layout->addWidget(new QLabel("Password must be at least 8 characters long "
-                                         "and include at least one upper case letter, "
-                                         "a number and a special character"));
+            layout->addWidget(new QLabel("Password must be at least 8 characters long \n"
+                                         "and include at least one upper case letter, \n"
+                                         "a number and a special character."));
             QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
             layout->addWidget(buttonBox);
 
             connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
 
             dialog->show();
+            return;
         } else if (!(newPsw1 == newPsw2)) {
             QDialog *dialog = new QDialog();
+            dialog->setWindowTitle("Shared Editor");
             QVBoxLayout *layout = new QVBoxLayout();
             dialog->setLayout(layout);
             layout->addWidget(new QLabel("Non matching new passwords!"));
@@ -557,6 +452,7 @@ void stacked::on_edit_saveButton_clicked() {
             connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
 
             dialog->show();
+            return;
         }
         pswChecked = QString::fromStdString(md5(newPsw1.toStdString()));
     } else {
@@ -566,17 +462,19 @@ void stacked::on_edit_saveButton_clicked() {
         //controllo formato mail
         if (!email_regex.match(email).hasMatch()) {
             QDialog *dialog = new QDialog();
+            dialog->setWindowTitle("Shared Editor");
             QVBoxLayout *layout = new QVBoxLayout();
             dialog->setLayout(layout);
-            layout->addWidget(new QLabel("Wrong email format"));
+            layout->addWidget(new QLabel("Wrong email format."));
             QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
             layout->addWidget(buttonBox);
 
             connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
 
             dialog->show();
+            return;
         }
-        emailChecked = email;client_->getColor();
+        emailChecked = email;
     } else {
         emailChecked = "";
     }

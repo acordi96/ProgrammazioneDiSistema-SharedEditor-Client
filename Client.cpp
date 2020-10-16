@@ -282,70 +282,21 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::string username = js.at("username").get<std::string>();
         int pos = js.at("pos").get<int>();
         emit updateRemotePosition(QString::fromStdString(username), pos);
-    } else if ( type_request == "EMAIL_UPDATE_SUCCESS"){
-        std::string email = js.at("email").get<std::string>();
-        QString qEmail = QString::fromUtf8(email.data(), email.size());
-        this->setEmail(qEmail);
-        QString res = QString::fromUtf8("email_update_success");
+    } else if(type_request == "WRONG_OLD_PASSWORD"){
+        QString res = QString::fromUtf8("wrong_old_password");
         emit formResultSuccess(res);
-    }  else if ( type_request == "USER_UPDATE_SUCCESS"){
-        QString oldUser = this->getUser();
-        std::string username = js.at("username").get<std::string>();
-        QString qUser = QString::fromUtf8(username.data(), username.size());
-        this->setUser(qUser);
-        QString res = QString::fromUtf8("user_update_success");
-        emit formResultSuccess(res);
+    } else if (type_request == "EDIT_SUCCESS"){
+        QString res = QString::fromUtf8("edit_success");
+        QString newEmail = QString::fromStdString(js.at("email").get<std::string>());
+        QString newColor = QString::fromStdString(js.at("color").get<std::string>());
 
-        //TO DO aggiornare interfacia grafica con nuovo nome
-        emit updateUser(oldUser,qUser);
-    }  else if ( type_request == "PASSWORD_UPDATE_SUCCESS"){
-        QString res = QString::fromUtf8("password_update_success");
-        emit formResultSuccess(res);
-    }  else if ( type_request == "USER_EMAIL_UPDATE_SUCCESS"){
-        QString oldUser = this->getUser();
-        std::string email = js.at("email").get<std::string>();
-        QString qEmail = QString::fromUtf8(email.data(), email.size());
-        this->setEmail(qEmail);
-        std::string username = js.at("username").get<std::string>();
-        QString qUser = QString::fromUtf8(username.data(), username.size());
-        this->setUser(qUser);
-        QString res = QString::fromUtf8("user_email_update_success");
-        emit formResultSuccess(res);
+        if(!newEmail.isEmpty()) this->setEmail(newEmail);
+        if(!newColor.isEmpty()) this->setColor(newColor);
 
-        //TO DO aggiornare interfacia grafica con nuovo nome
-        emit updateUser(oldUser,qUser);
-    }  else if ( type_request == "PASSWORD_EMAIL_UPDATE_SUCCESS"){
-        std::string email = js.at("email").get<std::string>();
-        QString qEmail = QString::fromUtf8(email.data(), email.size());
-        this->setEmail(qEmail);
-        QString res = QString::fromUtf8("password_email_update_success");
         emit formResultSuccess(res);
-    }  else if ( type_request == "PASSWORD_USER_UPDATE_SUCCESS"){
-        QString oldUser = this->getUser();
-        std::string username = js.at("username").get<std::string>();
-        QString qUser = QString::fromUtf8(username.data(), username.size());
-        this->setUser(qUser);
-        QString res = QString::fromUtf8("password_user_update_success");
-        emit formResultSuccess(res);
+    }  else if (type_request == "EDIT_FAILED"){
 
-        //TO DO aggiornare interfacia grafica con nuovo nome
-        emit updateUser(oldUser,qUser);
-    }  else if ( type_request == "PROFILE_UPDATE_SUCCESS"){
-        QString oldUser = this->getUser();
-        std::string username = js.at("username").get<std::string>();
-        QString qUser = QString::fromUtf8(username.data(), username.size());
-        this->setUser(qUser);
-        std::string email = js.at("email").get<std::string>();
-        QString qEmail = QString::fromUtf8(email.data(), email.size());
-        this->setEmail(qEmail);
-        QString res = QString::fromUtf8("profile_update_success");
-        emit formResultSuccess(res);
-
-        //TO DO aggiornare interfacia grafica con nuovo nome
-        emit updateUser(oldUser,qUser);
-    } else if (type_request == "PROFILE_UPDATE_FAILED"){
-
-        QString res = QString::fromUtf8("update_failed");
+        QString res = QString::fromUtf8("edit_failed");
         emit formResultSuccess(res);
     }
     return type_request;
