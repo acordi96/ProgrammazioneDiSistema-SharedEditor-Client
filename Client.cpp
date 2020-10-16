@@ -300,41 +300,35 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         int endIndex = crdtToChange.back().front(); //posizione finale
         int j=0;
         for(int i= startIndex; i < endIndex+1; i++) {
-            std::string username = usernameToChange[j];
-            j++;
-            auto it = std::find_if(symbols.begin(), symbols.end(), [i, username](Symbol& s) {return s.getPosizione().front() == i && s.getUsername()==username;});
-            if (it != symbols.end()) {
-                int index = it - symbols.begin();
-                Style style = symbols.at(index).getSymbolStyle();
+            Style style = symbols[i].getSymbolStyle();
+            if (js.contains("fontFamily")) {
+                std::string fontFamily = js.at("fontFamily").get<std::string>();
+                style.setFontFamily(fontFamily);
 
-                if (js.contains("fontFamily")) {
-                    std::string fontFamily = js.at("fontFamily").get<std::string>();
-                    style.setFontFamily(fontFamily);
-
-                }
-                if (js.contains("fontSize")) {
-                    bool fontSize = js.at("fontSize").get<bool>();
-                    style.setFontSize(fontSize);
-
-                }
-                if (js.contains("bold")) {
-                    bool bold = js.at("bold").get<bool>();
-                    style.setBold(bold);
-
-                }
-                if (js.contains("underlined")) {
-                    bool underlined = js.at("underlined").get<bool>();
-                    style.setBold(underlined);
-
-                }
-                if (js.contains("italic")) {
-                    bool italic = js.at("italic").get<bool>();
-                    style.setBold(italic);
-                }
-
-                emit changeStyle(index, index+1, style);
             }
+            if (js.contains("fontSize")) {
+                bool fontSize = js.at("fontSize").get<bool>();
+                style.setFontSize(fontSize);
+
+            }
+            if (js.contains("bold")) {
+                bool bold = js.at("bold").get<bool>();
+                style.setBold(bold);
+
+            }
+            if (js.contains("underlined")) {
+                bool underlined = js.at("underlined").get<bool>();
+                style.setBold(underlined);
+
+            }
+            if (js.contains("italic")) {
+                bool italic = js.at("italic").get<bool>();
+                style.setBold(italic);
+            }
+
+            emit changeStyle(i, i+1, style);
         }
+
     }
     //TO DO: prendere le risposte dal server e fare l'emit
     return type_request;

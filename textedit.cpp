@@ -1127,6 +1127,20 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                 else if (key_ev->text().toStdString().c_str()[0] == 22) {
                     QClipboard *clipboard = QGuiApplication::clipboard();
                     QString pastedText = clipboard->text();
+                    //TO DO VEDERE SE FUNZIONA
+                    textEdit->setFontWeight(QFont::Normal);
+                    textEdit->setFontItalic(false);
+                    textEdit->setFontUnderline(false);
+                    textEdit->setFontPointSize(8);
+                    textEdit->setFontFamily("Helvetica");
+                    QTextCharFormat form;
+                    form.setFontWeight(QFont::Normal);
+                    form.setFontItalic(false);
+                    form.setFontUnderline(false);
+                    form.setFontPointSize(8);
+                    form.setFontFamily("Helvetica");
+                    cursor.setCharFormat(form);
+                    textEdit->setTextCursor(cursor);
 
                     std::vector<std::string> usernameToInsert;
                     std::vector<char> charToInsert;
