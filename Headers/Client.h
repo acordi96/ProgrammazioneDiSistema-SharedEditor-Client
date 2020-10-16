@@ -91,6 +91,8 @@ signals:
 
     void updateFile(QString old, QString newN, QString owner, QString request);
 
+    void updateUser(QString old, QString newN);
+
     void insertSymbol(int pos, QChar c);
 
     void insertSymbolWithId(Symbol symbolToInsert);

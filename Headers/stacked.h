@@ -2,6 +2,7 @@
 #define STACKED_H
 
 #include <QMainWindow>
+#include <QColorDialog>
 #include "Headers/textedit.h"
 #include "Headers/userpage.h"
 #include "Headers/Client.h"
@@ -31,16 +32,22 @@ private slots:
    void on_reglogButton_clicked();
    void on_form_cancButton_clicked();
    void on_psw_log_line_returnPressed();
+   void on_edit_backButton_clicked();
+   void on_colorPicker_clicked();
+   void on_edit_saveButton_clicked();
    //void on_fileButton_clicked();
    //void on_newFileButton_clicked();
    void logout();
    void closeAll();
    void closeFile();
+   void editPage();
 /*signals:
     void updateRecentFiles();*/
 private:
    Userpage *up;
    TextEdit *te;
+
+   QColorDialog *colorDialog;
 };
 
 #endif // STACKED_H

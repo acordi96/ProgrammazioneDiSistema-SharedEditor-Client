@@ -43,6 +43,7 @@ Userpage::Userpage(QWidget *parent,Client *c):
 
     setCentralWidget(page);
     QObject::connect(client_, &Client::updateFile, this, &Userpage::updateRecentFiles);
+    QObject::connect(client_, &Client::updateUser, this, &Userpage::updateUserFile);
     //QObject::connect(page, &stacked::updateRecentFiles, this, &Userpage::updateFiles);
 }
 
@@ -70,7 +71,7 @@ void Userpage::setupUserinfo(){
     QHBoxLayout *hrzLayout3 = new QHBoxLayout();
     hrzLayout3->setObjectName(QString::fromUtf8("hrzLayout3"));
     hrzLayout3->setSpacing(1);
-
+/***********************************TITLE & ICON *********************************************************/
     QWidget *user_image = new QWidget(userinfo);
     user_image->setStyleSheet(QString::fromUtf8("image: url(")+rsrcPath+QString::fromUtf8("/user.png);"));
     hrzLayout3->addWidget(user_image);
@@ -87,12 +88,11 @@ void Userpage::setupUserinfo(){
 
     userVLayout3->addLayout(hrzLayout3);
 
-    QSpacerItem *vSpacer = new QSpacerItem(20,40,QSizePolicy::Minimum,QSizePolicy::Fixed);
+    QSpacerItem *vSpacer = new QSpacerItem(20,20,QSizePolicy::Minimum,QSizePolicy::Fixed);
     userVLayout3->addItem(vSpacer);
-
-    //icon
-    QHBoxLayout *icon_userLayout = new QHBoxLayout();
-    icon_userLayout->setSpacing(0);
+/************************************** ICON ***********************************************/
+//    QHBoxLayout *icon_userLayout = new QHBoxLayout();
+//    icon_userLayout->setSpacing(0);
 
     QHBoxLayout *iconLayout = new QHBoxLayout();
     iconLayout->setObjectName(QString::fromUtf8("iconSpace"));
@@ -101,13 +101,13 @@ void Userpage::setupUserinfo(){
 
     myIcon = new QWidget(iconSpace);
     myIcon->setObjectName(QString::fromUtf8("myIcon"));
-    myIcon->setGeometry(QRect(10,10,100,100));
+    myIcon->setGeometry(QRect(-10,10,100,100));
     myIcon->setStyleSheet(QString::fromUtf8("background-color:")+client_->getColor());
 
     QLabel *usrLetters = new QLabel(client_->getUser()[0].toUpper(),myIcon);
     usrLetters->setObjectName(QString::fromUtf8("usrLetters"));
     usrLetters->setStyleSheet("font: 15pt \"Sawasdee Bold\"");
-    usrLetters->setGeometry(5,5,80,80);
+    usrLetters->setGeometry(QRect(15,0,80,80));
 
     if(colorIsDark(client_->getColor())){
        usrLetters->setStyleSheet(QString::fromUtf8("color:rgb(243,243,243);font:36pt \"Sawasdee\";"));
@@ -116,21 +116,63 @@ void Userpage::setupUserinfo(){
        usrLetters->setStyleSheet(QString::fromUtf8("color:rgb(0,0,0);font:36pt \"Sawasdee\";"));
     }
 
-    usrLetters->setAlignment(Qt::AlignHCenter);
+    usrLetters->setAlignment(Qt::AlignCenter);
 
-    QSpacerItem *iconSpacer = new QSpacerItem(80,20,QSizePolicy::Fixed,QSizePolicy::Minimum);
+    QSpacerItem *iconSpacer = new QSpacerItem(120,20,QSizePolicy::Fixed,QSizePolicy::Minimum);
     iconLayout->addItem(iconSpacer);
 
     iconLayout->addWidget(iconSpace);
-    QSpacerItem *iconSpacer2 = new QSpacerItem(120,20,QSizePolicy::Fixed,QSizePolicy::Minimum);
+    QSpacerItem *iconSpacer2 = new QSpacerItem(90,20,QSizePolicy::Fixed,QSizePolicy::Minimum);
     iconLayout->addItem(iconSpacer2);
 
     userVLayout3->addLayout(iconLayout);
+/**************************************EDIT BUTTON********************************************************/
+    QSpacerItem *editVSpacer = new QSpacerItem(20,1,QSizePolicy::Fixed,QSizePolicy::Fixed);
+    userVLayout3->addItem(editVSpacer);
 
-    QSpacerItem *iconVSpacer2 = new QSpacerItem(20,40,QSizePolicy::Minimum,QSizePolicy::Fixed);
+    QHBoxLayout *editLayout = new QHBoxLayout();
+    editLayout->setObjectName(QString::fromUtf8("editLayout"));
+
+    QSpacerItem *editSpacer = new QSpacerItem(100,20,QSizePolicy::MinimumExpanding,QSizePolicy::Minimum);
+    editLayout->addItem(editSpacer);
+
+    QPushButton *goEdit = new QPushButton("Edit Profile",userinfo);
+    goEdit->setObjectName(QString::fromUtf8("editProfile"));
+    goEdit->setStyleSheet(QString::fromUtf8("QPushButton#editProfile{\n"
+                                            "background-color:#84ACD7;\n"
+                                            "border:1px;\n"
+                                            "border-radius:5px;\n"
+                                            "color:#FFFFFF;\n"
+                                            "font: 75 14pt \"Sawasdee Bold\";\n"
+                                            "}\n"
+                                            "QPushButton#editProfile:hover{\n"
+                                            "background-color:#68DFBB;\n"
+                                            "color:#FFFFFF;\n"
+                                            "border-radius:5px;\n"
+                                            "}"));
+
+    //add Icon
+    QIcon iconEdit;
+    iconEdit.addFile(rsrcPath+QString::fromUtf8("/edit.png"),QSize(),QIcon::Normal, QIcon::On);
+    goEdit->setIcon(iconEdit);
+    goEdit->setIconSize(QSize(16,16));
+    goEdit->setFlat(true);
+
+    connect(goEdit,&QPushButton::clicked,this,[=](){
+        emit this->goToEdit();
+    });
+    editLayout->addWidget(goEdit);
+
+    QSpacerItem *editSpacer2 = new QSpacerItem(100,20,QSizePolicy::MinimumExpanding,QSizePolicy::Minimum);
+    editLayout->addItem(editSpacer2);
+
+    userVLayout3->addLayout(editLayout);
+/**************************************** USER&EMAIL LABELS  ********************************************/
+    QSpacerItem *iconVSpacer2 = new QSpacerItem(20,20,QSizePolicy::Minimum,QSizePolicy::Fixed);
     userVLayout3->addItem(iconVSpacer2);
 
     QVBoxLayout *labelsLayout = new QVBoxLayout();
+    labelsLayout->setSpacing(1);
 
     QLabel *usernameLabel = new QLabel(client_->getUser(),userinfo);
     usernameLabel->setObjectName(QString::fromUtf8("usernameButton"));
@@ -144,16 +186,16 @@ void Userpage::setupUserinfo(){
     email_lab->setAlignment(Qt::AlignLeading|Qt::AlignCenter|Qt::AlignVCenter);
     labelsLayout->addWidget(email_lab);
 
-    icon_userLayout->addLayout(labelsLayout);
+   //icon_userLayout->addLayout(labelsLayout);
 
     QSpacerItem *vSpacer5 = new QSpacerItem(20,20,QSizePolicy::Minimum,QSizePolicy::Fixed);
     userVLayout3->addItem(vSpacer5);
 
-    userVLayout3->addLayout(icon_userLayout);
+    userVLayout3->addLayout(labelsLayout);
 
     QSpacerItem *vSpacer2 = new QSpacerItem(20,20,QSizePolicy::Minimum,QSizePolicy::Fixed);
     userVLayout3->addItem(vSpacer2);
-
+/************************************ NEW FILE BUTTON **********************************************/
     QHBoxLayout *newFBtnLayout = new QHBoxLayout();
     QSpacerItem *hSpacer = new QSpacerItem(100,20,QSizePolicy::MinimumExpanding,QSizePolicy::Minimum);
     newFBtnLayout->addItem(hSpacer);
@@ -190,7 +232,7 @@ void Userpage::setupUserinfo(){
 
     QSpacerItem *vSpacer3 = new QSpacerItem(20,60,QSizePolicy::Minimum,QSizePolicy::Fixed);
     userVLayout3->addItem(vSpacer3);
-
+/*************************************** URL INVITATION ************************************************/
     QHBoxLayout *urlLayout = new QHBoxLayout();
 
     lineURL=new QLineEdit(userinfo);
@@ -207,7 +249,7 @@ void Userpage::setupUserinfo(){
                                                    "border:1px;\n"
                                                    "border-radius:5px;\n"
                                                    "color:#FFFFFF;\n"
-                                                   "font: 75 16pt \"Sawasdee Bold\";\n"
+                                                   "font: 75 14pt \"Sawasdee Bold\";\n"
                                                    "}\n"
                                                    "QPushButton#openURLbutton:hover{\n"
                                                     "background-color:#68DFBB;\n"
@@ -265,6 +307,7 @@ void Userpage::setupRecentFiles(){
 
     QPushButton *upLogoutButton = new QPushButton(recent);
     upLogoutButton->setObjectName(QString::fromUtf8("upLogoutButton"));
+    upLogoutButton->setToolTip(QString::fromUtf8("Logout"));
     upLogoutButton->setStyleSheet(QString::fromUtf8("QPushButton#upLogoutButton:hover{\n"
                                                     "background-color:#E6E7E8;\n"
                                                     "border:1px;\n"
@@ -302,7 +345,7 @@ void Userpage::setupRecentFiles(){
     verticalLayout->setObjectName("verticalLayout");
     QLabel *title = new QLabel(QString::fromUtf8("author    title"),recent);
     title->setGeometry(QRect(10,35,281,20));
-    title->setStyleSheet(QString::fromUtf8("font: 12pt \"Sawasdee Bold\";"));
+    title->setStyleSheet(QString::fromUtf8("font: 14pt \"Sawasdee Bold\";"));
     title->setAlignment(Qt::AlignCenter);
 
     vLayout3->addWidget(title);
@@ -318,7 +361,7 @@ void Userpage::setupRecentFiles(){
                                                  "border-radius:5px;\n"
                                                  "color:#FFFFFF;\n"
                                                  "background-color:#84ACD7;\n"
-                                                 "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                 "font: 75 14pt \"Sawasdee Bold\";\n"
                                                  "}"));
 
          button->setFlat(true);
@@ -357,7 +400,7 @@ void Userpage::setupRecentFiles(){
                                                 "border:1px;\n"
                                                 "border-radius:5px;\n"
                                                 "color:#FFFFFF;\n"
-                                                "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                "font: 75 14pt \"Sawasdee Bold\";\n"
                                                 "}\n"
                                                 "QPushButton#openButton:hover{\n"
                                                 "background-color:#68DFBB;\n"
@@ -376,7 +419,7 @@ void Userpage::setupRecentFiles(){
                                                   "border:1px;\n"
                                                   "border-radius:5px;\n"
                                                   "color:#FFFFFF;\n"
-                                                  "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                  "font: 75 14pt \"Sawasdee Bold\";\n"
                                                   "}\n"
                                                   "QPushButton#renameButton:hover{\n"
                                                   "background-color:#68DFBB;\n"
@@ -395,7 +438,7 @@ void Userpage::setupRecentFiles(){
                                                   "border:1px;\n"
                                                   "border-radius:5px;\n"
                                                   "color:#FFFFFF;\n"
-                                                  "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                  "font: 75 14pt \"Sawasdee Bold\";\n"
                                                   "}\n"
                                                   "QPushButton#deleteButton:hover{\n"
                                                   "background-color:#68DFBB;\n"
@@ -416,7 +459,7 @@ void Userpage::setupRecentFiles(){
                                                   "border:1px;\n"
                                                   "border-radius:5px;\n"
                                                   "color:#FFFFFF;\n"
-                                                  "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                  "font: 75 14pt \"Sawasdee Bold\";\n"
                                                   "}\n"
                                                   "QPushButton#inviteButton:hover{\n"
                                                   "background-color:#68DFBB;\n"
@@ -606,7 +649,7 @@ void Userpage::on_fileName_clicked(int i){
                                                   "border:1px;\n"
                                                   "border-radius:5px;\n"
                                                   "color:#FFFFFF;\n"
-                                                  "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                  "font: 75 14pt \"Sawasdee Bold\";\n"
                                                 "}"));
         if(selectedFile == s) {
             selectedFile = "";
@@ -620,7 +663,7 @@ void Userpage::on_fileName_clicked(int i){
                                        "border-radius:5px;\n"
                                        "background-color:#C97064;\n"
                                        "color:#FFFFFF;\n"
-                                       "font: 75 12pt \"Sawasdee Bold\";\n"
+                                       "font: 75 14pt \"Sawasdee Bold\";\n"
                                        "}"));
 
 }
@@ -662,7 +705,7 @@ void Userpage::on_openButton_clicked(){
                                                   "border:1px;\n"
                                                   "border-radius:5px;\n"
                                                   "color:#FFFFFF;\n"
-                                                  "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                  "font: 75 14pt \"Sawasdee Bold\";\n"
                                                 "}"));
 
         selectedFile = "";
@@ -700,7 +743,7 @@ void Userpage::on_renameButton_clicked() {
                                                   "border:1px;\n"
                                                   "border-radius:5px;\n"
                                                   "color:#FFFFFF;\n"
-                                                  "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                  "font: 75 14pt \"Sawasdee Bold\";\n"
                                                   "}"));
     }else {
 
@@ -797,7 +840,7 @@ void Userpage::on_renameButton_clicked() {
                                                           "border:1px;\n"
                                                           "border-radius:5px;\n"
                                                           "color:#FFFFFF;\n"
-                                                          "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                          "font: 75 14pt \"Sawasdee Bold\";\n"
                                                           "}"));
                 selectedFile = "";
 
@@ -839,7 +882,7 @@ void Userpage::on_deleteButton_clicked() {
                                                       "border:1px;\n"
                                                       "border-radius:5px;\n"
                                                       "color:#FFFFFF;\n"
-                                                      "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                      "font: 75 14pt \"Sawasdee Bold\";\n"
                                                       "}"));
             selectedFile = "";
             return;
@@ -886,7 +929,7 @@ void Userpage::on_deleteButton_clicked() {
                                                       "border:1px;\n"
                                                       "border-radius:5px;\n"
                                                       "color:#FFFFFF;\n"
-                                                      "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                      "font: 75 14pt \"Sawasdee Bold\";\n"
                                                       "}"));
             selectedFile = "";
             return;
@@ -940,7 +983,7 @@ void Userpage::updateRecentFiles(QString old, QString newN, QString owner, QStri
                                                 "border:1px;\n"
                                                 "border-radius:5px;\n"
                                                 "color:#FFFFFF;\n"
-                                                "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                "font: 75 14pt \"Sawasdee Bold\";\n"
                                                 "}"));
         button->setFlat(true);
         page->findChild<QVBoxLayout *>("verticalLayout")->addWidget(button);
@@ -965,7 +1008,7 @@ void Userpage::updateRecentFiles(QString old, QString newN, QString owner, QStri
                                                 "border:1px;\n"
                                                 "border-radius:5px;\n"
                                                 "color:#FFFFFF;\n"
-                                                "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                "font: 75 14pt \"Sawasdee Bold\";\n"
                                                 "}"));
         button->setFlat(true);
         page->findChild<QVBoxLayout *>("verticalLayout")->addWidget(button);
@@ -1034,7 +1077,7 @@ void Userpage::on_inviteButton_clicked() {
                                                   "border:1px;\n"
                                                   "border-radius:5px;\n"
                                                   "color:#FFFFFF;\n"
-                                                  "font: 75 12pt \"Sawasdee Bold\";\n"
+                                                  "font: 75 14pt \"Sawasdee Bold\";\n"
                                                   "}"));
 
         return;
@@ -1056,7 +1099,7 @@ void Userpage::on_inviteButton_clicked() {
                                               "border:1px;\n"
                                               "border-radius:5px;\n"
                                               "color:#FFFFFF;\n"
-                                              "font: 75 12pt \"Sawasdee Bold\";\n"
+                                              "font: 75 14pt \"Sawasdee Bold\";\n"
                                               "}"));
 }
 
@@ -1094,4 +1137,8 @@ std::string Userpage::generateFileButton(const std::string& owner, const std::st
 
 void Userpage::clearLineURL(){
     lineURL->clear();
+}
+
+void Userpage::updateUserFile(QString old, QString newN) {
+    //aggiornare interfaccia grafica
 }

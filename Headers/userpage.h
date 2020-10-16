@@ -63,7 +63,7 @@ private slots:
 signals:
 
     void upLogout();
-
+    void goToEdit();
 public slots:
 
     //void customMenuRequested(QPoint pos);
@@ -78,6 +78,8 @@ public slots:
     void on_fileName_clicked(int i = 0);
 
     void updateRecentFiles(QString old, QString newN, QString owner, QString request);
+
+    void updateUserFile(QString old, QString newN);
 
     void handleOpenURLbutton();
 
