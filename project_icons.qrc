@@ -64,5 +64,7 @@
         <file>images/mac/edit.png</file>
         <file>images/win/color-picker.png</file>
         <file>images/mac/color-picker.png</file>
+        <file>images/win/hourglass.png</file>
+        <file>images/mac/hourglass.png</file>
     </qresource>
 </RCC>

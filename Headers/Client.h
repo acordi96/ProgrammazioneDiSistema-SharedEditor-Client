@@ -105,6 +105,8 @@ signals:
 
     void clearEditor();
 
+    void loading(bool active);
+
 private:
     void do_connect();
 

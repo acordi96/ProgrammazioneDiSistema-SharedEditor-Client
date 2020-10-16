@@ -10,6 +10,13 @@
 #include "Libs/md5.h"
 #include <QDesktopWidget>
 #include <QDebug>
+#include <QMessageBox>
+
+#ifdef Q_OS_MACOS
+const QString rsrcPath = ":/images/mac";
+#else
+const QString rsrcPath = ":/images/win";
+#endif
 
 using json = nlohmann::json;
 using boost::asio::ip::tcp;
@@ -223,7 +230,8 @@ void stacked::showPopupSuccess(QString result) {
         connect(te,&TextEdit::closeFile,this,&stacked::closeFile);
         connect(te,&TextEdit::closeAll,this,&stacked::closeAll);
         connect(up,&Userpage::goToEdit,this,&stacked::editPage);
-
+        connect(client_,&Client::loading,this,&stacked::showLoading);
+        //connect(te,&TextEdit::loading,this,&stacked::showLoading);
         //ui->setupUi(this);
 //        ui->stackedWidget->addWidget(te);
 //        ui->stackedWidget->addWidget(up);
@@ -454,6 +462,37 @@ void stacked::closeAll() {
 
 void stacked::on_psw_log_line_returnPressed() {
     on_loginButton_clicked();
+}
+void stacked::showLoading(bool active){
+
+    if(active){
+        loadLabel=new QWidget();
+        layout = new QHBoxLayout();
+
+        //QHBoxLayout *layout = new QHBoxLayout();
+        layout->setSpacing(12);
+
+        hourglass = new QWidget(loadLabel);
+        hourglass->setStyleSheet(QString::fromUtf8("image:url(")+rsrcPath+QString::fromUtf8("/hourglass.png);"));
+        layout->addWidget(hourglass);
+
+        label = new QLabel("Loading...",loadLabel);
+        //label->setText("Loading...");
+        label->setAlignment(Qt::AlignCenter);
+        layout->addWidget(label);
+
+        loadLabel->setWindowTitle("Shared Editor");
+        loadLabel->setFixedSize(QSize(150,50));
+        loadLabel->move(this->width()/2,this->height()/2);
+        loadLabel->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+
+        loadLabel->setLayout(layout);
+        loadLabel->show();
+    }else{
+        loadLabel->close();
+        delete loadLabel;
+    }
+
 }
 
 void stacked::editPage(){

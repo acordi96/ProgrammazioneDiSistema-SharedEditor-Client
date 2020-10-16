@@ -184,6 +184,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         //prima parte di file deve pulire il testo
         if (this->writing == 0) {
             emit clearEditor();
+            emit loading(true);
         }
         std::vector<int> usernameToInsert = js.at("usernameToInsert").get<std::vector<int>>();
         std::vector<wchar_t> charToInsert = js.at("charToInsert").get<std::vector<wchar_t>>();
@@ -202,6 +203,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         }
         if (js.contains("endOpenFile")) {
             this->writing = 0;
+            emit loading(false);
             emit formResultSuccess(QString::fromStdString("file_opened"));
         } else {
             this->writing++;
