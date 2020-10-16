@@ -321,7 +321,7 @@ void stacked::logout() {
     ui->user_log_line->clear();
     ui->psw_log_line->clear();
     ui->user_log_line->setFocus();
-    client_->setFiles(std::map<std::pair<std::string, std::string>, std::string>());
+    client_->setFiles(std::map < std::pair < std::string, std::string > , std::string > ());
     ui->stackedWidget->removeWidget(te);
     ui->stackedWidget->removeWidget(up);
     ui->stackedWidget->setCurrentIndex(0);
@@ -423,7 +423,9 @@ void stacked::on_edit_saveButton_clicked() {
          return;
     }
 
-    if (!newPsw1.isEmpty() && !newPsw2.isEmpty()) {
+    if (newPsw1.isEmpty() && newPsw2.isEmpty()) {
+        pswChecked = "";
+    } else {
         if (!psw_regex.match(newPsw1).hasMatch()) {
             // check password
             QDialog *dialog = new QDialog();
@@ -453,10 +455,10 @@ void stacked::on_edit_saveButton_clicked() {
 
             dialog->show();
             return;
-        }
-        pswChecked = QString::fromStdString(md5(newPsw1.toStdString()));
-    } else {
-        pswChecked = "";
+        } else if (newPsw1 == oldPsw) {
+            pswChecked = "";
+        } else
+            pswChecked = QString::fromStdString(md5(newPsw1.toStdString()));
     }
     if (email != client_->getEmail()) {
         //controllo formato mail
@@ -478,10 +480,11 @@ void stacked::on_edit_saveButton_clicked() {
     } else {
         emailChecked = "";
     }
-    if(selectedColor != client_->getColor())
+    if (selectedColor != client_->getColor())
         newColor = selectedColor;
     else
         newColor = "";
+
     try {
         json j = json{
                 {"operation",   "request_update_profile"},
@@ -491,7 +494,6 @@ void stacked::on_edit_saveButton_clicked() {
                 {"newPassword", pswChecked.toStdString()},
                 {"newColor",    newColor.toStdString()}
         };
-        std::cout << "RICHIESTA: " << j.dump() << std::endl;
         client_->sendAtServer(j);
     } catch (std::exception &e) {
         std::cerr << "Exception :" << e.what() << "\n";
