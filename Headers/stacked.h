@@ -55,7 +55,8 @@ private:
    QLabel *label;
    QWidget *hourglass;
    QHBoxLayout *layout;
-    QColorDialog *colorDialog;
+   QColorDialog *colorDialog;
+   QString selectedColor="";
 };
 
 #endif // STACKED_H

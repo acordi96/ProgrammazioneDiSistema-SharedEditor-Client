@@ -231,7 +231,7 @@ void stacked::showPopupSuccess(QString result) {
         connect(te,&TextEdit::closeAll,this,&stacked::closeAll);
         connect(up,&Userpage::goToEdit,this,&stacked::editPage);
         connect(client_,&Client::loading,this,&stacked::showLoading);
-        //connect(te,&TextEdit::loading,this,&stacked::showLoading);
+
         //ui->setupUi(this);
 //        ui->stackedWidget->addWidget(te);
 //        ui->stackedWidget->addWidget(up);
@@ -497,7 +497,7 @@ void stacked::showLoading(bool active){
 
 void stacked::editPage(){
     ui->edit_email_line->setText(client_->getEmail());
-    ui->edit_user_line->setText(client_->getUser());
+    ui->edit_user_label->setText(client_->getUser());
     ui->edit_icon->setStyleSheet(QString::fromUtf8("background-color:")+client_->getColor());
     ui->stackedWidget->setCurrentIndex(2);
 }
@@ -512,7 +512,7 @@ void stacked::on_colorPicker_clicked(){
     colorDialog->show();
     QObject::connect(colorDialog,&QColorDialog::colorSelected,this,[=](){
         ui->edit_icon->setStyleSheet(QString::fromUtf8("background-color:")+colorDialog->selectedColor().name());
-        client_->setColor(colorDialog->selectedColor().name());
+        selectedColor=colorDialog->selectedColor().name();
     });
 }
 
@@ -522,11 +522,76 @@ void stacked::on_edit_saveButton_clicked(){
 
     QString email = ui->edit_email_line->text();
     QString user = ui->edit_user_line->text();
-    QString oldUser = client_->getUser();
+    //QString oldUser = client_->getUser();
     QString oldPsw = ui->edit_oldpsw_line->text();
     QString newPsw1 = ui->edit_newpsw_line->text();
     QString newPsw2 = ui->edit_confnewpsw_line->text();
+    QString pswChecked, emailChecked;
 
+    if(!oldPsw.isEmpty() && !newPsw1.isEmpty() && !newPsw2.isEmpty()){
+        if (!psw_regex.match(newPsw1).hasMatch()) {
+                // check password
+                QDialog *dialog = new QDialog();
+                QVBoxLayout *layout = new QVBoxLayout();
+                dialog->setLayout(layout);
+                layout->addWidget(new QLabel("Password must be at least 8 characters long "
+                                             "and include at least one upper case letter, "
+                                             "a number and a special character"));
+                QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+                layout->addWidget(buttonBox);
+
+                connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+
+                dialog->show();
+        }else if (!(newPsw1 == newPsw2)) {
+            QDialog *dialog = new QDialog();
+            QVBoxLayout *layout = new QVBoxLayout();
+            dialog->setLayout(layout);
+            layout->addWidget(new QLabel("Non matching password!"));
+            QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+            layout->addWidget(buttonBox);
+
+            connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+
+            dialog->show();
+        }
+        pswChecked=newPsw1;
+    }else{
+        pswChecked="";
+    }
+    if(!email.isEmpty()){
+
+        //controllo formato mail
+        if (!email_regex.match(email).hasMatch()) {
+            QDialog *dialog = new QDialog();
+            QVBoxLayout *layout = new QVBoxLayout();
+            dialog->setLayout(layout);
+            layout->addWidget(new QLabel("Wrong email format"));
+            QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+            layout->addWidget(buttonBox);
+
+            connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+
+            dialog->show();
+        }
+        emailChecked=email;
+    }else{
+        emailChecked="";
+    }
+    try {
+        json j =json{
+                    {"operation", "request_update_profile"},
+                    {"email",     emailChecked.toStdString()},
+                    {"username",  user.toStdString()},
+                    {"oldPassword",  md5(oldPsw.toUtf8().constData())},
+                    {"newPassword",  md5(pswChecked.toUtf8().constData())},
+                    {"newColor",selectedColor.toStdString()}
+                };
+        client_->sendAtServer(j);
+    }  catch (std::exception &e) {
+        std::cerr<<"Exception :"<<e.what()<<"\n";
+    }
+/*
     //controllo formato mail
     if (!email_regex.match(email).hasMatch()) {
         QDialog *dialog = new QDialog();
@@ -597,6 +662,7 @@ void stacked::on_edit_saveButton_clicked(){
             /*
              *  PRENDI I DATI E INVIA A SERVER
              * */
+    /*
             std::string mess = j.dump().c_str();
             message msg;
             msg.body_length(mess.size());
@@ -610,4 +676,5 @@ void stacked::on_edit_saveButton_clicked(){
             std::cerr << "Exception: " << e.what() << "\n";
         }
     }
+    */
 }

@@ -1475,6 +1475,68 @@ QPushButton#edit_backButton:hover{
                 </layout>
                </item>
                <item>
+                <spacer name="verticalSpacer_18">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_20">
+                 <property name="spacing">
+                  <number>1</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <spacer name="horizontalSpacer_25">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="edit_user_label">
+                   <property name="styleSheet">
+                    <string notr="true">font: 16pt &quot;Sawasdee Bold&quot;;</string>
+                   </property>
+                   <property name="text">
+                    <string>username</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_26">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
                 <spacer name="verticalSpacer_13">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -1610,7 +1672,7 @@ background-color:#68DFBB;
                      <property name="sizeHint" stdset="0">
                       <size>
                        <width>20</width>
-                       <height>110</height>
+                       <height>80</height>
                       </size>
                      </property>
                     </spacer>
@@ -1664,22 +1726,6 @@ background-color:#68DFBB;
                     <widget class="QLineEdit" name="edit_email_line"/>
                    </item>
                    <item>
-                    <widget class="QLabel" name="edit_user_label">
-                     <property name="styleSheet">
-                      <string notr="true">font: 11pt &quot;Sawasdee Bold&quot;;</string>
-                     </property>
-                     <property name="text">
-                      <string>Username</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignCenter</set>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLineEdit" name="edit_user_line"/>
-                   </item>
-                   <item>
                     <widget class="QLabel" name="edit_oldPasswordLabel">
                      <property name="styleSheet">
                       <string notr="true">font: 11pt &quot;Sawasdee Bold&quot;;</string>
@@ -1693,7 +1739,11 @@ background-color:#68DFBB;
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLineEdit" name="edit_oldpsw_line"/>
+                    <widget class="QLineEdit" name="edit_oldpsw_line">
+                     <property name="echoMode">
+                      <enum>QLineEdit::Password</enum>
+                     </property>
+                    </widget>
                    </item>
                    <item>
                     <widget class="QLabel" name="edit_newpsw_label">
