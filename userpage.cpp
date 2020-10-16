@@ -104,7 +104,7 @@ void Userpage::setupUserinfo(){
     myIcon->setGeometry(QRect(-10,10,100,100));
     myIcon->setStyleSheet(QString::fromUtf8("background-color:")+client_->getColor());
 
-    QLabel *usrLetters = new QLabel(client_->getUser()[0].toUpper(),myIcon);
+    usrLetters = new QLabel(client_->getUser()[0].toUpper(),myIcon);
     usrLetters->setObjectName(QString::fromUtf8("usrLetters"));
     usrLetters->setStyleSheet("font: 15pt \"Sawasdee Bold\"");
     usrLetters->setGeometry(QRect(15,0,80,80));
@@ -1146,4 +1146,11 @@ void Userpage::updateUserFile(QString old, QString newN) {
 void Userpage::updateInfo(){
     email_lab->setText(client_->getEmail());
     myIcon->setStyleSheet(QString::fromUtf8("background-color:")+client_->getColor());
+    if(colorIsDark(client_->getColor())){
+       usrLetters->setStyleSheet(QString::fromUtf8("color:rgb(243,243,243);font:36pt \"Sawasdee\";"));
+    }
+    else{
+       usrLetters->setStyleSheet(QString::fromUtf8("color:rgb(0,0,0);font:36pt \"Sawasdee\";"));
+    }
+
 }

@@ -57,6 +57,7 @@ private:
     QLineEdit *lineURL;
     QPushButton *openURLbutton;
     QLabel *email_lab;
+    QLabel *usrLetters;
 
 
 private slots:
