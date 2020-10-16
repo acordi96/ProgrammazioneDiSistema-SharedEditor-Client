@@ -1731,7 +1731,7 @@ background-color:#68DFBB;
                       <string notr="true">font: 11pt &quot;Sawasdee Bold&quot;;</string>
                      </property>
                      <property name="text">
-                      <string>Old Password</string>
+                      <string>Old Password (required)</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignCenter</set>
