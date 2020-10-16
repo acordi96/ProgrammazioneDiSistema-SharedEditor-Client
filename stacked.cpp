@@ -78,30 +78,11 @@ void stacked::on_loginButton_clicked() {
 
         dialog->show();
     } else {
-        try {
-            /*
-             *  PRENDI I DATI E INVIA A SERVER
-             * */
-
-            json j = json{
-                    {"operation", "request_login"},
-                    {"username",  user.toStdString()},
-                    {"password",  md5(psw.toUtf8().constData())
-                    }
-            };
-            std::string mess = j.dump().c_str();
-            message msg;
-            msg.body_length(mess.size());
-            std::memcpy(msg.body(), mess.data(), msg.body_length());
-            msg.body()[msg.body_length()] = '\0';
-            msg.encode_header();
-            std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
-            sendmessage(msg);
-        }//try
-        catch (std::exception &e) {
-            std::cerr << "Exception: " << e.what() << "\n";
-        };
-    }//else esterno
+        json j = json{{"operation", "request_login"},
+                      {"username",  user.toStdString()},
+                      {"password",  md5(psw.toUtf8().constData())}};
+        client_->sendAtServer(j);
+    }
 }
 
 void stacked::sendmessage(message mess) {
@@ -168,45 +149,14 @@ void stacked::on_form_regButton_clicked() {
 
         dialog->show();
     } else {
-        try {
+        json j = json{
+                {"operation", "request_signup"},
+                {"email",     email.toStdString()},
+                {"username",  user.toStdString()},
+                {"password",  md5(psw1.toUtf8().constData())}
+        };
+        client_->sendAtServer(j);
 
-            json j = json{
-                    {"operation", "request_signup"},
-                    {"email",     email.toStdString()},
-                    {"username",  user.toStdString()},
-                    {"password",  md5(psw1.toUtf8().constData())}
-            };
-            /*
-             *  PRENDI I DATI E INVIA A SERVER
-             * */
-            std::string mess = j.dump().c_str();
-            message msg;
-            msg.body_length(mess.size());
-            std::memcpy(msg.body(), mess.data(), msg.body_length());
-            msg.body()[msg.body_length()] = '\0';
-            msg.encode_header();
-            std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
-            sendmessage(msg);
-            /*
-             if(requestType=="SIGNUP_OK"){
-                 ui->stackedWidget->setCurrentIndex(2);
-             }
-             else{
-                 QDialog *dialog = new QDialog();
-                 QVBoxLayout *layout = new QVBoxLayout();
-                 dialog->setLayout(layout);
-                 layout->addWidget(new QLabel("Error! Something went wrong. Try again later."));
-                 QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-                 layout->addWidget(buttonBox);
-
-                 connect(buttonBox,&QDialogButtonBox::accepted,dialog,&QDialog::accept);
-
-                 dialog->show();
-             }
-*/
-        } catch (std::exception &e) {
-            std::cerr << "Exception: " << e.what() << "\n";
-        }
     }
 }
 
@@ -287,13 +237,13 @@ void stacked::showPopupSuccess(QString result) {
             layout->addWidget(new QLabel("Delete file error"));
         } else if (result == "error_file_in_use") {
             layout->addWidget(new QLabel("File in use, rename failed"));
-        } else if (result == "wrong_old_password"){
+        } else if (result == "wrong_old_password") {
             layout->addWidget(new QLabel("Wrong old password!"));
-        }else if (result == "edit_success"){
+        } else if (result == "edit_success") {
             up->updateInfo();
             ui->stackedWidget->setCurrentIndex(4);
             layout->addWidget(new QLabel("Profile updated!"));
-        }else if (result == "edit_failed") {
+        } else if (result == "edit_failed") {
             ui->stackedWidget->setCurrentIndex(4);
             layout->addWidget(new QLabel("Error in update profile."));
         }
@@ -311,6 +261,7 @@ void stacked::on_reglogButton_clicked() {
     ui->stackedWidget->setCurrentIndex(1);
 
 }
+
 void stacked::on_form_cancButton_clicked() {
     ui->psw_log_line->clear();
     ui->stackedWidget->setCurrentIndex(0);
@@ -321,7 +272,7 @@ void stacked::logout() {
     ui->user_log_line->clear();
     ui->psw_log_line->clear();
     ui->user_log_line->setFocus();
-    client_->setFiles(std::map < std::pair < std::string, std::string > , std::string > ());
+    client_->setFiles(std::map<std::pair<std::string, std::string>, std::string>());
     ui->stackedWidget->removeWidget(te);
     ui->stackedWidget->removeWidget(up);
     ui->stackedWidget->setCurrentIndex(0);
@@ -413,14 +364,14 @@ void stacked::on_edit_saveButton_clicked() {
     QString newPsw2 = ui->edit_confnewpsw_line->text();
     QString pswChecked, emailChecked, newColor;
 
-    if(oldPsw.isEmpty()){
-         QMessageBox::warning(this,tr(" Shared Editor"),tr("Insert old password to validate changes."));
-         ui->edit_oldpsw_line->setStyleSheet(QString::fromUtf8("QLineEdit#edit_oldpsw_line{\n"
-                                                               "border-radius: 3px;\n"
-                                                               "border-style: solid;\n"
-                                                               "border-width: 1px;\n"
-                                                               "border-color: red}"));
-         return;
+    if (oldPsw.isEmpty()) {
+        QMessageBox::warning(this, tr(" Shared Editor"), tr("Insert old password to validate changes."));
+        ui->edit_oldpsw_line->setStyleSheet(QString::fromUtf8("QLineEdit#edit_oldpsw_line{\n"
+                                                              "border-radius: 3px;\n"
+                                                              "border-style: solid;\n"
+                                                              "border-width: 1px;\n"
+                                                              "border-color: red}"));
+        return;
     }
 
     if (newPsw1.isEmpty() && newPsw2.isEmpty()) {

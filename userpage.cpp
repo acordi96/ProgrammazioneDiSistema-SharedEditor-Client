@@ -105,7 +105,7 @@ void Userpage::setupUserinfo() {
     myIcon->setGeometry(QRect(-10, 10, 100, 100));
     myIcon->setStyleSheet(QString::fromUtf8("background-color:") + client_->getColor());
 
-    usrLetters = new QLabel(client_->getUser()[0].toUpper(),myIcon);
+    usrLetters = new QLabel(client_->getUser()[0].toUpper(), myIcon);
     usrLetters->setObjectName(QString::fromUtf8("usrLetters"));
     usrLetters->setStyleSheet("font: 15pt \"Sawasdee Bold\"");
     usrLetters->setGeometry(QRect(15, 0, 80, 80));
@@ -255,6 +255,7 @@ void Userpage::setupUserinfo() {
                                                    "background-color:#68DFBB;\n"
                                                    "border-radius:5px;\n"
                                                    "}"));
+
     connect(openURLbutton, &QPushButton::clicked, this, &Userpage::handleOpenURLbutton);
     QSpacerItem *urlSpacer = new QSpacerItem(20, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
     urlLayout->addItem(urlSpacer);
@@ -574,28 +575,12 @@ void Userpage::handleNewFileButton() {
             if (modalWindow.exec() == 0)
                 break;
         }
-
-        //invio al server la richiesta per creare un nuovo file
-        try {
-            json j = json{
-                    {"operation", "request_new_file"},
-                    {"name",      modalWindow.textValue().toStdString()},
-                    {"username",  client_->getUser().toStdString()}
-            };
-
-            //PRENDI I DATI E INVIA A SERVER
-            std::string mess = j.dump().c_str();
-            message msg;
-            msg.body_length(mess.size());
-            std::memcpy(msg.body(), mess.data(), msg.body_length());
-            msg.body()[msg.body_length()] = '\0';
-            msg.encode_header();
-            std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
-            sendmessage(msg);
-
-        } catch (std::exception &e) {
-            std::cerr << "Exception: " << e.what() << "\n";
-        }
+        json j = json{
+                {"operation", "request_new_file"},
+                {"name",      modalWindow.textValue().toStdString()},
+                {"username",  client_->getUser().toStdString()}
+        };
+        client_->sendAtServer(j);
 
         QString testo = modalWindow.textValue();
         client_->setFileName(testo);
@@ -682,36 +667,13 @@ void Userpage::on_openButton_clicked() {
     std::pair<std::string, std::string> parsed = parseFileButton(selectedFile);
     std::string owner = parsed.first;
     std::string filename = parsed.second;
-    try {
-        json j = json{
-                {"operation", "open_file"},
-                {"name",      filename},
-                {"username",  owner}
-        };
-        client_->setFileName(QString::fromStdString(filename));
-        //PRENDI I DATI E INVIA A SERVER
-        std::string mess = j.dump().c_str();
-        message msg;
-        msg.body_length(mess.size());
-        std::memcpy(msg.body(), mess.data(), msg.body_length());
-        msg.body()[msg.body_length()] = '\0';
-        msg.encode_header();
-        std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
-        sendmessage(msg);
-        //deseleziono il file
-        QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
-        deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
-                                                  "background-color:#84ACD7;\n"
-                                                  "border:1px;\n"
-                                                  "border-radius:5px;\n"
-                                                  "color:#FFFFFF;\n"
-                                                  "font: 75 14pt \"Sawasdee Bold\";\n"
-                                                  "}"));
 
-        selectedFile = "";
-    } catch (std::exception &e) {
-        std::cerr << "Exception: " << e.what() << "\n";
-    }
+    json j = json{
+            {"operation", "open_file"},
+            {"name",      filename},
+            {"username",  owner}
+    };
+    client_->sendAtServer(j);
 
 }
 
@@ -815,38 +777,14 @@ void Userpage::on_renameButton_clicked() {
             }
 
             //invio al server la richiesta per rinominare un file
+            json j = json{
+                    {"operation", "request_new_name"},
+                    {"old_name",  filename},
+                    {"new_name",  modalWindow.textValue().toStdString()},
+                    {"username",  client_->getUser().toStdString()}
+            };
+            client_->sendAtServer(j);
 
-            try {
-                json j = json{
-                        {"operation", "request_new_name"},
-                        {"old_name",  filename},
-                        {"new_name",  modalWindow.textValue().toStdString()},
-                        {"username",  client_->getUser().toStdString()}
-                };
-
-                //PRENDI I DATI E INVIA A SERVER
-                std::string mess = j.dump().c_str();
-                message msg;
-                msg.body_length(mess.size());
-                std::memcpy(msg.body(), mess.data(), msg.body_length());
-                msg.body()[msg.body_length()] = '\0';
-                msg.encode_header();
-                std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
-                sendmessage(msg);
-                // deseleziono il pulsante che ho rinominato
-                QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
-                deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
-                                                          "background-color:#84ACD7;\n"
-                                                          "border:1px;\n"
-                                                          "border-radius:5px;\n"
-                                                          "color:#FFFFFF;\n"
-                                                          "font: 75 14pt \"Sawasdee Bold\";\n"
-                                                          "}"));
-                selectedFile = "";
-
-            } catch (std::exception &e) {
-                std::cerr << "Exception: " << e.what() << "\n";
-            }
         }
     }
 
@@ -887,29 +825,13 @@ void Userpage::on_deleteButton_clicked() {
             selectedFile = "";
             return;
         } else {
-            try {
-                json j = json{
-                        {"operation", "delete_file"},
-                        {"name",      filename},
-                        {"username",  client_->getUser().toStdString()},
-                        {"owner",     owner}
-                };
-
-                //PRENDI I DATI E INVIA A SERVER
-                std::string mess = j.dump().c_str();
-                message msg;
-                msg.body_length(mess.size());
-                std::memcpy(msg.body(), mess.data(), msg.body_length());
-                msg.body()[msg.body_length()] = '\0';
-                msg.encode_header();
-                std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
-                sendmessage(msg);
-                //deseleziono file eliminato
-                selectedFile = "";
-
-            } catch (std::exception &e) {
-                std::cerr << "Exception: " << e.what() << "\n";
-            }
+            json j = json{
+                    {"operation", "delete_file"},
+                    {"name",      filename},
+                    {"username",  client_->getUser().toStdString()},
+                    {"owner",     owner}
+            };
+            client_->sendAtServer(j);
 
         }
 
@@ -934,29 +856,13 @@ void Userpage::on_deleteButton_clicked() {
             selectedFile = "";
             return;
         } else {
-            try {
-                json j = json{
-                        {"operation", "delete_file"},
-                        {"name",      filename},
-                        {"username",  client_->getUser().toStdString()},
-                        {"owner",     owner}
-                };
-
-                //PRENDI I DATI E INVIA A SERVER
-                std::string mess = j.dump().c_str();
-                message msg;
-                msg.body_length(mess.size());
-                std::memcpy(msg.body(), mess.data(), msg.body_length());
-                msg.body()[msg.body_length()] = '\0';
-                msg.encode_header();
-                std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
-                sendmessage(msg);
-                //deseleziono file eliminato
-                selectedFile = "";
-
-            } catch (std::exception &e) {
-                std::cerr << "Exception: " << e.what() << "\n";
-            }
+            json j = json{
+                    {"operation", "delete_file"},
+                    {"name",      filename},
+                    {"username",  client_->getUser().toStdString()},
+                    {"owner",     owner}
+            };
+            client_->sendAtServer(j);
 
         }
     }
@@ -1039,16 +945,7 @@ void Userpage::handleOpenURLbutton() {
                 {"operation",       "validate_invitation"},
                 {"invitation_code", this->lineURL->text().toStdString()}
         };
-
-        //PRENDI I DATI E INVIA A SERVER
-        std::string mess = j.dump().c_str();
-        message msg;
-        msg.body_length(mess.size());
-        std::memcpy(msg.body(), mess.data(), msg.body_length());
-        msg.body()[msg.body_length()] = '\0';
-        msg.encode_header();
-        std::cout << "Richiesta da inviare al server " << msg.body() << std::endl;
-        sendmessage(msg);
+        client_->sendAtServer(j);
     } else {
         QMessageBox::information(
                 this,
@@ -1153,12 +1050,11 @@ void Userpage::updateUserFile(QString old, QString newN) {
 
 void Userpage::updateInfo() {
     email_lab->setText(client_->getEmail());
-    myIcon->setStyleSheet(QString::fromUtf8("background-color:")+client_->getColor());
-    if(colorIsDark(client_->getColor())){
-       usrLetters->setStyleSheet(QString::fromUtf8("color:rgb(243,243,243);font:36pt \"Sawasdee\";"));
-    }
-    else{
-       usrLetters->setStyleSheet(QString::fromUtf8("color:rgb(0,0,0);font:36pt \"Sawasdee\";"));
+    myIcon->setStyleSheet(QString::fromUtf8("background-color:") + client_->getColor());
+    if (colorIsDark(client_->getColor())) {
+        usrLetters->setStyleSheet(QString::fromUtf8("color:rgb(243,243,243);font:36pt \"Sawasdee\";"));
+    } else {
+        usrLetters->setStyleSheet(QString::fromUtf8("color:rgb(0,0,0);font:36pt \"Sawasdee\";"));
     }
 
 }
