@@ -10,6 +10,10 @@ Symbol::Symbol(char car, std::string usr, std::vector<int> pos) : character(car)
                                                                   posizione(std::move(pos)) {
 
 }
+Symbol::Symbol(char car, std::string usr, std::vector<int> pos, Style style) : character(car), username(std::move(usr)),
+                                                                  posizione(std::move(pos)), symbolStyle(std::move(style)) {
+
+}
 
 Symbol::Symbol() {
     Symbol::character = '\0';

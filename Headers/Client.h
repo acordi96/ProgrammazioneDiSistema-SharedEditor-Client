@@ -67,6 +67,7 @@ public:
     void setEmail(const QString &value);
 
     std::vector<int> insertSymbolNewCRDT(int index, char character, const std::string &username);
+    std::vector<int> insertSymbolNewCRDT(int index, char character, const std::string &username, Style style);
 
     int generateIndexCRDT(Symbol symbol, int iter, int start, int end);
 
@@ -93,6 +94,7 @@ signals:
     void insertSymbol(int pos, QChar c);
 
     void insertSymbolWithId(Symbol symbolToInsert);
+    void insertSymbolWithStyle(Symbol symbolToInsert);
 
     void eraseSymbols(std::vector<Symbol> symbolsToErase);
 
@@ -102,6 +104,10 @@ signals:
 
     void clearEditor();
 
+    //per lo stile
+    void changeFontFamily(int startIndex, int endIndex, std::string fontFamily);
+    void changeFontSize(int startIndex, int endIndex, int fontSize);
+    void changeStyle(int startIndex, int endIndex, Style style);
 private:
     void do_connect();
 

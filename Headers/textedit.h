@@ -26,6 +26,8 @@ QT_END_NAMESPACE
 
 class QEvent;
 typedef  std::map<std::string, std::string> usersInFile;
+
+
 class TextEdit : public QMainWindow
 {
 Q_OBJECT
@@ -41,10 +43,15 @@ public slots:
     void fileNew();
     void showSymbol(int pos, QChar c);
     void showSymbolWithId(Symbol symbolToInsert);
+    void showSymbolWithStyle(Symbol symbolToInsert);
     void updateRemotePosition(QString user, int pos);
     void eraseSymbols(std::vector<Symbol> symbolsToErase);
     //TO DO:mettere user
     //void show_Symbol(std::pair<int,char> tuple);
+
+
+    //per lo stile
+    void changeStyle(int startIndex, int endIndex, Style style);
 protected:
     void closeEvent(QCloseEvent *e) override;
     bool eventFilter(QObject *obj, QEvent *ev) override;
@@ -111,11 +118,11 @@ private:
     void decreentPosition(int pos, int count);
 
     //funzioni per lo stile
-    void requestFontSizeChanged(int fontSize);
-    void requestFontFamilyChanged(std::string fontFamily);
 
-
-
+    void requestStyleChanged(std::string fontFamily);
+    void requestStyleChanged(int fontSize);
+    void requestStyleBoldChanged(int bold);
+    void requestStyleUndelined(int underlined);
 
 
     QAction *actionSave;

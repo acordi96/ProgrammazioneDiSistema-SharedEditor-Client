@@ -2,8 +2,8 @@
 // Created by Sam on 22/apr/2020.
 //
 
-#define serverRoute "93.43.250.236"
-//#define serverRoute "127.0.0.1"
+//#define serverRoute "93.43.250.236"
+#define serverRoute "127.0.0.1"
 
 #include <QtWidgets/QMessageBox>
 #include "Headers/Client.h"
@@ -129,7 +129,24 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
             emit insertSymbolWithId(symbolToInsert);
         }
         return type_request;
-    } else if (type_request == "remove_res") {
+    } else if (type_request == "insertAndStyle_res") {
+        //prendo il vettore di symbol
+        std::vector<std::string> usernameToInsert = js.at("usernameToInsert").get<std::vector<std::string>>();
+        std::vector<char> charToInsert = js.at("charToInsert").get<std::vector<char>>();
+        std::vector<std::vector<int>> crdtToInsert = js.at("crdtToInsert").get<std::vector<std::vector<int>>>();
+        std::string fontFamily = js.at("fontFamily").get<std::string>();
+        int fontSize = js.at("fontSize").get<int>();
+        bool bold = js.at("bold").get<bool>();
+        bool italic = js.at("italic").get<bool>();
+        bool underlined = js.at("underlined").get<bool>();
+        //TO DO:anche qui un solo elemento
+        for (int i = 0; i < usernameToInsert.size(); i++) {
+            Style style = {bold, underlined, italic, fontFamily, fontSize};
+            Symbol symbolToInsert(charToInsert[i], usernameToInsert[i], crdtToInsert[i], style);
+            emit insertSymbolWithStyle(symbolToInsert);
+        }
+        return type_request;
+    }else if (type_request == "remove_res") {
         std::vector<std::string> usernameToErase = js.at("usernameToErase").get<std::vector<std::string>>();
         std::vector<char> charToErase = js.at("charToErase").get<std::vector<char>>();
         std::vector<std::vector<int>> crdtToErase = js.at("crdtToErase").get<std::vector<std::vector<int>>>();
@@ -273,7 +290,53 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::string username = js.at("username").get<std::string>();
         int pos = js.at("pos").get<int>();
         emit updateRemotePosition(QString::fromStdString(username), pos);
+    }else if(type_request == "styleChanged"){
+        std::vector<std::string> usernameToChange = js.at("usernameToChange").get<std::vector<std::string>>();
+        std::vector<char> charToChange = js.at("charToChange").get<std::vector<char>>();
+        std::vector<std::vector<int>> crdtToChange = js.at("crdtToChange").get<std::vector<std::vector<int>>>();
+
+        //TO DO: devo scorrere il mio vettore e trovarci quei caratteri e settargli in get style, quel setfontFamily
+        int startIndex = crdtToChange.front().front(); //posizione 1
+        int endIndex = crdtToChange.back().front(); //posizione finale
+        int j=0;
+        for(int i= startIndex; i < endIndex+1; i++) {
+            std::string username = usernameToChange[j];
+            j++;
+            auto it = std::find_if(symbols.begin(), symbols.end(), [i, username](Symbol& s) {return s.getPosizione().front() == i && s.getUsername()==username;});
+            if (it != symbols.end()) {
+                int index = it - symbols.begin();
+                Style style = symbols.at(index).getSymbolStyle();
+
+                if (js.contains("fontFamily")) {
+                    std::string fontFamily = js.at("fontFamily").get<std::string>();
+                    style.setFontFamily(fontFamily);
+
+                }
+                if (js.contains("fontSize")) {
+                    bool fontSize = js.at("fontSize").get<bool>();
+                    style.setFontSize(fontSize);
+
+                }
+                if (js.contains("bold")) {
+                    bool bold = js.at("bold").get<bool>();
+                    style.setBold(bold);
+
+                }
+                if (js.contains("underlined")) {
+                    bool underlined = js.at("underlined").get<bool>();
+                    style.setBold(underlined);
+
+                }
+                if (js.contains("italic")) {
+                    bool italic = js.at("italic").get<bool>();
+                    style.setBold(italic);
+                }
+
+                emit changeStyle(index, index+1, style);
+            }
+        }
     }
+    //TO DO: prendere le risposte dal server e fare l'emit
     return type_request;
 }
 
@@ -350,6 +413,26 @@ void Client::setFiles(const std::vector<std::string> &owners, const std::vector<
 std::map<std::pair<std::string, std::string>, std::string> Client::getFiles() const {
     return files;
 }
+//stessa cosa di sotto ma con style
+std::vector<int> Client::insertSymbolNewCRDT(int index, char character, const std::string &username, Style style) {
+    std::vector<int> vector;
+    if (this->symbols.empty()) {
+        vector = {0};
+        index = 0;
+    } else if (index > this->symbols.size() - 1) {
+        vector = {this->symbols.back().getPosizione().at(0) + 1};
+        index = this->symbols.size();
+    } else if (index == 0) {
+        vector = {this->symbols.front().getPosizione().at(0) - 1};
+    } else
+        vector = generatePos(index);
+    Symbol s(character, username, vector, style);
+
+    this->symbols.insert(this->symbols.begin() + index, s);
+
+    return vector;
+}
+
 
 //crea un nuovo symbol e lo inserisce nel crdt in posizione index
 std::vector<int> Client::insertSymbolNewCRDT(int index, char character, const std::string &username) {
@@ -401,6 +484,7 @@ int Client::generateIndexCRDT(Symbol symbol, int iter, int start,
         }
         newEnd++;
     }
+
     return newEnd;
 }
 

@@ -5,8 +5,8 @@
 #ifndef PROGETTO_PROVA_STYLE_H
 #define PROGETTO_PROVA_STYLE_H
 
-#define DEFAULT_FONT_FAMILY "Times New Roman"
-#define DEFAULT_FONT_SIZE 14
+#define DEFAULT_FONT_FAMILY "Helvetica"
+#define DEFAULT_FONT_SIZE 8
 #define DEFAULT_COLOR "#00ffffff"
 
 #include <string>
@@ -15,12 +15,13 @@ class Style {
 private:
     bool bold;
     bool underlined;
+    bool italic;
     std::string fontFamily;
     int fontSize;
     std::string color;
 public:
     Style();
-
+    Style(bool bold, bool underlined, bool italic, std::string fontFamily, int fontSize);
     bool isBold() const;
 
     void setBold(bool bold);
@@ -28,6 +29,10 @@ public:
     bool isUnderlined() const;
 
     void setUnderlined(bool underlined);
+
+    bool isItalic() const;
+
+    void setItalic(bool italic);
 
     const std::string &getFontFamily() const;
 

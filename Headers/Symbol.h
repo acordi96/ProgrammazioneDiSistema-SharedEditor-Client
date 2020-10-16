@@ -18,6 +18,7 @@ private:
     Style symbolStyle;
 public:
     Symbol(char car, std::string usr, std::vector<int> pos);
+    Symbol(char car, std::string usr, std::vector<int> pos, Style symbolStyle);
     Symbol();
 
     const Style &getSymbolStyle() const;
