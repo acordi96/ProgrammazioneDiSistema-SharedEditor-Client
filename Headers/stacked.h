@@ -1,7 +1,9 @@
 #ifndef STACKED_H
 #define STACKED_H
 
+#include <QDialog>
 #include <QMainWindow>
+#include <QVBoxLayout>
 #include "Headers/textedit.h"
 #include "Headers/userpage.h"
 #include "Headers/Client.h"
@@ -36,11 +38,18 @@ private slots:
    void logout();
    void closeAll();
    void closeFile();
+   void showLoading(bool active);
 /*signals:
     void updateRecentFiles();*/
 private:
    Userpage *up;
    TextEdit *te;
+
+   //for loading
+   QWidget *loadLabel;
+   QLabel *label;
+   QWidget *hourglass;
+   QHBoxLayout *layout;
 };
 
 #endif // STACKED_H
