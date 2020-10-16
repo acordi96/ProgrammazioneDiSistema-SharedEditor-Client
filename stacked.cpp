@@ -581,7 +581,7 @@ void stacked::on_edit_saveButton_clicked() {
         emailChecked = "";
     }
     if(selectedColor != client_->getColor())
-        newColor = client_->getColor();
+        newColor = selectedColor;
     else
         newColor = "";
     try {
