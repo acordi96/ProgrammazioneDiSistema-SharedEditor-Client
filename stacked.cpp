@@ -445,7 +445,7 @@ void stacked::logout() {
     ui->user_log_line->clear();
     ui->psw_log_line->clear();
     ui->user_log_line->setFocus();
-    client_->setFiles(std::map<std::pair<std::string, std::string>, std::string>());
+    client_->setFiles(std::map < std::pair < std::string, std::string > , std::string > ());
     ui->stackedWidget->removeWidget(te);
     ui->stackedWidget->removeWidget(up);
     ui->stackedWidget->setCurrentIndex(0);
@@ -531,13 +531,15 @@ void stacked::on_edit_saveButton_clicked() {
     QString newPsw2 = ui->edit_confnewpsw_line->text();
     QString pswChecked, emailChecked, newColor;
 
-    if (!newPsw1.isEmpty() && !newPsw2.isEmpty()) {
+    if (newPsw1.isEmpty() && newPsw2.isEmpty()) {
+        pswChecked = "";
+    } else {
         if (!psw_regex.match(newPsw1).hasMatch()) {
             // check password
             QDialog *dialog = new QDialog();
             QVBoxLayout *layout = new QVBoxLayout();
             dialog->setLayout(layout);
-            layout->addWidget(new QLabel("Password must be at least 8 characters long "
+            layout->addWidget(new QLabel("New password must be at least 8 characters long "
                                          "and include at least one upper case letter, "
                                          "a number and a special character"));
             QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
@@ -557,10 +559,10 @@ void stacked::on_edit_saveButton_clicked() {
             connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
 
             dialog->show();
-        }
-        pswChecked = QString::fromStdString(md5(newPsw1.toStdString()));
-    } else {
-        pswChecked = "";
+        } else if (newPsw1 == oldPsw) {
+            pswChecked = "";
+        } else
+            pswChecked = QString::fromStdString(md5(newPsw1.toStdString()));
     }
     if (email != client_->getEmail()) {
         //controllo formato mail
@@ -576,14 +578,15 @@ void stacked::on_edit_saveButton_clicked() {
 
             dialog->show();
         }
-        emailChecked = email;client_->getColor();
+        emailChecked = email;
     } else {
         emailChecked = "";
     }
-    if(selectedColor != client_->getColor())
+    if (selectedColor != client_->getColor())
         newColor = selectedColor;
     else
         newColor = "";
+
     try {
         json j = json{
                 {"operation",   "request_update_profile"},
@@ -593,7 +596,6 @@ void stacked::on_edit_saveButton_clicked() {
                 {"newPassword", pswChecked.toStdString()},
                 {"newColor",    newColor.toStdString()}
         };
-        std::cout << "RICHIESTA: " << j.dump() << std::endl;
         client_->sendAtServer(j);
     } catch (std::exception &e) {
         std::cerr << "Exception :" << e.what() << "\n";
