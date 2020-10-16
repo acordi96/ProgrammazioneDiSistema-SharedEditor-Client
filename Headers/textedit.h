@@ -121,9 +121,9 @@ private:
 
     void requestStyleChanged(std::string fontFamily);
     void requestStyleChanged(int fontSize);
-    void requestStyleBoldChanged(int bold);
-    void requestStyleUndelined(int underlined);
-
+    void requestStyleBoldChanged(bool bold);
+    void requestStyleUndelined(bool underlined);
+    void requestStylItalic(bool italic);
 
     QAction *actionSave;
     QAction *actionTextBold;
