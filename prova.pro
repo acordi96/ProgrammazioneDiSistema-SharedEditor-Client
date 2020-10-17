@@ -25,6 +25,7 @@ SOURCES += \
         userpage.cpp\
         Symbol.cpp \
         MessageSymbol.cpp\
+        Style.cpp\
         Libs/md5.cpp \
 
 HEADERS += \
@@ -36,6 +37,7 @@ HEADERS += \
         Headers/Symbol.h \
         Headers/textedit.h \
         Headers/userpage.h \
+        Headers/Style.h\
         Libs/md5.h \
         Libs/json.hpp
 

@@ -99,14 +99,23 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
     setupFileActions();
     setupConnectedUsers();
     setupTextActions();
-    setupEditActions();
-    /*{
-        QMenu *userMenu = menuBar()->addMenu(client_->getUser());
-        userMenu->addAction(tr("Logout"),this,[=](){
+
+    {
+        QToolBar *tb = addToolBar(tr("Logout"));
+        tb->setStyleSheet(QString::fromUtf8("QToolButton:hover {background-color:#E6E7E8;border:1px;}"));
+        QWidget *spacer = new QWidget();
+        spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        tb->addWidget(spacer);
+
+        const QIcon quitIcon = QIcon::fromTheme("quit", QIcon(rsrcPath + "/logout.png"));
+        QAction *a = tb->addAction(quitIcon, tr("&Logout"), this, [=]() {
             requestLogout();
             emit this->logout();
         });
-    }*/
+        a->setShortcut(Qt::CTRL + Qt::Key_Q);
+
+
+    }
     QFont textFont("Helvetica");
     textFont.setStyleHint(QFont::SansSerif);
     textEdit->setFont(textFont);
@@ -181,61 +190,15 @@ void TextEdit::setupFileActions() {
         closingFile();
         emit this->closeFile();
     });
-/*
-        QPushButton *goback = new QPushButton(menuBar());
-        goback->setIcon(backIcon);
-        goback->setFlat(true);
-        QObject::connect(goback,&QPushButton::clicked,this,[=](){
-            closingFile();
-            emit this->closeFile();
-        });
-        menuBar()->addSeparator();
-    {
-            //needed to avoid arrow to overlap with menu
-            //look for better solution
-            QMenu *space=menuBar()->addMenu(tr("   "));
-     }
 
-    QMenu *menu = menuBar()->addMenu(tr("&File"));
-
-    const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(rsrcPath + "/filenew.png"));
-    a = menu->addAction(newIcon,  tr("&New"), this, &TextEdit::fileNew);
-
-    a->setPriority(QAction::LowPriority);
-    a->setShortcut(QKeySequence::New);
-
-    const QIcon openIcon = QIcon::fromTheme("document-open", QIcon(rsrcPath + "/fileopen.png"));
-    a = menu->addAction(openIcon, tr("&Open..."), this, &TextEdit::fileOpen);
-    a->setShortcut(QKeySequence::Open);
-
-
-    menu->addSeparator();
-
-    menu->addSeparator();
-*/
 #ifndef QT_NO_PRINTER
 
     const QIcon exportPdfIcon = QIcon::fromTheme("exportpdf", QIcon(rsrcPath + "/exportpdf.png"));
     a = tb->addAction(exportPdfIcon, tr("&Export PDF..."), this, &TextEdit::filePrintPdf);
     a->setPriority(QAction::LowPriority);
     a->setShortcut(Qt::CTRL + Qt::Key_D);
-    //tb->addAction(a);
 
-    //menu->addSeparator();
 #endif
-    QWidget *spacer = new QWidget();
-    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    tb->addWidget(spacer);
-
-    const QIcon quitIcon = QIcon::fromTheme("quit", QIcon(rsrcPath + "/logout.png"));
-    a = tb->addAction(quitIcon, tr("&Logout"), this, [=]() {
-        requestLogout();
-        emit this->logout();
-    });
-    a->setShortcut(Qt::CTRL + Qt::Key_Q);
-
-//    const QIcon profileIcon = QIcon::fromTheme("profile",QIcon(rsrcPath + "/user.png"));
-//    a = tb->addAction(profileIcon,tr("&Userpage"),this,[=](){emit this->closeFile();});
 
 }
 
@@ -280,111 +243,39 @@ void TextEdit::setupEditActions() {
 
 void TextEdit::setupTextActions() {
     QToolBar *tb = addToolBar(tr("Format Actions"));
-    QMenu *menu = menuBar()->addMenu(tr("F&ormat"));
+    tb->setStyleSheet(QString::fromUtf8("QToolButton:hover {background-color:#E6E7E8;border:1px;}"));
 
     const QIcon boldIcon = QIcon::fromTheme("format-text-bold", QIcon(rsrcPath + "/textbold.png"));
-    actionTextBold = menu->addAction(boldIcon, tr("&Bold"), this, &TextEdit::textBold);
+    actionTextBold = tb->addAction(boldIcon, tr("&Bold"), this, &TextEdit::textBold);
     actionTextBold->setShortcut(Qt::CTRL + Qt::Key_B);
     actionTextBold->setPriority(QAction::LowPriority);
     QFont bold;
     bold.setBold(true);
     actionTextBold->setFont(bold);
-    tb->addAction(actionTextBold);
     actionTextBold->setCheckable(true);
 
     const QIcon italicIcon = QIcon::fromTheme("format-text-italic", QIcon(rsrcPath + "/textitalic.png"));
-    actionTextItalic = menu->addAction(italicIcon, tr("&Italic"), this, &TextEdit::textItalic);
+    actionTextItalic = tb->addAction(italicIcon, tr("&Italic"), this, &TextEdit::textItalic);
     actionTextItalic->setPriority(QAction::LowPriority);
     actionTextItalic->setShortcut(Qt::CTRL + Qt::Key_I);
     QFont italic;
     italic.setItalic(true);
     actionTextItalic->setFont(italic);
-    tb->addAction(actionTextItalic);
     actionTextItalic->setCheckable(true);
 
     const QIcon underlineIcon = QIcon::fromTheme("format-text-underline", QIcon(rsrcPath + "/textunder.png"));
-    actionTextUnderline = menu->addAction(underlineIcon, tr("&Underline"), this, &TextEdit::textUnderline);
+    actionTextUnderline = tb->addAction(underlineIcon, tr("&Underline"), this, &TextEdit::textUnderline);
     actionTextUnderline->setShortcut(Qt::CTRL + Qt::Key_U);
     actionTextUnderline->setPriority(QAction::LowPriority);
     QFont underline;
     underline.setUnderline(true);
     actionTextUnderline->setFont(underline);
-    tb->addAction(actionTextUnderline);
     actionTextUnderline->setCheckable(true);
-
-    menu->addSeparator();
-
-    //stili indentazioni:
-    /*const QIcon leftIcon = QIcon::fromTheme("format-justify-left", QIcon(rsrcPath + "/textleft.png"));
-    actionAlignLeft = new QAction(leftIcon, tr("&Left"), this);
-    actionAlignLeft->setShortcut(Qt::CTRL + Qt::Key_L);
-    actionAlignLeft->setCheckable(true);
-    actionAlignLeft->setPriority(QAction::LowPriority);
-    const QIcon centerIcon = QIcon::fromTheme("format-justify-center", QIcon(rsrcPath + "/textcenter.png"));
-    actionAlignCenter = new QAction(centerIcon, tr("C&enter"), this);
-    actionAlignCenter->setShortcut(Qt::CTRL + Qt::Key_E);
-    actionAlignCenter->setCheckable(true);
-    actionAlignCenter->setPriority(QAction::LowPriority);
-    const QIcon rightIcon = QIcon::fromTheme("format-justify-right", QIcon(rsrcPath + "/textright.png"));
-    actionAlignRight = new QAction(rightIcon, tr("&Right"), this);
-    actionAlignRight->setShortcut(Qt::CTRL + Qt::Key_R);
-    actionAlignRight->setCheckable(true);
-    actionAlignRight->setPriority(QAction::LowPriority);
-    const QIcon fillIcon = QIcon::fromTheme("format-justify-fill", QIcon(rsrcPath + "/textjustify.png"));
-    actionAlignJustify = new QAction(fillIcon, tr("&Justify"), this);
-    actionAlignJustify->setShortcut(Qt::CTRL + Qt::Key_J);
-    actionAlignJustify->setCheckable(true);
-    actionAlignJustify->setPriority(QAction::LowPriority);
-
-    // Make sure the alignLeft  is always left of the alignRight
-    QActionGroup *alignGroup = new QActionGroup(this);
-    connect(alignGroup, &QActionGroup::triggered, this, &TextEdit::textAlign);
-
-    if (QApplication::isLeftToRight()) {
-        alignGroup->addAction(actionAlignLeft);
-        alignGroup->addAction(actionAlignCenter);
-        alignGroup->addAction(actionAlignRight);
-    } else {
-        alignGroup->addAction(actionAlignRight);
-        alignGroup->addAction(actionAlignCenter);
-        alignGroup->addAction(actionAlignLeft);
-    }
-    alignGroup->addAction(actionAlignJustify);
-
-    tb->addActions(alignGroup->actions());
-    menu->addActions(alignGroup->actions());
-
-    menu->addSeparator();*/
 
     QPixmap pix(16, 16);
     pix.fill(Qt::black);
-    actionTextColor = menu->addAction(pix, tr("&Color..."), this, &TextEdit::textColor);
+    actionTextColor = tb->addAction(pix, tr("&Color..."), this, &TextEdit::textColor);
     tb->addAction(actionTextColor);
-
-    tb = addToolBar(tr("Format Actions"));
-    tb->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
-    addToolBarBreak(Qt::TopToolBarArea);
-    addToolBar(tb);
-
-    comboStyle = new QComboBox(tb);
-    tb->addWidget(comboStyle);
-    comboStyle->addItem("Standard");
-    comboStyle->addItem("Bullet List (Disc)");
-    comboStyle->addItem("Bullet List (Circle)");
-    comboStyle->addItem("Bullet List (Square)");
-    comboStyle->addItem("Ordered List (Decimal)");
-    comboStyle->addItem("Ordered List (Alpha lower)");
-    comboStyle->addItem("Ordered List (Alpha upper)");
-    comboStyle->addItem("Ordered List (Roman lower)");
-    comboStyle->addItem("Ordered List (Roman upper)");
-    comboStyle->addItem("Heading 1");
-    comboStyle->addItem("Heading 2");
-    comboStyle->addItem("Heading 3");
-    comboStyle->addItem("Heading 4");
-    comboStyle->addItem("Heading 5");
-    comboStyle->addItem("Heading 6");
-
-    connect(comboStyle, QOverload<int>::of(&QComboBox::activated), this, &TextEdit::textStyle);
 
     comboFont = new QFontComboBox(tb);
     tb->addWidget(comboFont);
@@ -856,43 +747,6 @@ void TextEdit::cursorPositionChanged() {
     };
     //client_->sendAtServer(j);
 
-
-    //alignmentChanged(textEdit->alignment());
-    QTextList *list = textEdit->textCursor().currentList();
-    if (list) {
-        switch (list->format().style()) {
-            case QTextListFormat::ListDisc:
-                comboStyle->setCurrentIndex(1);
-                break;
-            case QTextListFormat::ListCircle:
-                comboStyle->setCurrentIndex(2);
-                break;
-            case QTextListFormat::ListSquare:
-                comboStyle->setCurrentIndex(3);
-                break;
-            case QTextListFormat::ListDecimal:
-                comboStyle->setCurrentIndex(4);
-                break;
-            case QTextListFormat::ListLowerAlpha:
-                comboStyle->setCurrentIndex(5);
-                break;
-            case QTextListFormat::ListUpperAlpha:
-                comboStyle->setCurrentIndex(6);
-                break;
-            case QTextListFormat::ListLowerRoman:
-                comboStyle->setCurrentIndex(7);
-                break;
-            case QTextListFormat::ListUpperRoman:
-                comboStyle->setCurrentIndex(8);
-                break;
-            default:
-                comboStyle->setCurrentIndex(-1);
-                break;
-        }
-    } else {
-        int headingLevel = textEdit->textCursor().blockFormat().headingLevel();
-        comboStyle->setCurrentIndex(headingLevel ? headingLevel + 8 : 0);
-    }
 }
 
 void TextEdit::showSymbolWithId(Symbol symbolToInsert) {
