@@ -64,7 +64,7 @@ public slots:
 
 
     //per lo stile
-    void changeStyle(int startIndex, int endIndex, Style style);
+    void changeStyle(int startIndex, int endIndex, const Style& style);
 
 protected:
     void closeEvent(QCloseEvent *e) override;

@@ -15,6 +15,7 @@ bool Style::isBold() const {
 
 void Style::setBold(bool bold) {
     Style::bold = bold;
+
 }
 
 bool Style::isUnderlined() const {

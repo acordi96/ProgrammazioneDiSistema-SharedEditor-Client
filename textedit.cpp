@@ -604,123 +604,125 @@ void TextEdit::textBold() {
     QTextCharFormat fmt;
     fmt.setFontWeight(actionTextBold->isChecked() ? QFont::Bold : QFont::Normal);
     mergeFormatOnWordOrSelection(fmt);
-    requestStyleBoldChanged(true);
+    requestStyleBoldChanged(actionTextBold->isChecked());
 }
 
 void TextEdit::requestStyleBoldChanged(bool bold) {
     QTextCursor cursor = textEdit->textCursor();
-    if (cursor.hasSelection()) {
-        int startIndex = cursor.selectionStart();
-        int endIndex = cursor.selectionEnd();
+    if (!cursor.hasSelection())
+        cursor.select(QTextCursor::WordUnderCursor);
+    int startIndex = cursor.selectionStart();
+    int endIndex = cursor.selectionEnd();
 
-        //Update symbols of the client
-        //mi devo prendere i syboli che vanno da quella dimensione a quella
-        std::vector<Symbol> symbols = client_->symbols;
-        std::vector<std::string> usernameToChange;
-        std::vector<char> charToChange;
-        std::vector<std::vector<int>> crdtToChange;
-        //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
-        //Serialize data
+    //Update symbols of the client
+    //mi devo prendere i syboli che vanno da quella dimensione a quella
+    std::vector<Symbol> symbols = client_->symbols;
+    std::vector<std::string> usernameToChange;
+    std::vector<char> charToChange;
+    std::vector<std::vector<int>> crdtToChange;
+    //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
+    //Serialize data
 
-        for (int i = startIndex; i < endIndex; i++) {
-            usernameToChange.push_back(symbols[i].getUsername());
-            charToChange.push_back(symbols[i].getCharacter());
-            crdtToChange.push_back(symbols[i].getPosizione());
-            Style style = symbols[i].getSymbolStyle();
-            style.setFontSize(bold);
-        }
-
-        json j = json{
-                {"operation",        "styleChanged"},
-                {"usernameToChange", usernameToChange},
-                {"charToChange",     charToChange},
-                {"crdtToChange",     crdtToChange},
-                {"bold",             bold}
-        };
-        client_->sendAtServer(j);
+    for (int i = startIndex; i < endIndex; i++) {
+        usernameToChange.push_back(symbols[i].getUsername());
+        charToChange.push_back(symbols[i].getCharacter());
+        crdtToChange.push_back(symbols[i].getPosizione());
+        Style style = symbols[i].getSymbolStyle();
+        style.setFontSize(bold);
     }
+
+    json j = json{
+            {"operation",        "styleChanged"},
+            {"usernameToChange", usernameToChange},
+            {"charToChange",     charToChange},
+            {"crdtToChange",     crdtToChange},
+            {"bold",             bold}
+    };
+    client_->sendAtServer(j);
 }
 
 void TextEdit::textUnderline() {
     QTextCharFormat fmt;
-    fmt.setFontUnderline(actionTextUnderline->isChecked());
+    fmt.setFontUnderline(actionTextUnderline->isChecked()/* ? QFont::UnderlineResolved : QFont::Normal*/);
     mergeFormatOnWordOrSelection(fmt);
-    requestStyleUndelined(true);
+    requestStyleUndelined(actionTextUnderline->isChecked());
 }
 
 void TextEdit::requestStyleUndelined(bool underlined) {
     QTextCursor cursor = textEdit->textCursor();
-    if (cursor.hasSelection()) {
-        int startIndex = cursor.selectionStart();
-        int endIndex = cursor.selectionEnd();
+    if (!cursor.hasSelection())
+        cursor.select(QTextCursor::WordUnderCursor);
+    int startIndex = cursor.selectionStart();
+    int endIndex = cursor.selectionEnd();
 
-        //Update symbols of the client
-        //mi devo prendere i syboli che vanno da quella dimensione a quella
-        std::vector<Symbol> symbols = client_->symbols;
-        std::vector<std::string> usernameToChange;
-        std::vector<char> charToChange;
-        std::vector<std::vector<int>> crdtToChange;
-        //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
-        //Serialize data
+    //Update symbols of the client
+    //mi devo prendere i syboli che vanno da quella dimensione a quella
+    std::vector<Symbol> symbols = client_->symbols;
+    std::vector<std::string> usernameToChange;
+    std::vector<char> charToChange;
+    std::vector<std::vector<int>> crdtToChange;
+    //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
+    //Serialize data
 
-        for (int i = startIndex; i < endIndex; i++) {
-            usernameToChange.push_back(symbols[i].getUsername());
-            charToChange.push_back(symbols[i].getCharacter());
-            crdtToChange.push_back(symbols[i].getPosizione());
-            Style style = symbols[i].getSymbolStyle();
-            style.setFontSize(underlined);
-        }
-
-        json j = json{
-                {"operation",        "styleChanged"},
-                {"usernameToChange", usernameToChange},
-                {"charToChange",     charToChange},
-                {"crdtToChange",     crdtToChange},
-                {"underlined",       underlined}
-        };
-        client_->sendAtServer(j);
+    for (int i = startIndex; i < endIndex; i++) {
+        usernameToChange.push_back(symbols[i].getUsername());
+        charToChange.push_back(symbols[i].getCharacter());
+        crdtToChange.push_back(symbols[i].getPosizione());
+        Style style = symbols[i].getSymbolStyle();
+        style.setFontSize(underlined);
     }
+
+    json j = json{
+            {"operation",        "styleChanged"},
+            {"usernameToChange", usernameToChange},
+            {"charToChange",     charToChange},
+            {"crdtToChange",     crdtToChange},
+            {"underlined",       underlined}
+    };
+    client_->sendAtServer(j);
+
 }
 
 void TextEdit::textItalic() {
     QTextCharFormat fmt;
-    fmt.setFontItalic(actionTextItalic->isChecked());
+    fmt.setFontItalic(actionTextItalic->isChecked()/* ? QFont::StyleItalic : QFont::Normal*/);
     mergeFormatOnWordOrSelection(fmt);
-    requestStylItalic(true);
+    requestStylItalic(actionTextItalic->isChecked());
 }
 
 void TextEdit::requestStylItalic(bool italic) {
     QTextCursor cursor = textEdit->textCursor();
-    if (cursor.hasSelection()) {
-        int startIndex = cursor.selectionStart();
-        int endIndex = cursor.selectionEnd();
+    if (!cursor.hasSelection())
+        cursor.select(QTextCursor::WordUnderCursor);
+    int startIndex = cursor.selectionStart();
+    int endIndex = cursor.selectionEnd();
 
-        //Update symbols of the client
-        //mi devo prendere i syboli che vanno da quella dimensione a quella
-        std::vector<Symbol> symbols = client_->symbols;
-        std::vector<std::string> usernameToChange;
-        std::vector<char> charToChange;
-        std::vector<std::vector<int>> crdtToChange;
-        //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
-        //Serialize data
+    //Update symbols of the client
+    //mi devo prendere i syboli che vanno da quella dimensione a quella
+    std::vector<Symbol> symbols = client_->symbols;
+    std::vector<std::string> usernameToChange;
+    std::vector<char> charToChange;
+    std::vector<std::vector<int>> crdtToChange;
+    //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
+    //Serialize data
 
-        for (int i = startIndex; i < endIndex; i++) {
-            usernameToChange.push_back(symbols[i].getUsername());
-            charToChange.push_back(symbols[i].getCharacter());
-            crdtToChange.push_back(symbols[i].getPosizione());
-            Style style = symbols[i].getSymbolStyle();
-            style.setFontSize(italic);
-        }
-
-        json j = json{
-                {"operation",        "styleChanged"},
-                {"usernameToChange", usernameToChange},
-                {"charToChange",     charToChange},
-                {"crdtToChange",     crdtToChange},
-                {"italic",           italic}
-        };
-        client_->sendAtServer(j);
+    for (int i = startIndex; i < endIndex; i++) {
+        usernameToChange.push_back(symbols[i].getUsername());
+        charToChange.push_back(symbols[i].getCharacter());
+        crdtToChange.push_back(symbols[i].getPosizione());
+        Style style = symbols[i].getSymbolStyle();
+        style.setFontSize(italic);
     }
+
+    json j = json{
+            {"operation",        "styleChanged"},
+            {"usernameToChange", usernameToChange},
+            {"charToChange",     charToChange},
+            {"crdtToChange",     crdtToChange},
+            {"italic",           italic}
+    };
+    client_->sendAtServer(j);
+
 }
 
 void TextEdit::textFamily(const QString &f) {
@@ -739,7 +741,7 @@ void TextEdit::textSize(const QString &p) {
     if (p.toFloat() > 0) {
         QTextCharFormat fmt;
         fmt.setFontPointSize(pointSize);
-        mergeFormatOnWordOrSelection(fmt);
+        //mergeFormatOnWordOrSelection(fmt);
     }
     int size = textEdit->fontPointSize();
     requestStyleChanged(size);
@@ -1608,73 +1610,73 @@ void TextEdit::updateCursors(const CustomCursor &cursor) {
 
 void TextEdit::requestStyleChanged(int fontSize) {
     QTextCursor cursor = textEdit->textCursor();
-    if (cursor.hasSelection()) {
-        int startIndex = cursor.selectionStart();
-        int endIndex = cursor.selectionEnd();
+    if (!cursor.hasSelection())
+        cursor.select(QTextCursor::WordUnderCursor);
+    int startIndex = cursor.selectionStart();
+    int endIndex = cursor.selectionEnd();
 
-        //Update symbols of the client
-        //mi devo prendere i syboli che vanno da quella dimensione a quella
-        std::vector<Symbol> symbols = client_->symbols;
-        std::vector<std::string> usernameToChange;
-        std::vector<char> charToChange;
-        std::vector<std::vector<int>> crdtToChange;
-        //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
-        //Serialize data
+    //Update symbols of the client
+    //mi devo prendere i syboli che vanno da quella dimensione a quella
+    std::vector<Symbol> symbols = client_->symbols;
+    std::vector<std::string> usernameToChange;
+    std::vector<char> charToChange;
+    std::vector<std::vector<int>> crdtToChange;
+    //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
+    //Serialize data
 
-        for (int i = startIndex; i < endIndex; i++) {
-            usernameToChange.push_back(symbols[i].getUsername());
-            charToChange.push_back(symbols[i].getCharacter());
-            crdtToChange.push_back(symbols[i].getPosizione());
-            Style style = symbols[i].getSymbolStyle();
-            style.setFontSize(fontSize);
-        }
-
-        json j = json{
-                {"operation",        "styleChanged"},
-                {"usernameToChange", usernameToChange},
-                {"charToChange",     charToChange},
-                {"crdtToChange",     crdtToChange},
-                {"fontSize",         fontSize}
-        };
-        client_->sendAtServer(j);
+    for (int i = startIndex; i < endIndex; i++) {
+        usernameToChange.push_back(symbols[i].getUsername());
+        charToChange.push_back(symbols[i].getCharacter());
+        crdtToChange.push_back(symbols[i].getPosizione());
+        Style style = symbols[i].getSymbolStyle();
+        style.setFontSize(fontSize);
     }
+
+    json j = json{
+            {"operation",        "styleChanged"},
+            {"usernameToChange", usernameToChange},
+            {"charToChange",     charToChange},
+            {"crdtToChange",     crdtToChange},
+            {"fontSize",         fontSize}
+    };
+    client_->sendAtServer(j);
 }
 
 void TextEdit::requestStyleChanged(std::string fontFamily) {
     QTextCursor cursor = textEdit->textCursor();
-    if (cursor.hasSelection()) {
-        int startIndex = cursor.selectionStart();
-        int endIndex = cursor.selectionEnd();
+    if (!cursor.hasSelection())
+        cursor.select(QTextCursor::WordUnderCursor);
+    int startIndex = cursor.selectionStart();
+    int endIndex = cursor.selectionEnd();
 
-        //Update symbols of the client
-        //mi devo prendere i syboli che vanno da quella dimensione a quella
-        std::vector<Symbol> symbols = client_->symbols;
-        std::vector<std::string> usernameToChange;
-        std::vector<char> charToChange;
-        std::vector<std::vector<int>> crdtToChange;
-        //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
-        //Serialize data
-        for (int i = startIndex; i < endIndex; i++) {
-            usernameToChange.push_back(symbols[i].getUsername());
-            charToChange.push_back(symbols[i].getCharacter());
-            crdtToChange.push_back(symbols[i].getPosizione());
-            Style style = symbols[i].getSymbolStyle();
-            style.setFontFamily(fontFamily);
-        }
-
-        json j = json{
-                {"operation",        "styleChanged"},
-                {"usernameToChange", usernameToChange},
-                {"charToChange",     charToChange},
-                {"crdtToChange",     crdtToChange},
-                {"fontFamily",       fontFamily}
-        };
-        client_->sendAtServer(j);
+    //Update symbols of the client
+    //mi devo prendere i syboli che vanno da quella dimensione a quella
+    std::vector<Symbol> symbols = client_->symbols;
+    std::vector<std::string> usernameToChange;
+    std::vector<char> charToChange;
+    std::vector<std::vector<int>> crdtToChange;
+    //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
+    //Serialize data
+    for (int i = startIndex; i < endIndex; i++) {
+        usernameToChange.push_back(symbols[i].getUsername());
+        charToChange.push_back(symbols[i].getCharacter());
+        crdtToChange.push_back(symbols[i].getPosizione());
+        Style style = symbols[i].getSymbolStyle();
+        style.setFontFamily(fontFamily);
     }
+
+    json j = json{
+            {"operation",        "styleChanged"},
+            {"usernameToChange", usernameToChange},
+            {"charToChange",     charToChange},
+            {"crdtToChange",     crdtToChange},
+            {"fontFamily",       fontFamily}
+    };
+    client_->sendAtServer(j);
 }
 
 
-void TextEdit::changeStyle(int startIndex, int endIndex, Style style) {
+void TextEdit::changeStyle(int startIndex, int endIndex, const Style &style) {
     QTextCursor cursor = textEdit->textCursor();
     QTextCharFormat newFormat;
     QFont f;
