@@ -6,8 +6,12 @@
 #define PROGETTO_PROVA_STYLE_H
 
 #define DEFAULT_FONT_FAMILY "Helvetica"
-#define DEFAULT_FONT_SIZE 8
 #define DEFAULT_COLOR "#00ffffff"
+#ifdef __linux__
+    #define DEFAULT_FONT_SIZE 11
+#else //winzoz
+    #define DEFAULT_FONT_SIZE 9
+#endif
 
 #include <string>
 
@@ -21,7 +25,9 @@ private:
     std::string color;
 public:
     Style();
+
     Style(bool bold, bool underlined, bool italic, std::string fontFamily, int fontSize);
+
     bool isBold() const;
 
     void setBold(bool bold);

@@ -244,7 +244,7 @@ void TextEdit::setupEditActions() {
     QMenu *menu = menuBar()->addMenu(tr("&Edit"));
 
     const QIcon undoIcon = QIcon::fromTheme("edit-undo", QIcon(rsrcPath + "/editundo.png"));
-    actionUndo = menu->addAction(undoIcon, tr("&Undo"), textEdit, &QTextEdit::undo);
+/*    actionUndo = menu->addAction(undoIcon, tr("&Undo"), textEdit, &QTextEdit::undo);
     actionUndo->setShortcut(QKeySequence::Undo);
     tb->addAction(actionUndo);
 
@@ -253,7 +253,7 @@ void TextEdit::setupEditActions() {
     actionRedo->setPriority(QAction::LowPriority);
     actionRedo->setShortcut(QKeySequence::Redo);
     tb->addAction(actionRedo);
-    menu->addSeparator();
+    menu->addSeparator();*/
 
 #ifndef QT_NO_CLIPBOARD
     const QIcon cutIcon = QIcon::fromTheme("edit-cut", QIcon(rsrcPath + "/editcut.png"));
@@ -314,7 +314,8 @@ void TextEdit::setupTextActions() {
 
     menu->addSeparator();
 
-    const QIcon leftIcon = QIcon::fromTheme("format-justify-left", QIcon(rsrcPath + "/textleft.png"));
+    //stili indentazioni:
+    /*const QIcon leftIcon = QIcon::fromTheme("format-justify-left", QIcon(rsrcPath + "/textleft.png"));
     actionAlignLeft = new QAction(leftIcon, tr("&Left"), this);
     actionAlignLeft->setShortcut(Qt::CTRL + Qt::Key_L);
     actionAlignLeft->setCheckable(true);
@@ -353,7 +354,7 @@ void TextEdit::setupTextActions() {
     tb->addActions(alignGroup->actions());
     menu->addActions(alignGroup->actions());
 
-    menu->addSeparator();
+    menu->addSeparator();*/
 
     QPixmap pix(16, 16);
     pix.fill(Qt::black);
@@ -605,9 +606,10 @@ void TextEdit::textBold() {
     mergeFormatOnWordOrSelection(fmt);
     requestStyleBoldChanged(true);
 }
+
 void TextEdit::requestStyleBoldChanged(bool bold) {
     QTextCursor cursor = textEdit->textCursor();
-    if(cursor.hasSelection()) {
+    if (cursor.hasSelection()) {
         int startIndex = cursor.selectionStart();
         int endIndex = cursor.selectionEnd();
 
@@ -620,7 +622,7 @@ void TextEdit::requestStyleBoldChanged(bool bold) {
         //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
         //Serialize data
 
-        for(int i=startIndex; i<endIndex; i++){
+        for (int i = startIndex; i < endIndex; i++) {
             usernameToChange.push_back(symbols[i].getUsername());
             charToChange.push_back(symbols[i].getCharacter());
             crdtToChange.push_back(symbols[i].getPosizione());
@@ -629,24 +631,26 @@ void TextEdit::requestStyleBoldChanged(bool bold) {
         }
 
         json j = json{
-                {"operation","styleChanged"},
+                {"operation",        "styleChanged"},
                 {"usernameToChange", usernameToChange},
                 {"charToChange",     charToChange},
                 {"crdtToChange",     crdtToChange},
-                {"bold", bold}
+                {"bold",             bold}
         };
         client_->sendAtServer(j);
     }
 }
+
 void TextEdit::textUnderline() {
     QTextCharFormat fmt;
     fmt.setFontUnderline(actionTextUnderline->isChecked());
     mergeFormatOnWordOrSelection(fmt);
     requestStyleUndelined(true);
 }
+
 void TextEdit::requestStyleUndelined(bool underlined) {
     QTextCursor cursor = textEdit->textCursor();
-    if(cursor.hasSelection()) {
+    if (cursor.hasSelection()) {
         int startIndex = cursor.selectionStart();
         int endIndex = cursor.selectionEnd();
 
@@ -659,7 +663,7 @@ void TextEdit::requestStyleUndelined(bool underlined) {
         //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
         //Serialize data
 
-        for(int i=startIndex; i<endIndex; i++){
+        for (int i = startIndex; i < endIndex; i++) {
             usernameToChange.push_back(symbols[i].getUsername());
             charToChange.push_back(symbols[i].getCharacter());
             crdtToChange.push_back(symbols[i].getPosizione());
@@ -668,11 +672,11 @@ void TextEdit::requestStyleUndelined(bool underlined) {
         }
 
         json j = json{
-                {"operation","styleChanged"},
+                {"operation",        "styleChanged"},
                 {"usernameToChange", usernameToChange},
                 {"charToChange",     charToChange},
                 {"crdtToChange",     crdtToChange},
-                {"underlined", underlined}
+                {"underlined",       underlined}
         };
         client_->sendAtServer(j);
     }
@@ -684,9 +688,10 @@ void TextEdit::textItalic() {
     mergeFormatOnWordOrSelection(fmt);
     requestStylItalic(true);
 }
+
 void TextEdit::requestStylItalic(bool italic) {
     QTextCursor cursor = textEdit->textCursor();
-    if(cursor.hasSelection()) {
+    if (cursor.hasSelection()) {
         int startIndex = cursor.selectionStart();
         int endIndex = cursor.selectionEnd();
 
@@ -699,7 +704,7 @@ void TextEdit::requestStylItalic(bool italic) {
         //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
         //Serialize data
 
-        for(int i=startIndex; i<endIndex; i++){
+        for (int i = startIndex; i < endIndex; i++) {
             usernameToChange.push_back(symbols[i].getUsername());
             charToChange.push_back(symbols[i].getCharacter());
             crdtToChange.push_back(symbols[i].getPosizione());
@@ -708,15 +713,16 @@ void TextEdit::requestStylItalic(bool italic) {
         }
 
         json j = json{
-                {"operation","styleChanged"},
+                {"operation",        "styleChanged"},
                 {"usernameToChange", usernameToChange},
                 {"charToChange",     charToChange},
                 {"crdtToChange",     crdtToChange},
-                {"italic", italic}
+                {"italic",           italic}
         };
         client_->sendAtServer(j);
     }
 }
+
 void TextEdit::textFamily(const QString &f) {
     std::cout << "SONO UN FONT 1 " << std::endl;
     QTextCharFormat fmt;
@@ -815,7 +821,7 @@ void TextEdit::textColor() {
     colorChanged(col);
 }
 
-void TextEdit::textAlign(QAction *a) {
+/*void TextEdit::textAlign(QAction *a) {
     if (a == actionAlignLeft)
         textEdit->setAlignment(Qt::AlignLeft | Qt::AlignAbsolute);
     else if (a == actionAlignCenter)
@@ -824,7 +830,7 @@ void TextEdit::textAlign(QAction *a) {
         textEdit->setAlignment(Qt::AlignRight | Qt::AlignAbsolute);
     else if (a == actionAlignJustify)
         textEdit->setAlignment(Qt::AlignJustify);
-}
+}*/
 
 void TextEdit::currentCharFormatChanged(const QTextCharFormat &format) {
     fontChanged(format.font());
@@ -849,7 +855,7 @@ void TextEdit::cursorPositionChanged() {
     //client_->sendAtServer(j);
 
 
-    alignmentChanged(textEdit->alignment());
+    //alignmentChanged(textEdit->alignment());
     QTextList *list = textEdit->textCursor().currentList();
     if (list) {
         switch (list->format().style()) {
@@ -1063,7 +1069,7 @@ void TextEdit::colorChanged(const QColor &c) {
     actionTextColor->setIcon(pix);
 }
 
-void TextEdit::alignmentChanged(Qt::Alignment a) {
+/*void TextEdit::alignmentChanged(Qt::Alignment a) {
     if (a & Qt::AlignLeft)
         actionAlignLeft->setChecked(true);
     else if (a & Qt::AlignHCenter)
@@ -1072,7 +1078,7 @@ void TextEdit::alignmentChanged(Qt::Alignment a) {
         actionAlignRight->setChecked(true);
     else if (a & Qt::AlignJustify)
         actionAlignJustify->setChecked(true);
-}
+}*/
 
 bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
     if (ev->type() == QEvent::KeyPress) {
@@ -1186,16 +1192,17 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     char c = key_ev->text().toStdString().c_str()[0];
 
                     //prendo lo stile
-                    bool isBold = textEdit->fontWeight()==QFont::Bold;
+                    bool isBold = textEdit->fontWeight() == QFont::Bold;
                     int size = textEdit->fontPointSize();
                     std::string fontFamily = textEdit->fontFamily().toStdString();
-                    if(fontFamily=="")
-                        fontFamily="Helvetica";
-                    if(size==0)
-                        size=8;
+                    if (fontFamily == "")
+                        fontFamily = "Helvetica";
+                    if (size == 0)
+                        size = 8;
                     Style style = {isBold, textEdit->fontItalic(), textEdit->fontUnderline(), fontFamily, size};
                     //std::vector<int> crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
-                    std::vector<int> crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString(), style);
+                    std::vector<int> crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString(),
+                                                                         style);
                     textEdit->setTextCursor(cursor);
                     //emit updateCursor();
 
@@ -1210,11 +1217,11 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                             {"usernameToInsert", usernamev},
                             {"charToInsert",     charv},
                             {"crdtToInsert",     crdtv},
-                            {"bold", isBold},
-                            {"italic", textEdit->fontItalic()},
-                            {"underlined",textEdit->fontUnderline()},
-                            {"fontFamily", fontFamily},
-                            {"fontSize", size}
+                            {"bold",             isBold},
+                            {"italic",           textEdit->fontItalic()},
+                            {"underlined",       textEdit->fontUnderline()},
+                            {"fontFamily",       fontFamily},
+                            {"fontSize",         size}
                     };
                     client_->sendAtServer(j);
                     //drawRemoteCursors();
@@ -1405,10 +1412,10 @@ void TextEdit::eraseSymbols(std::vector<Symbol> symbolsToErase) {
 
         cur.endEditBlock();
         for (auto list:_listParticipantsAndColors) {
-            if(list.first.toStdString()!=username) {
+            if (list.first.toStdString() != username) {
                 if (_cursorsVector[list.first].position > toErase)
                     _cursorsVector[list.first].setPosition(_cursorsVector[list.first].position - 1);
-            }else{
+            } else {
                 _cursorsVector[QString::fromStdString(username)].setPosition(toErase - 1);
             }
         }
@@ -1523,7 +1530,7 @@ void TextEdit::decreentPosition(int pos, int count) {
 
 void TextEdit::updateListParticipants(usersInFile users) {
     for (auto user:_listParticipantsAndColors) {
-        _labels[user.first]->move(0,0);
+        _labels[user.first]->move(0, 0);
         _labels[user.first]->hide();
     }
     _listParticipantsAndColors.clear();
@@ -1601,7 +1608,7 @@ void TextEdit::updateCursors(const CustomCursor &cursor) {
 
 void TextEdit::requestStyleChanged(int fontSize) {
     QTextCursor cursor = textEdit->textCursor();
-    if(cursor.hasSelection()) {
+    if (cursor.hasSelection()) {
         int startIndex = cursor.selectionStart();
         int endIndex = cursor.selectionEnd();
 
@@ -1614,7 +1621,7 @@ void TextEdit::requestStyleChanged(int fontSize) {
         //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
         //Serialize data
 
-        for(int i=startIndex; i<endIndex; i++){
+        for (int i = startIndex; i < endIndex; i++) {
             usernameToChange.push_back(symbols[i].getUsername());
             charToChange.push_back(symbols[i].getCharacter());
             crdtToChange.push_back(symbols[i].getPosizione());
@@ -1623,11 +1630,11 @@ void TextEdit::requestStyleChanged(int fontSize) {
         }
 
         json j = json{
-                {"operation","styleChanged"},
+                {"operation",        "styleChanged"},
                 {"usernameToChange", usernameToChange},
                 {"charToChange",     charToChange},
                 {"crdtToChange",     crdtToChange},
-                {"fontSize", fontSize}
+                {"fontSize",         fontSize}
         };
         client_->sendAtServer(j);
     }
@@ -1635,7 +1642,7 @@ void TextEdit::requestStyleChanged(int fontSize) {
 
 void TextEdit::requestStyleChanged(std::string fontFamily) {
     QTextCursor cursor = textEdit->textCursor();
-    if(cursor.hasSelection()) {
+    if (cursor.hasSelection()) {
         int startIndex = cursor.selectionStart();
         int endIndex = cursor.selectionEnd();
 
@@ -1647,7 +1654,7 @@ void TextEdit::requestStyleChanged(std::string fontFamily) {
         std::vector<std::vector<int>> crdtToChange;
         //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
         //Serialize data
-        for(int i=startIndex; i<endIndex; i++){
+        for (int i = startIndex; i < endIndex; i++) {
             usernameToChange.push_back(symbols[i].getUsername());
             charToChange.push_back(symbols[i].getCharacter());
             crdtToChange.push_back(symbols[i].getPosizione());
@@ -1656,29 +1663,27 @@ void TextEdit::requestStyleChanged(std::string fontFamily) {
         }
 
         json j = json{
-                {"operation","styleChanged"},
+                {"operation",        "styleChanged"},
                 {"usernameToChange", usernameToChange},
                 {"charToChange",     charToChange},
                 {"crdtToChange",     crdtToChange},
-                {"fontFamily",     fontFamily}
+                {"fontFamily",       fontFamily}
         };
         client_->sendAtServer(j);
     }
 }
 
 
-
-void TextEdit::changeStyle(int startIndex, int endIndex, Style style)  {
+void TextEdit::changeStyle(int startIndex, int endIndex, Style style) {
     QTextCursor cursor = textEdit->textCursor();
     QTextCharFormat newFormat;
     QFont f;
     cursor.beginEditBlock();
 
 
-
-    while(endIndex > startIndex) {
+    while (endIndex > startIndex) {
         cursor.setPosition(--endIndex);
-        cursor.setPosition(endIndex+1, QTextCursor::KeepAnchor); //to select the char to be updated
+        cursor.setPosition(endIndex + 1, QTextCursor::KeepAnchor); //to select the char to be updated
         f.setFamily(QString::fromStdString(style.getFontFamily()));
         f.setBold(style.isBold());
         f.setItalic(style.isItalic());
