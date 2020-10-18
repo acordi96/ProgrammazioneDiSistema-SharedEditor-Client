@@ -496,38 +496,24 @@ void TextEdit::textBold() {
     QTextCursor cursor = textEdit->textCursor();
     if (!cursor.hasSelection())
         cursor.select(QTextCursor::WordUnderCursor);
+    bool bold = actionTextBold->isChecked();
     for (auto style = client_->symbols.begin() + cursor.selectionStart();
          style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
         QTextCharFormat fmt = style->getTextCharFormat();
-        fmt.setFontWeight(actionTextBold->isChecked() ? QFont::Bold : QFont::Normal);
+        fmt.setFontWeight(bold ? QFont::Bold : QFont::Normal);
         cursor.mergeCharFormat(fmt);
         textEdit->mergeCurrentCharFormat(fmt);
     }
-    requestStyleBoldChanged(actionTextBold->isChecked());
-}
 
-void TextEdit::requestStyleBoldChanged(bool bold) {
-    QTextCursor cursor = textEdit->textCursor();
-    if (!cursor.hasSelection())
-        cursor.select(QTextCursor::WordUnderCursor);
-    int startIndex = cursor.selectionStart();
-    int endIndex = cursor.selectionEnd();
-
-    //Update symbols of the client
-    //mi devo prendere i syboli che vanno da quella dimensione a quella
     std::vector<std::string> usernameToChange;
     std::vector<char> charToChange;
     std::vector<std::vector<int>> crdtToChange;
-    //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
-    //Serialize data
 
-    for (int i = startIndex; i < endIndex; i++) {
+    for (int i = cursor.selectionStart(); i < cursor.selectionEnd(); i++) {
         usernameToChange.push_back(client_->symbols[i].getUsername());
         charToChange.push_back(client_->symbols[i].getCharacter());
         crdtToChange.push_back(client_->symbols[i].getPosizione());
-        Style style = client_->symbols[i].getSymbolStyle();
-        style.setBold(bold);
-        client_->symbols[i].setSymbolStyle(style);
+        client_->symbols[i].symbolStyle.setBold(bold);
     }
 
     json j = json{
@@ -545,38 +531,24 @@ void TextEdit::textUnderline() {
     QTextCursor cursor = textEdit->textCursor();
     if (!cursor.hasSelection())
         cursor.select(QTextCursor::WordUnderCursor);
+    bool underlined = actionTextUnderline->isChecked();
     for (auto style = client_->symbols.begin() + cursor.selectionStart();
          style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
         QTextCharFormat fmt = style->getTextCharFormat();
-        fmt.setFontUnderline(actionTextUnderline->isChecked());
+        fmt.setFontUnderline(underlined);
         cursor.mergeCharFormat(fmt);
         textEdit->mergeCurrentCharFormat(fmt);
     }
-    requestStyleUndelined(actionTextUnderline->isChecked());
-}
 
-void TextEdit::requestStyleUndelined(bool underlined) {
-    QTextCursor cursor = textEdit->textCursor();
-    if (!cursor.hasSelection())
-        cursor.select(QTextCursor::WordUnderCursor);
-    int startIndex = cursor.selectionStart();
-    int endIndex = cursor.selectionEnd();
-
-    //Update symbols of the client
-    //mi devo prendere i syboli che vanno da quella dimensione a quella
     std::vector<std::string> usernameToChange;
     std::vector<char> charToChange;
     std::vector<std::vector<int>> crdtToChange;
-    //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
-    //Serialize data
 
-    for (int i = startIndex; i < endIndex; i++) {
+    for (int i = cursor.selectionStart(); i < cursor.selectionEnd(); i++) {
         usernameToChange.push_back(client_->symbols[i].getUsername());
         charToChange.push_back(client_->symbols[i].getCharacter());
         crdtToChange.push_back(client_->symbols[i].getPosizione());
-        Style style = client_->symbols[i].getSymbolStyle();
-        style.setUnderlined(underlined);
-        client_->symbols[i].setSymbolStyle(style);
+        client_->symbols[i].symbolStyle.setUnderlined(underlined);
     }
 
     json j = json{
@@ -594,38 +566,24 @@ void TextEdit::textItalic() {
     QTextCursor cursor = textEdit->textCursor();
     if (!cursor.hasSelection())
         cursor.select(QTextCursor::WordUnderCursor);
+    bool italic = actionTextItalic->isChecked();
     for (auto style = client_->symbols.begin() + cursor.selectionStart();
          style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
         QTextCharFormat fmt = style->getTextCharFormat();
-        fmt.setFontItalic(actionTextItalic->isChecked());
+        fmt.setFontItalic(italic);
         cursor.mergeCharFormat(fmt);
         textEdit->mergeCurrentCharFormat(fmt);
     }
-    requestStyleItalic(actionTextItalic->isChecked());
-}
 
-void TextEdit::requestStyleItalic(bool italic) {
-    QTextCursor cursor = textEdit->textCursor();
-    if (!cursor.hasSelection())
-        cursor.select(QTextCursor::WordUnderCursor);
-    int startIndex = cursor.selectionStart();
-    int endIndex = cursor.selectionEnd();
-
-    //Update symbols of the client
-    //mi devo prendere i syboli che vanno da quella dimensione a quella
     std::vector<std::string> usernameToChange;
     std::vector<char> charToChange;
     std::vector<std::vector<int>> crdtToChange;
-    //TO DO: chiedere a matte, fare un for e mettere in un vettore le posizioni coinvolte
-    //Serialize data
 
-    for (int i = startIndex; i < endIndex; i++) {
+    for (int i = cursor.selectionStart(); i < cursor.selectionEnd(); i++) {
         usernameToChange.push_back(client_->symbols[i].getUsername());
         charToChange.push_back(client_->symbols[i].getCharacter());
         crdtToChange.push_back(client_->symbols[i].getPosizione());
-        Style style = client_->symbols[i].getSymbolStyle();
-        style.setItalic(italic);
-        client_->symbols[i].setSymbolStyle(style);
+        client_->symbols[i].symbolStyle.setItalic(italic);
     }
 
     json j = json{

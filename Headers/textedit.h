@@ -179,12 +179,6 @@ private:
 
     void requestStyleChanged(int fontSize);
 
-    void requestStyleBoldChanged(bool bold);
-
-    void requestStyleUndelined(bool underlined);
-
-    void requestStyleItalic(bool italic);
-
     QAction *actionSave;
     QAction *actionTextBold;
     QAction *actionTextUnderline;
