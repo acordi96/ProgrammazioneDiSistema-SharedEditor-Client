@@ -23,7 +23,7 @@ private:
     bool italic;
     std::string fontFamily;
     int fontSize;
-    std::string color;
+    QColor color;
 public:
     Style();
 
@@ -49,9 +49,9 @@ public:
 
     void setFontSize(int fontSize);
 
-    const std::string &getColor() const;
+    const QColor &getColor() const;
 
-    void setColor(const std::string &color);
+    void setColor(const QColor &color);
 
     QTextCharFormat getTextCharFormat();
 

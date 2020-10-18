@@ -686,30 +686,50 @@ void TextEdit::textStyle(int styleIndex) {
 }
 
 void TextEdit::textColor() {
-    QColor col = QColorDialog::getColor(textEdit->textColor(), this);
-    if (!col.isValid())
+    QColor color = QColorDialog::getColor(textEdit->textColor(), this);
+    if (!color.isValid())
         return;
-    QTextCharFormat fmt;
-    fmt.setForeground(col);
-    mergeFormatOnWordOrSelection(fmt);
-    colorChanged(col);
+    QPixmap pix(16, 16);
+    pix.fill(color);
+    actionTextColor->setIcon(pix);
+
+    QTextCursor cursor = textEdit->textCursor();
+    if (!cursor.hasSelection())
+        cursor.select(QTextCursor::WordUnderCursor);
+    for (auto style = client_->symbols.begin() + cursor.selectionStart();
+         style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
+        QTextCharFormat fmt = style->getTextCharFormat();
+        fmt.setForeground(color);
+        cursor.mergeCharFormat(fmt);
+        textEdit->mergeCurrentCharFormat(fmt);
+    }
+
+    std::vector<std::string> usernameToChange;
+    std::vector<char> charToChange;
+    std::vector<std::vector<int>> crdtToChange;
+
+    for (int i = cursor.selectionStart(); i < cursor.selectionEnd(); i++) {
+        usernameToChange.push_back(client_->symbols[i].getUsername());
+        charToChange.push_back(client_->symbols[i].getCharacter());
+        crdtToChange.push_back(client_->symbols[i].getPosizione());
+        client_->symbols[i].symbolStyle.setColor(color);
+    }
+
+    json j = json{
+            {"operation",        "styleChanged"},
+            {"usernameToChange", usernameToChange},
+            {"charToChange",     charToChange},
+            {"crdtToChange",     crdtToChange},
+            {"color",            color.name().toStdString()}
+    };
+    client_->sendAtServer(j);
 }
 
-/*void TextEdit::textAlign(QAction *a) {
-    if (a == actionAlignLeft)
-        textEdit->setAlignment(Qt::AlignLeft | Qt::AlignAbsolute);
-    else if (a == actionAlignCenter)
-        textEdit->setAlignment(Qt::AlignHCenter);
-    else if (a == actionAlignRight)
-        textEdit->setAlignment(Qt::AlignRight | Qt::AlignAbsolute);
-    else if (a == actionAlignJustify)
-        textEdit->setAlignment(Qt::AlignJustify);
-}*/
 
-void TextEdit::currentCharFormatChanged(const QTextCharFormat &format) {
+/*void TextEdit::currentCharFormatChanged(const QTextCharFormat &format) {
     fontChanged(format.font());
     colorChanged(format.foreground().color());
-}
+}*/
 
 void TextEdit::updateRemotePosition(QString user, int pos) {
     _cursorsVector[user].setPosition(pos);
@@ -905,17 +925,6 @@ void TextEdit::colorChanged(const QColor &c) {
     pix.fill(c);
     actionTextColor->setIcon(pix);
 }
-
-/*void TextEdit::alignmentChanged(Qt::Alignment a) {
-    if (a & Qt::AlignLeft)
-        actionAlignLeft->setChecked(true);
-    else if (a & Qt::AlignHCenter)
-        actionAlignCenter->setChecked(true);
-    else if (a & Qt::AlignRight)
-        actionAlignRight->setChecked(true);
-    else if (a & Qt::AlignJustify)
-        actionAlignJustify->setChecked(true);
-}*/
 
 bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
     if (ev->type() == QEvent::KeyPress) {
@@ -1541,6 +1550,8 @@ void TextEdit::changeStyle(json js) {
                     oldFormat.setFontUnderline(js.at("underlined").get<bool>());
                 if (js.contains("italic"))
                     oldFormat.setFontItalic(js.at("italic").get<bool>());
+                if (js.contains("color"))
+                    oldFormat.setForeground(QColor(QString::fromStdString(js.at("color").get<std::string>())));
                 if (js.contains("fontFamily"))
                     oldFormat.setFontFamily(QString::fromStdString(js.at("fontFamily").get<std::string>()));
                 if (js.contains("fontSize"))
@@ -1566,6 +1577,8 @@ void TextEdit::changeStyle(json js) {
                         oldFormat.setFontUnderline(js.at("underlined").get<bool>());
                     if (js.contains("italic"))
                         oldFormat.setFontItalic(js.at("italic").get<bool>());
+                    if (js.contains("color"))
+                        oldFormat.setForeground(QColor(QString::fromStdString(js.at("color").get<std::string>())));
                     if (js.contains("fontFamily"))
                         oldFormat.setFontFamily(QString::fromStdString(js.at("fontFamily").get<std::string>()));
                     if (js.contains("fontSize"))

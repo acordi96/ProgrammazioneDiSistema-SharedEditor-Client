@@ -109,7 +109,7 @@ private slots:
     void textColor();
     //void textAlign(QAction *a);
 
-    void currentCharFormatChanged(const QTextCharFormat &format);
+    //void currentCharFormatChanged(const QTextCharFormat &format);
 
     void cursorPositionChanged();
 
@@ -145,7 +145,6 @@ private:
     void fontChanged(const QFont &f);
 
     void colorChanged(const QColor &c);
-    //void alignmentChanged(Qt::Alignment a);
 
     void resetText();
 

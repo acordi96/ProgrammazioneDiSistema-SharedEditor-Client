@@ -50,11 +50,11 @@ void Style::setFontSize(int fontSize) {
     Style::fontSize = fontSize;
 }
 
-const std::string &Style::getColor() const {
+const QColor &Style::getColor() const {
     return color;
 }
 
-void Style::setColor(const std::string &color) {
+void Style::setColor(const QColor &color) {
     Style::color = color;
 }
 
@@ -64,6 +64,7 @@ QTextCharFormat Style::getTextCharFormat() {
     format.setFontWeight(this->bold);
     format.setFontItalic(this->italic);
     format.setFontUnderline(this->underlined);
+    format.setForeground(this->color);
 
     return QTextCharFormat();
 }
@@ -72,5 +73,6 @@ void Style::setTextCharFormat(QTextCharFormat tcf) {
     this->bold = tcf.fontWeight();
     this->italic = tcf.fontItalic();
     this->underlined = tcf.fontUnderline();
+    this->color = tcf.foreground().color();
     //TODO: others
 }
