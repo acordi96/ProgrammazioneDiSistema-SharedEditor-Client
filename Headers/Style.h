@@ -14,6 +14,7 @@
 #endif
 
 #include <string>
+#include <QtGui/QTextCharFormat>
 
 class Style {
 private:
@@ -51,6 +52,11 @@ public:
     const std::string &getColor() const;
 
     void setColor(const std::string &color);
+
+    QTextCharFormat getTextCharFormat();
+
+    void setTextCharFormat(QTextCharFormat tcf);
+
 };
 
 

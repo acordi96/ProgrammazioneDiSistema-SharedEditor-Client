@@ -107,7 +107,7 @@ signals:
     //per lo stile
     void changeFontFamily(int startIndex, int endIndex, std::string fontFamily);
     void changeFontSize(int startIndex, int endIndex, int fontSize);
-    void changeStyle(int startIndex, int endIndex, Style style);
+    void changeStyle(json js);
 private:
     void do_connect();
 

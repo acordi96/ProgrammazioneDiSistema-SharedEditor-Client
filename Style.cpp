@@ -58,4 +58,19 @@ void Style::setColor(const std::string &color) {
     Style::color = color;
 }
 
+QTextCharFormat Style::getTextCharFormat() {
+    QTextCharFormat format;
 
+    format.setFontWeight(this->bold);
+    format.setFontItalic(this->italic);
+    format.setFontUnderline(this->underlined);
+
+    return QTextCharFormat();
+}
+
+void Style::setTextCharFormat(QTextCharFormat tcf) {
+    this->bold = tcf.fontWeight();
+    this->italic = tcf.fontItalic();
+    this->underlined = tcf.fontUnderline();
+    //TODO: others
+}

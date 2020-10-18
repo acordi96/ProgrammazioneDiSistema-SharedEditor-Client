@@ -9,17 +9,19 @@
 #include <iostream>
 #include <array>
 #include <vector>
+#include <QtGui/QTextCharFormat>
 #include "Style.h"
 class Symbol {
 private:
     char character;
     std::string username;
     std::vector<int> posizione;
-    Style symbolStyle;
 public:
     Symbol(char car, std::string usr, std::vector<int> pos);
     Symbol(char car, std::string usr, std::vector<int> pos, Style symbolStyle);
     Symbol();
+
+    Style symbolStyle;
 
     const Style &getSymbolStyle() const;
 
@@ -40,6 +42,8 @@ public:
     char getCharacter();
 
     void setCharacter(char ch);
+
+    QTextCharFormat getTextCharFormat();
 
 };
 

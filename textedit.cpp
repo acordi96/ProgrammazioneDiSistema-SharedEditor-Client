@@ -91,6 +91,7 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
     qRegisterMetaType<Symbol>("Symbol");
     qRegisterMetaType<std::vector<Symbol>>("std::vector<Symbol>");
     qRegisterMetaType<Style>("Style");
+    qRegisterMetaType<json>("json");
 
     textEdit->installEventFilter(this);
 
@@ -492,9 +493,16 @@ void TextEdit::filePrintPdf() {
 }
 
 void TextEdit::textBold() {
-    QTextCharFormat fmt;
-    fmt.setFontWeight(actionTextBold->isChecked() ? QFont::Bold : QFont::Normal);
-    mergeFormatOnWordOrSelection(fmt);
+    QTextCursor cursor = textEdit->textCursor();
+    if (!cursor.hasSelection())
+        cursor.select(QTextCursor::WordUnderCursor);
+    for (auto style = client_->symbols.begin() + cursor.selectionStart();
+         style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
+        QTextCharFormat fmt = style->getTextCharFormat();
+        fmt.setFontWeight(actionTextBold->isChecked() ? QFont::Bold : QFont::Normal);
+        cursor.mergeCharFormat(fmt);
+        textEdit->mergeCurrentCharFormat(fmt);
+    }
     requestStyleBoldChanged(actionTextBold->isChecked());
 }
 
@@ -507,7 +515,6 @@ void TextEdit::requestStyleBoldChanged(bool bold) {
 
     //Update symbols of the client
     //mi devo prendere i syboli che vanno da quella dimensione a quella
-    std::vector<Symbol> symbols = client_->symbols;
     std::vector<std::string> usernameToChange;
     std::vector<char> charToChange;
     std::vector<std::vector<int>> crdtToChange;
@@ -515,11 +522,12 @@ void TextEdit::requestStyleBoldChanged(bool bold) {
     //Serialize data
 
     for (int i = startIndex; i < endIndex; i++) {
-        usernameToChange.push_back(symbols[i].getUsername());
-        charToChange.push_back(symbols[i].getCharacter());
-        crdtToChange.push_back(symbols[i].getPosizione());
-        Style style = symbols[i].getSymbolStyle();
-        style.setFontSize(bold);
+        usernameToChange.push_back(client_->symbols[i].getUsername());
+        charToChange.push_back(client_->symbols[i].getCharacter());
+        crdtToChange.push_back(client_->symbols[i].getPosizione());
+        Style style = client_->symbols[i].getSymbolStyle();
+        style.setBold(bold);
+        client_->symbols[i].setSymbolStyle(style);
     }
 
     json j = json{
@@ -529,13 +537,21 @@ void TextEdit::requestStyleBoldChanged(bool bold) {
             {"crdtToChange",     crdtToChange},
             {"bold",             bold}
     };
+
     client_->sendAtServer(j);
 }
 
 void TextEdit::textUnderline() {
-    QTextCharFormat fmt;
-    fmt.setFontUnderline(actionTextUnderline->isChecked()/* ? QFont::UnderlineResolved : QFont::Normal*/);
-    mergeFormatOnWordOrSelection(fmt);
+    QTextCursor cursor = textEdit->textCursor();
+    if (!cursor.hasSelection())
+        cursor.select(QTextCursor::WordUnderCursor);
+    for (auto style = client_->symbols.begin() + cursor.selectionStart();
+         style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
+        QTextCharFormat fmt = style->getTextCharFormat();
+        fmt.setFontUnderline(actionTextUnderline->isChecked());
+        cursor.mergeCharFormat(fmt);
+        textEdit->mergeCurrentCharFormat(fmt);
+    }
     requestStyleUndelined(actionTextUnderline->isChecked());
 }
 
@@ -548,7 +564,6 @@ void TextEdit::requestStyleUndelined(bool underlined) {
 
     //Update symbols of the client
     //mi devo prendere i syboli che vanno da quella dimensione a quella
-    std::vector<Symbol> symbols = client_->symbols;
     std::vector<std::string> usernameToChange;
     std::vector<char> charToChange;
     std::vector<std::vector<int>> crdtToChange;
@@ -556,11 +571,12 @@ void TextEdit::requestStyleUndelined(bool underlined) {
     //Serialize data
 
     for (int i = startIndex; i < endIndex; i++) {
-        usernameToChange.push_back(symbols[i].getUsername());
-        charToChange.push_back(symbols[i].getCharacter());
-        crdtToChange.push_back(symbols[i].getPosizione());
-        Style style = symbols[i].getSymbolStyle();
-        style.setFontSize(underlined);
+        usernameToChange.push_back(client_->symbols[i].getUsername());
+        charToChange.push_back(client_->symbols[i].getCharacter());
+        crdtToChange.push_back(client_->symbols[i].getPosizione());
+        Style style = client_->symbols[i].getSymbolStyle();
+        style.setUnderlined(underlined);
+        client_->symbols[i].setSymbolStyle(style);
     }
 
     json j = json{
@@ -575,13 +591,20 @@ void TextEdit::requestStyleUndelined(bool underlined) {
 }
 
 void TextEdit::textItalic() {
-    QTextCharFormat fmt;
-    fmt.setFontItalic(actionTextItalic->isChecked()/* ? QFont::StyleItalic : QFont::Normal*/);
-    mergeFormatOnWordOrSelection(fmt);
-    requestStylItalic(actionTextItalic->isChecked());
+    QTextCursor cursor = textEdit->textCursor();
+    if (!cursor.hasSelection())
+        cursor.select(QTextCursor::WordUnderCursor);
+    for (auto style = client_->symbols.begin() + cursor.selectionStart();
+         style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
+        QTextCharFormat fmt = style->getTextCharFormat();
+        fmt.setFontItalic(actionTextItalic->isChecked());
+        cursor.mergeCharFormat(fmt);
+        textEdit->mergeCurrentCharFormat(fmt);
+    }
+    requestStyleItalic(actionTextItalic->isChecked());
 }
 
-void TextEdit::requestStylItalic(bool italic) {
+void TextEdit::requestStyleItalic(bool italic) {
     QTextCursor cursor = textEdit->textCursor();
     if (!cursor.hasSelection())
         cursor.select(QTextCursor::WordUnderCursor);
@@ -590,7 +613,6 @@ void TextEdit::requestStylItalic(bool italic) {
 
     //Update symbols of the client
     //mi devo prendere i syboli che vanno da quella dimensione a quella
-    std::vector<Symbol> symbols = client_->symbols;
     std::vector<std::string> usernameToChange;
     std::vector<char> charToChange;
     std::vector<std::vector<int>> crdtToChange;
@@ -598,11 +620,12 @@ void TextEdit::requestStylItalic(bool italic) {
     //Serialize data
 
     for (int i = startIndex; i < endIndex; i++) {
-        usernameToChange.push_back(symbols[i].getUsername());
-        charToChange.push_back(symbols[i].getCharacter());
-        crdtToChange.push_back(symbols[i].getPosizione());
-        Style style = symbols[i].getSymbolStyle();
-        style.setFontSize(italic);
+        usernameToChange.push_back(client_->symbols[i].getUsername());
+        charToChange.push_back(client_->symbols[i].getCharacter());
+        crdtToChange.push_back(client_->symbols[i].getPosizione());
+        Style style = client_->symbols[i].getSymbolStyle();
+        style.setItalic(italic);
+        client_->symbols[i].setSymbolStyle(style);
     }
 
     json j = json{
@@ -1530,30 +1553,77 @@ void TextEdit::requestStyleChanged(std::string fontFamily) {
 }
 
 
-void TextEdit::changeStyle(int startIndex, int endIndex, const Style &style) {
+void TextEdit::changeStyle(json js) {
     QTextCursor cursor = textEdit->textCursor();
-    QTextCharFormat newFormat;
-    QFont f;
     cursor.beginEditBlock();
 
-
-    while (endIndex > startIndex) {
-        cursor.setPosition(--endIndex);
-        cursor.setPosition(endIndex + 1, QTextCursor::KeepAnchor); //to select the char to be updated
-        f.setFamily(QString::fromStdString(style.getFontFamily()));
-        f.setBold(style.isBold());
-        f.setItalic(style.isItalic());
-        f.setUnderline(style.isUnderlined());
-        f.setPointSize(style.getFontSize());
-        /*
-        f.setBold(cursor.charFormat().font().bold());
-        f.setItalic(cursor.charFormat().font().italic());
-        f.setUnderline(cursor.charFormat().font().underline());
-        f.setPointSize(cursor.charFormat().font().pointSize());
-         */
-        newFormat.setFont(f);
-        cursor.mergeCharFormat(newFormat);
+    std::vector<Symbol> symbolsToChange;
+    for (int i = 0; i < js.at("usernameToChange").get<std::vector<std::string>>().size(); i++) {
+        symbolsToChange.emplace_back(Symbol(js.at("charToChange").get<std::vector<char>>()[i],
+                                            js.at("usernameToChange").get<std::vector<std::string>>()[i],
+                                            js.at("crdtToChange").get<std::vector<std::vector<int>>>()[i]));
     }
+
+    int lastFound = 0;
+    for (auto iterSymbolsToChange = symbolsToChange.begin();
+         iterSymbolsToChange != symbolsToChange.end(); ++iterSymbolsToChange) {
+        if ((lastFound - 2) >= 0)
+            lastFound -= 2;
+        else if ((lastFound - 1) >= 0)
+            lastFound--;
+        int count = lastFound;
+        bool foundSecondPart = false;
+        for (auto iterSymbols = client_->symbols.begin() + lastFound; iterSymbols !=
+                                                                      client_->symbols.end(); ++iterSymbols) { //cerca prima da dove hai trovato prima in poi
+            if (*iterSymbolsToChange == *iterSymbols) {
+                QTextCharFormat oldFormat = iterSymbols->getTextCharFormat();
+                if (js.contains("bold"))
+                    oldFormat.setFontWeight(js.at("bold").get<bool>() ? QFont::Bold : QFont::Normal);
+                if (js.contains("underlined"))
+                    oldFormat.setFontUnderline(js.at("underlined").get<bool>());
+                if (js.contains("italic"))
+                    oldFormat.setFontItalic(js.at("italic").get<bool>());
+                if (js.contains("fontFamily"))
+                    oldFormat.setFontFamily(QString::fromStdString(js.at("fontFamily").get<std::string>()));
+                if (js.contains("fontSize"))
+                    oldFormat.setFontWeight(js.at("fontSize").get<int>()); //TODO: weight??
+                cursor.setPosition(count);
+                cursor.setPosition(count + 1, QTextCursor::KeepAnchor);
+                cursor.mergeCharFormat(oldFormat);
+                client_->symbols[count].symbolStyle.setTextCharFormat(oldFormat);
+                lastFound = count;
+                foundSecondPart = true;
+                break;
+            }
+            count++;
+        }
+        if (!foundSecondPart) { //se non hai trovato cerca anche nella prima parte
+            for (auto iterSymbols = client_->symbols.begin();
+                 iterSymbols != client_->symbols.begin() + lastFound; ++iterSymbols) {
+                if (*iterSymbolsToChange == *iterSymbols) {
+                    QTextCharFormat oldFormat = iterSymbols->getTextCharFormat();
+                    if (js.contains("bold"))
+                        oldFormat.setFontWeight(js.at("bold").get<bool>() ? QFont::Bold : QFont::Normal);
+                    if (js.contains("underlined"))
+                        oldFormat.setFontUnderline(js.at("underlined").get<bool>());
+                    if (js.contains("italic"))
+                        oldFormat.setFontItalic(js.at("italic").get<bool>());
+                    if (js.contains("fontFamily"))
+                        oldFormat.setFontFamily(QString::fromStdString(js.at("fontFamily").get<std::string>()));
+                    if (js.contains("fontSize"))
+                        oldFormat.setFontWeight(js.at("fontSize").get<int>()); //TODO: weight??
+                    cursor.setPosition(count);
+                    cursor.setPosition(count + 1, QTextCursor::KeepAnchor);
+                    cursor.mergeCharFormat(oldFormat);
+                    client_->symbols[count].symbolStyle.setTextCharFormat(oldFormat);
+                    lastFound = count;
+                    break;
+                }
+                count++;
+            }
+        }
+    }
+
     cursor.endEditBlock();
 
     textEdit->setFocus();

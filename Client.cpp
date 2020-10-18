@@ -146,7 +146,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
             emit insertSymbolWithStyle(symbolToInsert);
         }
         return type_request;
-    }else if (type_request == "remove_res") {
+    } else if (type_request == "remove_res") {
         std::vector<std::string> usernameToErase = js.at("usernameToErase").get<std::vector<std::string>>();
         std::vector<char> charToErase = js.at("charToErase").get<std::vector<char>>();
         std::vector<std::vector<int>> crdtToErase = js.at("crdtToErase").get<std::vector<std::vector<int>>>();
@@ -290,47 +290,8 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::string username = js.at("username").get<std::string>();
         int pos = js.at("pos").get<int>();
         emit updateRemotePosition(QString::fromStdString(username), pos);
-    }else if(type_request == "styleChanged") {
-        std::vector<std::string> usernameToChange = js.at("usernameToChange").get<std::vector<std::string>>();
-        std::vector<char> charToChange = js.at("charToChange").get<std::vector<char>>();
-        std::vector<std::vector<int>> crdtToChange = js.at("crdtToChange").get<std::vector<std::vector<int>>>();
-
-        int startIndex = crdtToChange.front().front(); //posizione 1
-        int endIndex = crdtToChange.back().front(); //posizione finale
-        int j = 0;
-        for (int i = startIndex; i < endIndex + 1; i++) {
-            std::string username = usernameToChange[j];
-            j++;
-            auto it = std::find_if(symbols.begin(), symbols.end(), [i, username](Symbol &s) {
-                return s.getPosizione().front() == i && s.getUsername() == username;
-            });
-            if (it != symbols.end()) {
-                int index = it - symbols.begin();
-                Style style = symbols.at(index).getSymbolStyle();
-
-                if (js.contains("fontFamily")) {
-                    std::string fontFamily = js.at("fontFamily").get<std::string>();
-                    style.setFontFamily(fontFamily);
-                }
-                if (js.contains("fontSize")) {
-                    int fontSize = js.at("fontSize").get<int>();
-                    style.setFontSize(fontSize);
-                }
-                if (js.contains("bold")) {
-                    bool bold = js.at("bold").get<bool>();
-                    style.setBold(bold);
-                }
-                if (js.contains("underlined")) {
-                    bool underlined = js.at("underlined").get<bool>();
-                    style.setUnderlined(underlined);
-                }
-                if (js.contains("italic")) {
-                    bool italic = js.at("italic").get<bool>();
-                    style.setItalic(italic);
-                }
-                emit changeStyle(i, i + 1, style);
-            }
-        }
+    } else if (type_request == "styleChanged") {
+        emit changeStyle(js);
     }
     return type_request;
 }
@@ -408,6 +369,7 @@ void Client::setFiles(const std::vector<std::string> &owners, const std::vector<
 std::map<std::pair<std::string, std::string>, std::string> Client::getFiles() const {
     return files;
 }
+
 //stessa cosa di sotto ma con style
 std::vector<int> Client::insertSymbolNewCRDT(int index, char character, const std::string &username, Style style) {
     std::vector<int> vector;

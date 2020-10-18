@@ -67,3 +67,14 @@ const Style &Symbol::getSymbolStyle() const {
 void Symbol::setSymbolStyle(const Style &symbolStyle) {
     Symbol::symbolStyle = symbolStyle;
 }
+
+QTextCharFormat Symbol::getTextCharFormat() {
+    QTextCharFormat format;
+    Style style = this->getSymbolStyle();
+
+    format.setFontWeight(style.isBold());
+    format.setFontItalic(style.isItalic());
+    format.setFontUnderline(style.isUnderlined());
+
+    return QTextCharFormat();
+}

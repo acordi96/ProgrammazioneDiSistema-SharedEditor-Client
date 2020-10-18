@@ -35,7 +35,6 @@ class QEvent;
 
 typedef std::map<std::string, std::string> usersInFile;
 
-
 class TextEdit : public QMainWindow {
 Q_OBJECT
 
@@ -64,7 +63,7 @@ public slots:
 
 
     //per lo stile
-    void changeStyle(int startIndex, int endIndex, const Style& style);
+    void changeStyle(json js);
 
 protected:
     void closeEvent(QCloseEvent *e) override;
@@ -184,7 +183,7 @@ private:
 
     void requestStyleUndelined(bool underlined);
 
-    void requestStylItalic(bool italic);
+    void requestStyleItalic(bool italic);
 
     QAction *actionSave;
     QAction *actionTextBold;
