@@ -882,11 +882,19 @@ void TextEdit::showSymbolWithStyle(Symbol symbolToInsert) {
     QTextCursor cur = textEdit->textCursor();
     cur.beginEditBlock();
 
+    bool wasBold = actionTextBold->isChecked();
+    bool wasItalic = actionTextItalic->isChecked();
+    bool wasUnderlined = actionTextUnderline->isChecked();
+    QColor wasColor = textEdit->textColor();
+    int wasSixe = textEdit->fontPointSize();
+    std::string wasFontFamily = textEdit->fontFamily().toStdString();
+
     symbolToInsert.getSymbolStyle().isBold() ? format.setFontWeight(QFont::Bold) : format.setFontWeight(QFont::Normal);
     symbolToInsert.getSymbolStyle().isItalic() ? format.setFontItalic(true) : format.setFontItalic(false);
     symbolToInsert.getSymbolStyle().isUnderlined() ? format.setFontUnderline(true) : format.setFontUnderline(false);
     format.setFontFamily(QString::fromStdString(symbolToInsert.getSymbolStyle().getFontFamily()));
     format.setFontPointSize(symbolToInsert.getSymbolStyle().getFontSize());
+    format.setForeground(QColor(QString::fromStdString(symbolToInsert.getSymbolStyle().getColor())));
 
     int endIndex;
     cur.hasSelection() ? endIndex = cur.selectionEnd() : endIndex = -90;
@@ -909,6 +917,13 @@ void TextEdit::showSymbolWithStyle(Symbol symbolToInsert) {
         cur.setPosition(oldPos);
     }
     cur.endEditBlock();
+
+    wasBold ? format.setFontWeight(QFont::Bold) : format.setFontWeight(QFont::Normal);
+    textEdit->setFontItalic(wasItalic);
+    textEdit->setFontUnderline(wasUnderlined);
+    textEdit->setFontFamily(QString::fromStdString(wasFontFamily));
+    textEdit->setFontPointSize(wasSixe);
+    textEdit->setTextColor(wasColor);
 
     textEdit->setTextCursor(cur);
 
