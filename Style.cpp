@@ -6,8 +6,7 @@
 
 Style::Style() : bold(false), underlined(false), italic(false), fontFamily(DEFAULT_FONT_FAMILY), fontSize(DEFAULT_FONT_SIZE),color(DEFAULT_COLOR) {}
 
-//per prender
-Style::Style(bool bold, bool underlined, bool italic, std::string fontFamily, int fontSize) : bold(bold), underlined(underlined), italic(italic), fontFamily(fontFamily), fontSize(fontSize){}
+Style::Style(bool bold, bool underlined, bool italic, std::string fontFamily, int fontSize, std::string cl) : bold(bold), underlined(underlined), italic(italic), fontFamily(fontFamily), fontSize(fontSize), color(cl){}
 
 bool Style::isBold() const {
     return bold;
@@ -50,11 +49,11 @@ void Style::setFontSize(int fontSize) {
     Style::fontSize = fontSize;
 }
 
-const QColor &Style::getColor() const {
+const std::string &Style::getColor() const {
     return color;
 }
 
-void Style::setColor(const QColor &color) {
+void Style::setColor(const std::string &color) {
     Style::color = color;
 }
 
@@ -64,7 +63,9 @@ QTextCharFormat Style::getTextCharFormat() {
     format.setFontWeight(this->bold);
     format.setFontItalic(this->italic);
     format.setFontUnderline(this->underlined);
-    format.setForeground(this->color);
+    format.setForeground(QColor(QString::fromStdString(this->color)));
+    format.setFontPointSize(this->fontSize);
+    format.setFontFamily(QString::fromStdString(this->fontFamily));
 
     return QTextCharFormat();
 }
@@ -73,6 +74,7 @@ void Style::setTextCharFormat(QTextCharFormat tcf) {
     this->bold = tcf.fontWeight();
     this->italic = tcf.fontItalic();
     this->underlined = tcf.fontUnderline();
-    this->color = tcf.foreground().color();
-    //TODO: others
+    this->color = tcf.foreground().color().name().toStdString();
+    this->fontFamily = tcf.fontFamily().toStdString();
+    this->fontSize = tcf.fontPointSize();
 }

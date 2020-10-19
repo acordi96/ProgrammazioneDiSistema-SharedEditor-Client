@@ -23,11 +23,11 @@ private:
     bool italic;
     std::string fontFamily;
     int fontSize;
-    QColor color;
+    std::string color;
 public:
     Style();
 
-    Style(bool bold, bool underlined, bool italic, std::string fontFamily, int fontSize);
+    Style(bool bold, bool underlined, bool italic, std::string fontFamily, int fontSize, std::string color);
 
     bool isBold() const;
 
@@ -49,15 +49,14 @@ public:
 
     void setFontSize(int fontSize);
 
-    const QColor &getColor() const;
+    const std::string &getColor() const;
 
-    void setColor(const QColor &color);
+    void setColor(const std::string &color);
 
     QTextCharFormat getTextCharFormat();
 
     void setTextCharFormat(QTextCharFormat tcf);
 
 };
-
 
 #endif //PROGETTO_PROVA_STYLE_H

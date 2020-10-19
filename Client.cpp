@@ -139,9 +139,10 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         bool bold = js.at("bold").get<bool>();
         bool italic = js.at("italic").get<bool>();
         bool underlined = js.at("underlined").get<bool>();
+        std::string color= js.at("color").get<std::string>();
         //TO DO:anche qui un solo elemento
         for (int i = 0; i < usernameToInsert.size(); i++) {
-            Style style = {bold, underlined, italic, fontFamily, fontSize};
+            Style style = {bold, underlined, italic, fontFamily, fontSize, color};
             Symbol symbolToInsert(charToInsert[i], usernameToInsert[i], crdtToInsert[i], style);
             emit insertSymbolWithStyle(symbolToInsert);
         }

@@ -61,6 +61,12 @@ const QString rsrcPath = ":/images/mac";
 const QString rsrcPath = ":/images/win";
 #endif
 
+#ifdef __linux__
+#define DEFAULT_FONT_SIZE 11
+#else //winzoz
+#define DEFAULT_FONT_SIZE 9
+#endif
+
 TextEdit::TextEdit(Client *c, QWidget *parent)
         : QMainWindow(parent), client_(c) {
 #ifdef Q_OS_MACOS
@@ -494,6 +500,7 @@ void TextEdit::filePrintPdf() {
 
 void TextEdit::textBold() {
     QTextCursor cursor = textEdit->textCursor();
+    actionTextBold->isChecked() ? textEdit->setFontWeight(QFont::Bold) : textEdit->setFontWeight(QFont::Normal);
     if (!cursor.hasSelection())
         cursor.select(QTextCursor::WordUnderCursor);
     if (!cursor.hasSelection())
@@ -530,6 +537,7 @@ void TextEdit::textBold() {
 
 void TextEdit::textUnderline() {
     QTextCursor cursor = textEdit->textCursor();
+    textEdit->setFontUnderline(actionTextUnderline->isChecked());
     if (!cursor.hasSelection())
         cursor.select(QTextCursor::WordUnderCursor);
     if (!cursor.hasSelection())
@@ -566,6 +574,7 @@ void TextEdit::textUnderline() {
 
 void TextEdit::textItalic() {
     QTextCursor cursor = textEdit->textCursor();
+    textEdit->setFontItalic(actionTextItalic->isChecked());
     if (!cursor.hasSelection())
         cursor.select(QTextCursor::WordUnderCursor);
     if (!cursor.hasSelection())
@@ -602,6 +611,7 @@ void TextEdit::textItalic() {
 
 void TextEdit::textColor() {
     QColor color = QColorDialog::getColor(textEdit->textColor(), this);
+    textEdit->setTextColor(color);
     if (!color.isValid())
         return;
     QPixmap pix(16, 16);
@@ -627,7 +637,7 @@ void TextEdit::textColor() {
         usernameToChange.push_back(client_->symbols[i].getUsername());
         charToChange.push_back(client_->symbols[i].getCharacter());
         crdtToChange.push_back(client_->symbols[i].getPosizione());
-        client_->symbols[i].symbolStyle.setColor(color);
+        client_->symbols[i].symbolStyle.setColor(color.name().toStdString());
         i++;
     }
 
@@ -643,6 +653,7 @@ void TextEdit::textColor() {
 
 void TextEdit::textFamily(const QString &f) {
     QTextCursor cursor = textEdit->textCursor();
+    textEdit->setFontFamily(f);
     if (!cursor.hasSelection())
         cursor.select(QTextCursor::WordUnderCursor);
     if (!cursor.hasSelection())
@@ -678,6 +689,7 @@ void TextEdit::textFamily(const QString &f) {
 
 void TextEdit::textSize(const QString &p) {
     qreal pointSize = p.toFloat();
+    textEdit->setFontPointSize(pointSize);
     if (p.toFloat() <= 0)
         return;
     QTextCursor cursor = textEdit->textCursor();
@@ -713,7 +725,7 @@ void TextEdit::textSize(const QString &p) {
     client_->sendAtServer(j);
 
 }
-
+/*
 void TextEdit::textStyle(int styleIndex) {
     QTextCursor cursor = textEdit->textCursor();
     QTextListFormat::Style style = QTextListFormat::ListStyleUndefined;
@@ -778,7 +790,7 @@ void TextEdit::textStyle(int styleIndex) {
     }
 
     cursor.endEditBlock();
-}
+}*/
 
 /*void TextEdit::currentCharFormatChanged(const QTextCharFormat &format) {
     fontChanged(format.font());
@@ -1090,10 +1102,11 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     int size = textEdit->fontPointSize();
                     std::string fontFamily = textEdit->fontFamily().toStdString();
                     if (fontFamily == "")
-                        fontFamily = "Helvetica";
+                        fontFamily = DEFAULT_FONT_FAMILY;
                     if (size == 0)
-                        size = 8;
-                    Style style = {isBold, textEdit->fontItalic(), textEdit->fontUnderline(), fontFamily, size};
+                        size = DEFAULT_FONT_SIZE;
+                    std::string color = textEdit->textColor().name().toStdString();
+                    Style style = {isBold, textEdit->fontItalic(), textEdit->fontUnderline(), fontFamily, size, color};
                     //std::vector<int> crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
                     std::vector<int> crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString(),
                                                                          style);
@@ -1114,6 +1127,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                             {"bold",             isBold},
                             {"italic",           textEdit->fontItalic()},
                             {"underlined",       textEdit->fontUnderline()},
+                            {"color",            color},
                             {"fontFamily",       fontFamily},
                             {"fontSize",         size}
                     };
