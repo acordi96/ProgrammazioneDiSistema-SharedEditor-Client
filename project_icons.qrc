@@ -60,5 +60,11 @@
         <file>images/back-arrow.png</file>
         <file>images/win/eye.png</file>
         <file>images/mac/eye.png</file>
+        <file>images/win/edit.png</file>
+        <file>images/mac/edit.png</file>
+        <file>images/win/color-picker.png</file>
+        <file>images/mac/color-picker.png</file>
+        <file>images/win/hourglass.png</file>
+        <file>images/mac/hourglass.png</file>
     </qresource>
 </RCC>

@@ -66,14 +66,14 @@ public:
 
     void setEmail(const QString &value);
 
-    std::vector<int> insertSymbolNewCRDT(int index, char character, const std::string &username);
-    std::vector<int> insertSymbolNewCRDT(int index, char character, const std::string &username, Style style);
+    std::vector<int> insertSymbolNewCRDT(int index, wchar_t character, const std::string &username);
+    std::vector<int> insertSymbolNewCRDT(int index, wchar_t character, const std::string &username, Style style);
 
     int generateIndexCRDT(Symbol symbol, int iter, int start, int end);
 
     std::vector<int> eraseSymbolCRDT(std::vector<Symbol> symbolsToErase);
 
-    void insertSymbolIndex(const Symbol &symbol, int index);
+    void insertSymbolIndex(Symbol Symbol, int index);
 
     std::vector<int> generatePos(int index);
 
@@ -91,6 +91,8 @@ signals:
 
     void updateFile(QString old, QString newN, QString owner, QString request);
 
+    void updateUser(QString old, QString newN);
+
     void insertSymbol(int pos, QChar c);
 
     void insertSymbolWithId(Symbol symbolToInsert);
@@ -103,6 +105,8 @@ signals:
     void updateUserslist(usersInFile users);
 
     void clearEditor();
+
+    void loading(bool active);
 
     //per lo stile
     void changeFontFamily(int startIndex, int endIndex, std::string fontFamily);

@@ -122,7 +122,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
     } else if (type_request == "insert_res") {
         //prendo il vettore di symbol
         std::vector<std::string> usernameToInsert = js.at("usernameToInsert").get<std::vector<std::string>>();
-        std::vector<char> charToInsert = js.at("charToInsert").get<std::vector<char>>();
+        std::vector<wchar_t> charToInsert = js.at("charToInsert").get<std::vector<wchar_t>>();
         std::vector<std::vector<int>> crdtToInsert = js.at("crdtToInsert").get<std::vector<std::vector<int>>>();
         for (int i = 0; i < usernameToInsert.size(); i++) {
             Symbol symbolToInsert(charToInsert[i], usernameToInsert[i], crdtToInsert[i]);
@@ -149,7 +149,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         return type_request;
     } else if (type_request == "remove_res") {
         std::vector<std::string> usernameToErase = js.at("usernameToErase").get<std::vector<std::string>>();
-        std::vector<char> charToErase = js.at("charToErase").get<std::vector<char>>();
+        std::vector<wchar_t> charToErase = js.at("charToErase").get<std::vector<wchar_t>>();
         std::vector<std::vector<int>> crdtToErase = js.at("crdtToErase").get<std::vector<std::vector<int>>>();
         std::vector<Symbol> symbolsToErase;
         for (int i = 0; i < usernameToErase.size(); i++) {
@@ -198,21 +198,28 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
 
     } else if (type_request == "open_file") {
         //prima parte di file deve pulire il testo
-        if (this->writing == 0)
-                emit clearEditor();
-        std::vector<std::string> usernameToInsert = js.at("usernameToInsert").get<std::vector<std::string>>();
-        std::vector<char> charToInsert = js.at("charToInsert").get<std::vector<char>>();
+        if (this->writing == 0) {
+            emit clearEditor();
+            emit loading(true);
+        }
+        std::vector<int> usernameToInsert = js.at("usernameToInsert").get<std::vector<int>>();
+        std::vector<wchar_t> charToInsert = js.at("charToInsert").get<std::vector<wchar_t>>();
         std::vector<std::vector<int>> crdtToInsert = js.at("crdtToInsert").get<std::vector<std::vector<int>>>();
+        std::vector<std::string> idToUsername = js.at("usernameToId").get<std::vector<std::string>>();
+        std::map<int, std::string> usernameToId;
+        for (int i = 0; i < idToUsername.size(); i++)
+            usernameToId.insert({i, idToUsername[i]});
         for (int i = 0; i < usernameToInsert.size(); i++) {
             //ricreo il simbolo
-            Symbol symbolToInsert(charToInsert[i], usernameToInsert[i], crdtToInsert[i]);
+            Symbol symbolToInsert(charToInsert[i], usernameToId.at(usernameToInsert[i]), crdtToInsert[i]);
             int index = this->generateIndexCRDT(symbolToInsert, 0, -1, -1);
             //aggiungo al crdt
             this->insertSymbolIndex(symbolToInsert, index);
             emit insertSymbol(index, charToInsert[i]);
         }
-        if (this->writing == js.at("ofPartToWrite")) {
+        if (js.contains("endOpenFile")) {
             this->writing = 0;
+            emit loading(false);
             emit formResultSuccess(QString::fromStdString("file_opened"));
         } else {
             this->writing++;
@@ -291,6 +298,22 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::string username = js.at("username").get<std::string>();
         int pos = js.at("pos").get<int>();
         emit updateRemotePosition(QString::fromStdString(username), pos);
+    } else if(type_request == "WRONG_OLD_PASSWORD"){
+        QString res = QString::fromUtf8("wrong_old_password");
+        emit formResultSuccess(res);
+    } else if (type_request == "EDIT_SUCCESS"){
+        QString res = QString::fromUtf8("edit_success");
+        QString newEmail = QString::fromStdString(js.at("email").get<std::string>());
+        QString newColor = QString::fromStdString(js.at("color").get<std::string>());
+
+        if(!newEmail.isEmpty()) this->setEmail(newEmail);
+        if(!newColor.isEmpty()) this->setColor(newColor);
+
+        emit formResultSuccess(res);
+    }  else if (type_request == "EDIT_FAILED"){
+
+        QString res = QString::fromUtf8("edit_failed");
+        emit formResultSuccess(res);
     } else if (type_request == "styleChanged_res") {
         emit changeStyle(js);
     }
@@ -393,7 +416,7 @@ std::vector<int> Client::insertSymbolNewCRDT(int index, char character, const st
 
 
 //crea un nuovo symbol e lo inserisce nel crdt in posizione index
-std::vector<int> Client::insertSymbolNewCRDT(int index, char character, const std::string &username) {
+std::vector<int> Client::insertSymbolNewCRDT(int index, wchar_t character, const std::string &username) {
     std::vector<int> vector;
     if (this->symbols.empty()) {
         vector = {0};
@@ -482,7 +505,7 @@ std::vector<int> Client::eraseSymbolCRDT(std::vector<Symbol> symbolsToErase) {
     return erased;
 }
 
-void Client::insertSymbolIndex(const Symbol &symbol, int index) {
+void Client::insertSymbolIndex(Symbol symbol, int index) {
     int i = 0;
     for (auto iterPositions = this->symbols.begin(); iterPositions != this->symbols.end(); ++iterPositions) {
         if (index == i) {

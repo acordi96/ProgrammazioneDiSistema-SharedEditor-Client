@@ -28,6 +28,8 @@ public:
 
     void clearLineURL();
 
+    void updateInfo();
+
 private:
     void setupRecentFiles();
 
@@ -36,6 +38,8 @@ private:
     void sendmessage(message mess);
 
     void requestLogout();
+
+    bool colorIsDark(QString color);
 
     Client *client_;
     QHBoxLayout *hLayout;
@@ -49,6 +53,12 @@ private:
     QLineEdit *urlLine;
 
     QWidget *myIcon;
+    QPushButton *newFileButton;
+    QLineEdit *lineURL;
+    QPushButton *openURLbutton;
+    QLabel *email_lab;
+    QLabel *usrLetters;
+
 
 private slots:
 
@@ -63,7 +73,7 @@ private slots:
 signals:
 
     void upLogout();
-
+    void goToEdit();
 public slots:
 
     //void customMenuRequested(QPoint pos);
@@ -79,17 +89,15 @@ public slots:
 
     void updateRecentFiles(QString old, QString newN, QString owner, QString request);
 
+    void updateUserFile(QString old, QString newN);
+
     void handleOpenURLbutton();
 
     //void updateFiles();
 
 
 private:
-    QPushButton *newFileButton;
-    QLineEdit *lineURL;
-    QPushButton *openURLbutton;
 
-    bool colorIsDark(QString color);
 };
 
 #endif // USERPAGE_H

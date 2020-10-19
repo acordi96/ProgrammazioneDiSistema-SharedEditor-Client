@@ -214,16 +214,7 @@ void TextEdit::setupEditActions() {
     QMenu *menu = menuBar()->addMenu(tr("&Edit"));
 
     const QIcon undoIcon = QIcon::fromTheme("edit-undo", QIcon(rsrcPath + "/editundo.png"));
-/*    actionUndo = menu->addAction(undoIcon, tr("&Undo"), textEdit, &QTextEdit::undo);
-    actionUndo->setShortcut(QKeySequence::Undo);
-    tb->addAction(actionUndo);
 
-    const QIcon redoIcon = QIcon::fromTheme("edit-redo", QIcon(rsrcPath + "/editredo.png"));
-    actionRedo = menu->addAction(redoIcon, tr("&Redo"), textEdit, &QTextEdit::redo);
-    actionRedo->setPriority(QAction::LowPriority);
-    actionRedo->setShortcut(QKeySequence::Redo);
-    tb->addAction(actionRedo);
-    menu->addSeparator();*/
 
 #ifndef QT_NO_CLIPBOARD
     const QIcon cutIcon = QIcon::fromTheme("edit-cut", QIcon(rsrcPath + "/editcut.png"));
@@ -818,7 +809,7 @@ void TextEdit::showSymbolWithId(Symbol symbolToInsert) {
 
     int pos = client_->generateIndexCRDT(symbolToInsert, 0, -1, -1);
     client_->insertSymbolIndex(symbolToInsert, pos);
-    char c = symbolToInsert.getCharacter();
+    wchar_t c = symbolToInsert.getCharacter();
     QString user = QString::fromStdString(symbolToInsert.getUsername());
 
     QTextCharFormat format;
@@ -1003,15 +994,16 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
     if (ev->type() == QEvent::KeyPress) {
         QKeyEvent *key_ev = static_cast<QKeyEvent *>(ev);
         int key = key_ev->key();
-        /*std::cout << "CRDT: " << std::flush; //print crdt
+        /*std::cout << "FILE CRDT: " << std::flush; //print crdt
         for (auto iterPositions = client_->symbols.begin(); iterPositions != client_->symbols.end(); ++iterPositions) {
             if (iterPositions->getCharacter() != 10 && iterPositions->getCharacter() != 13)
-                std::cout << "[" << (int) iterPositions->getCharacter() << "(" << iterPositions->getCharacter()
-                          << ") - " << std::flush;
+                std::wcout << "[" << (int) iterPositions->getCharacter() << "(" << iterPositions->getCharacter()
+                           << ") - " << std::flush;
             else
-                std::cout << "[" << (int) iterPositions->getCharacter() << "(\\n) - " << std::flush;
+                std::wcout << "[" << (int) iterPositions->getCharacter() << "(\\n) - " << std::flush;
             for (int i = 0; i < iterPositions->getPosizione().size(); i++)
                 std::cout << std::to_string(iterPositions->getPosizione()[i]) << std::flush;
+            std::cout << " - " << iterPositions->getUsername() << std::flush;
             std::cout << "]" << std::flush;
         }
         std::cout << std::endl;*/
@@ -1035,7 +1027,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
 
                     std::vector<Symbol> symbolsToErase;
                     std::vector<std::string> usernameToErase;
-                    std::vector<char> charToErase;
+                    std::vector<wchar_t> charToErase;
                     std::vector<std::vector<int>> crdtToErase;
 
                     int k = 0;
@@ -1100,7 +1092,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     key_ev->text().toStdString().c_str()[0] != 1) { //ctrl+a
                     //caso carattere normale (lettere e spazio)
 
-                    char c = key_ev->text().toStdString().c_str()[0];
+                    wchar_t c = key_ev->text().toStdWString().c_str()[0];
 
                     //prendo lo stile
                     bool isBold = textEdit->fontWeight() == QFont::Bold;
@@ -1120,7 +1112,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
 
                     std::vector<std::string> usernamev;
                     usernamev.push_back(client_->getUser().toStdString());
-                    std::vector<char> charv;
+                    std::vector<wchar_t> charv;
                     charv.push_back(c);
                     std::vector<std::vector<int>> crdtv;
                     crdtv.push_back(crdt);
@@ -1150,10 +1142,10 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     textEdit->setTextCursor(cursor);
 
                     std::vector<std::string> usernameToInsert;
-                    std::vector<char> charToInsert;
+                    std::vector<wchar_t> charToInsert;
                     std::vector<std::vector<int>> crdtToInsert;
                     std::vector<int> crdt;
-                    char c;
+                    wchar_t c;
                     int startPos = pos;
                     int dim = pastedText.size();
                     int of = dim / client_->maxBufferSymbol;
@@ -1167,7 +1159,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         for (int k = 0; k < client_->maxBufferSymbol; k++) {
                             textEdit->setTextCursor(cursor);
                             usernameToInsert.push_back(client_->getUser().toStdString());
-                            c = pastedText.toStdString().c_str()[(i * client_->maxBufferSymbol) + k];
+                            c = pastedText.toStdWString().c_str()[(i * client_->maxBufferSymbol) + k];
                             charToInsert.push_back(c);
                             crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
                             crdtToInsert.push_back(crdt);
@@ -1192,7 +1184,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         for (int i = 0; i < (dim % client_->maxBufferSymbol); i++) {
                             textEdit->setTextCursor(cursor);
                             usernameToInsert.push_back(client_->getUser().toStdString());
-                            c = pastedText.toStdString().c_str()[(of * client_->maxBufferSymbol) + i];
+                            c = pastedText.toStdWString().c_str()[(of * client_->maxBufferSymbol) + i];
                             charToInsert.push_back(c);
                             crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
                             crdtToInsert.push_back(crdt);
@@ -1228,7 +1220,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         if (pos > 0) {
                             std::vector<Symbol> symbolsToErase;
                             std::vector<std::string> usernameToErase;
-                            std::vector<char> charToErase;
+                            std::vector<wchar_t> charToErase;
                             std::vector<std::vector<int>> crdtToErase;
                             symbolsToErase.push_back(client_->symbols[pos - 1]);
                             usernameToErase.push_back(client_->symbols[pos - 1].getUsername());
@@ -1257,7 +1249,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     if (pos >= 0 && pos < textEdit->toPlainText().size()) {
                         std::vector<Symbol> symbolsToErase;
                         std::vector<std::string> usernameToErase;
-                        std::vector<char> charToErase;
+                        std::vector<wchar_t> charToErase;
                         std::vector<std::vector<int>> crdtToErase;
                         symbolsToErase.push_back(client_->symbols[pos]);
                         usernameToErase.push_back(client_->symbols[pos].getUsername());
@@ -1371,11 +1363,9 @@ void TextEdit::highlightcharacter() {
     QString name = sender->objectName();
     QTextCursor cursor = textEdit->textCursor();
     QTextCursor tempCursor = QTextCursor(cursor);
-    int pos;
-    int i = 0;
+    int pos = 0;
     for (auto s: client_->symbols) {
         if (s.getUsername() == name.toStdString()) {
-            pos = i;
             tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
             tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
             tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
@@ -1384,15 +1374,16 @@ void TextEdit::highlightcharacter() {
                 textEdit->setTextBackgroundColor(client_->getColor());
             else
                 textEdit->setTextBackgroundColor(_listParticipantsAndColors[name]);
-        }
 
-        i++;
+        }
+        pos++;
     }
+
     textEdit->setTextCursor(cursor);
     textEdit->setTextBackgroundColor(QColor(255, 255, 255, 255));
     textEdit->setFocus();
 
-    timer->start(2000);
+    timer->start(3500);
 
 }
 
