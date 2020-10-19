@@ -290,7 +290,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::string username = js.at("username").get<std::string>();
         int pos = js.at("pos").get<int>();
         emit updateRemotePosition(QString::fromStdString(username), pos);
-    } else if (type_request == "styleChanged") {
+    } else if (type_request == "styleChanged_res") {
         emit changeStyle(js);
     }
     return type_request;

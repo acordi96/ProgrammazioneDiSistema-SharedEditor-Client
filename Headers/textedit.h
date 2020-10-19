@@ -144,8 +144,6 @@ private:
 
     void fontChanged(const QFont &f);
 
-    void colorChanged(const QColor &c);
-
     void resetText();
 
     void resetCursors();
@@ -173,10 +171,6 @@ private:
     void decreentPosition(int pos, int count);
 
     //funzioni per lo stile
-
-    void requestStyleChanged(std::string fontFamily);
-
-    void requestStyleChanged(int fontSize);
 
     QAction *actionSave;
     QAction *actionTextBold;
