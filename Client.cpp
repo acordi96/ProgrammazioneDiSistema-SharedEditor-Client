@@ -139,7 +139,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         bool bold = js.at("bold").get<bool>();
         bool italic = js.at("italic").get<bool>();
         bool underlined = js.at("underlined").get<bool>();
-        std::string color= js.at("color").get<std::string>();
+        std::string color = js.at("color").get<std::string>();
         //TO DO:anche qui un solo elemento
         for (int i = 0; i < usernameToInsert.size(); i++) {
             Style style = {bold, underlined, italic, fontFamily, fontSize, color};
@@ -204,22 +204,48 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         }
         std::vector<int> usernameToInsert = js.at("usernameToInsert").get<std::vector<int>>();
         std::vector<wchar_t> charToInsert = js.at("charToInsert").get<std::vector<wchar_t>>();
-        std::vector<std::vector<int>> crdtToInsert = js.at("crdtToInsert").get<std::vector<std::vector<int>>>();
+        std::vector<std::vector<int>> crdtToInsert;
+        std::vector<int> forceCRDT;
+        if(!js.contains("first_open"))
+            crdtToInsert = js.at("crdtToInsert").get<std::vector<std::vector<int>>>();
         std::vector<std::string> idToUsername = js.at("usernameToId").get<std::vector<std::string>>();
-        std::vector<int> bold = js.at("bold").get<std::vector<int>>();
-        std::vector<int> italic = js.at("italic").get<std::vector<int>>();
-        std::vector<int> underlined = js.at("underlined").get<std::vector<int>>();
-        std::vector<std::string> colorj = js.at("color").get<std::vector<std::string>>();
-        std::vector<std::string> fontFamily = js.at("fontFamily").get<std::vector<std::string>>();
-        std::vector<int> size = js.at("size").get<std::vector<int>>();
+        std::vector<int> bold;
+        if (!js.contains("boldDefault"))
+            bold = js.at("bold").get<std::vector<int>>();
+        std::vector<int> italic;
+        if (!js.contains("italicDefault"))
+            italic = js.at("italic").get<std::vector<int>>();
+        std::vector<int> underlined;
+        if (!js.contains("underlinedDefault"))
+            underlined = js.at("underlined").get<std::vector<int>>();
+        std::vector<std::string> colorj;
+        if (!js.contains("colorDefault"))
+            colorj = js.at("color").get<std::vector<std::string>>();
+        std::vector<std::string> fontFamily;
+        if (!js.contains("fontFamilyDefault"))
+            fontFamily = js.at("fontFamily").get<std::vector<std::string>>();
+        std::vector<int> size;
+        if (!js.contains("sizeDefault"))
+            size = js.at("size").get<std::vector<int>>();
 
         std::map<int, std::string> usernameToId;
         for (int i = 0; i < idToUsername.size(); i++)
             usernameToId.insert({i, idToUsername[i]});
         for (int i = 0; i < usernameToInsert.size(); i++) {
             //ricreo il simbolo
-            Style style(bold[i] == 1, underlined[i] == 1,italic[i] == 1, fontFamily[i], size[i], colorj[i]);
-            Symbol symbolToInsert(charToInsert[i], usernameToId.at(usernameToInsert[i]), crdtToInsert[i], style);
+            Style style(js.contains("boldDefault") ? false : bold[i] == 1,
+                        js.contains("underlinedDefault") ? false : underlined[i] == 1,
+                        js.contains("italicDefault") ? false : italic[i] == 1,
+                        js.contains("fontFamilyDefault") ? DEFAULT_FONT_FAMILY : (fontFamily[i] == "0"
+                                                                                  ? DEFAULT_FONT_FAMILY
+                                                                                  : fontFamily[i]),
+                        js.contains("sizeDefault") ? DEFAULT_FONT_SIZE : (size[i] == 0 ? DEFAULT_FONT_SIZE : size[i]),
+                        js.contains("colorDefault") ? DEFAULT_COLOR : (colorj[i] == "0" ? DEFAULT_COLOR : colorj[i]));
+            if(js.contains("first_open")) {
+                forceCRDT.clear();
+                forceCRDT.push_back((this->writing * this->maxBufferSymbol) + i);
+            }
+            Symbol symbolToInsert(charToInsert[i], usernameToId.at(usernameToInsert[i]), js.contains("first_open") ? forceCRDT :crdtToInsert[i], style);
             emit insertSymbolWithStyle(symbolToInsert);
         }
         if (js.contains("endOpenFile")) {
@@ -303,19 +329,19 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::string username = js.at("username").get<std::string>();
         int pos = js.at("pos").get<int>();
         emit updateRemotePosition(QString::fromStdString(username), pos);
-    } else if(type_request == "WRONG_OLD_PASSWORD"){
+    } else if (type_request == "WRONG_OLD_PASSWORD") {
         QString res = QString::fromUtf8("wrong_old_password");
         emit formResultSuccess(res);
-    } else if (type_request == "EDIT_SUCCESS"){
+    } else if (type_request == "EDIT_SUCCESS") {
         QString res = QString::fromUtf8("edit_success");
         QString newEmail = QString::fromStdString(js.at("email").get<std::string>());
         QString newColor = QString::fromStdString(js.at("color").get<std::string>());
 
-        if(!newEmail.isEmpty()) this->setEmail(newEmail);
-        if(!newColor.isEmpty()) this->setColor(newColor);
+        if (!newEmail.isEmpty()) this->setEmail(newEmail);
+        if (!newColor.isEmpty()) this->setColor(newColor);
 
         emit formResultSuccess(res);
-    }  else if (type_request == "EDIT_FAILED"){
+    } else if (type_request == "EDIT_FAILED") {
 
         QString res = QString::fromUtf8("edit_failed");
         emit formResultSuccess(res);

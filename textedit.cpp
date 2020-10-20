@@ -1012,19 +1012,19 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
     if (ev->type() == QEvent::KeyPress) {
         QKeyEvent *key_ev = static_cast<QKeyEvent *>(ev);
         int key = key_ev->key();
-        /*std::cout << "FILE CRDT: " << std::flush; //print crdt
+        std::cout << "FILE CRDT: " << std::flush; //print crdt
         for (auto iterPositions = client_->symbols.begin(); iterPositions != client_->symbols.end(); ++iterPositions) {
             if (iterPositions->getCharacter() != 10 && iterPositions->getCharacter() != 13)
-                std::wcout << "[" << (int) iterPositions->getCharacter() << "(" << iterPositions->getCharacter()
+                std::wcout << "{" << (int) iterPositions->getCharacter() << "(" << iterPositions->getCharacter()
                            << ") - " << std::flush;
             else
-                std::wcout << "[" << (int) iterPositions->getCharacter() << "(\\n) - " << std::flush;
+                std::wcout << "[" << (int) iterPositions->getCharacter() << "(\\n) - [" << std::flush;
             for (int i = 0; i < iterPositions->getPosizione().size(); i++)
-                std::cout << std::to_string(iterPositions->getPosizione()[i]) << std::flush;
-            std::cout << " - " << iterPositions->getUsername() << std::flush;
-            std::cout << "]" << std::flush;
+                std::cout << std::to_string(iterPositions->getPosizione()[i]) << " " << std::flush;
+            std::cout << "] - " << iterPositions->getUsername() << std::flush;
+            std::cout << "}" << std::flush;
         }
-        std::cout << std::endl;*/
+        std::cout << std::endl;
         if (obj == textEdit) {
             if (!key_ev->text().isEmpty()) {
                 QTextCursor cursor = textEdit->textCursor();
