@@ -1084,8 +1084,43 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     std::vector<wchar_t> charToErase;
                     std::vector<std::vector<int>> crdtToErase;
 
-                    int k = 0;
                     int dim = endIndex - startIndex;
+                    int count = 0;
+                    std::cout << "START:" << std::to_string(startIndex) << " END:" << std::to_string(endIndex) << " DIM:" << std::to_string(dim) << std::endl;
+                    for(int iter = 0; iter < dim; iter++) {
+                        symbolsToErase.push_back(client_->symbols.at(iter + startIndex));
+                        usernameToErase.push_back(client_->symbols.at(iter + startIndex).getUsername());
+                        charToErase.push_back(client_->symbols.at(iter + startIndex).getCharacter());
+                        crdtToErase.push_back(client_->symbols.at(iter + startIndex).getPosizione());
+                        if(++count == client_->maxBufferSymbol) {
+                            client_->eraseSymbolCRDT(symbolsToErase);
+                            iter -= client_->maxBufferSymbol;
+                            dim -= client_->maxBufferSymbol;
+                            json j = json{
+                                    {"operation",       "remove"},
+                                    {"usernameToErase", usernameToErase},
+                                    {"charToErase",     charToErase},
+                                    {"crdtToErase",     crdtToErase}
+                            };
+                            client_->sendAtServer(j);
+                            symbolsToErase.clear();
+                            usernameToErase.clear();
+                            charToErase.clear();
+                            crdtToErase.clear();
+                            count = 0;
+                        }
+                    }
+                    if(!symbolsToErase.empty()) {
+                        client_->eraseSymbolCRDT(symbolsToErase);
+                        json j = json{
+                                {"operation",       "remove"},
+                                {"usernameToErase", usernameToErase},
+                                {"charToErase",     charToErase},
+                                {"crdtToErase",     crdtToErase}
+                        };
+                        client_->sendAtServer(j);
+                    }
+                    /*int k = 0;
                     int of = dim / client_->maxBufferSymbol;
                     while ((k + 1) * client_->maxBufferSymbol <= dim) {
                         symbolsToErase.clear();
@@ -1093,10 +1128,10 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         charToErase.clear();
                         crdtToErase.clear();
                         for (int i = 0; i < client_->maxBufferSymbol; i++) {
-                            symbolsToErase.push_back(client_->symbols.at(i + startIndex));
-                            usernameToErase.push_back(client_->symbols.at(i + startIndex).getUsername());
-                            charToErase.push_back(client_->symbols.at(i + startIndex).getCharacter());
-                            crdtToErase.push_back(client_->symbols.at(i + startIndex).getPosizione());
+                            symbolsToErase.push_back(client_->symbols.at((client_->maxBufferSymbol * k) + i + startIndex));
+                            usernameToErase.push_back(client_->symbols.at((client_->maxBufferSymbol * k) + i + startIndex).getUsername());
+                            charToErase.push_back(client_->symbols.at((client_->maxBufferSymbol * k) + i + startIndex).getCharacter());
+                            crdtToErase.push_back(client_->symbols.at((client_->maxBufferSymbol * k) + i + startIndex).getPosizione());
                         }
                         client_->eraseSymbolCRDT(symbolsToErase);
 
@@ -1116,10 +1151,10 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         charToErase.clear();
                         crdtToErase.clear();
                         for (int i = 0; i < (dim % client_->maxBufferSymbol); i++) {
-                            symbolsToErase.push_back(client_->symbols.at(i + startIndex));
-                            usernameToErase.push_back(client_->symbols.at(i + startIndex).getUsername());
-                            charToErase.push_back(client_->symbols.at(i + startIndex).getCharacter());
-                            crdtToErase.push_back(client_->symbols.at(i + startIndex).getPosizione());
+                            symbolsToErase.push_back(client_->symbols.at((client_->maxBufferSymbol * of) + i + startIndex));
+                            usernameToErase.push_back(client_->symbols.at((client_->maxBufferSymbol * of) + i + startIndex).getUsername());
+                            charToErase.push_back(client_->symbols.at((client_->maxBufferSymbol * of) + i + startIndex).getCharacter());
+                            crdtToErase.push_back(client_->symbols.at((client_->maxBufferSymbol * of) + i + startIndex).getPosizione());
                         }
                         client_->eraseSymbolCRDT(symbolsToErase);
                         json j = json{
@@ -1129,7 +1164,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                                 {"crdtToErase",     crdtToErase}
                         };
                         client_->sendAtServer(j);
-                    }
+                    }*/
                     decreentPosition(startIndex, dim);
                     drawGraphicCursor();
                 } else {
