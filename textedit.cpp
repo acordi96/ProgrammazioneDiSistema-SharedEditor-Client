@@ -507,9 +507,7 @@ void TextEdit::textBold() {
         cursor.select(QTextCursor::WordUnderCursor);
     if (!cursor.hasSelection())
         return;
-    qDebug()<<"BOLD ="<<actionTextBold->isChecked();
     bool bold = actionTextBold->isChecked();
-    actionTextBold->setChecked(!actionTextBold->isChecked());
     std::vector<std::string> usernameToChange;
     std::vector<char> charToChange;
     std::vector<std::vector<int>> crdtToChange;
