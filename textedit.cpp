@@ -62,9 +62,9 @@ const QString rsrcPath = ":/images/win";
 #endif
 
 #ifdef __linux__
-#define DEFAULT_FONT_SIZE 11
+    #define DEFAULT_FONT_SIZE 11
 #else //winzoz
-#define DEFAULT_FONT_SIZE 9
+    #define DEFAULT_FONT_SIZE 9
 #endif
 
 TextEdit::TextEdit(Client *c, QWidget *parent)
@@ -807,7 +807,6 @@ void TextEdit::updateRemotePosition(QString user, int pos) {
 }
 
 void TextEdit::cursorPositionChanged() {
-
     QTextCursor cursor = textEdit->textCursor();
     int pos = cursor.position();
 
@@ -816,8 +815,7 @@ void TextEdit::cursorPositionChanged() {
             {"username",  client_->getUser().toStdString()},
             {"pos",       pos}
     };
-    //client_->sendAtServer(j);
-
+    client_->sendAtServer(j);
 }
 
 void TextEdit::showSymbolWithId(Symbol symbolToInsert) {
@@ -900,8 +898,6 @@ void TextEdit::showSymbolWithStyle(Symbol symbolToInsert) {
     QString user = QString::fromStdString(symbolToInsert.getUsername());
 
     QTextCharFormat format;
-    QTextCursor cur = textEdit->textCursor();
-    cur.beginEditBlock();
 
     bool wasBold = actionTextBold->isChecked();
     bool wasItalic = actionTextItalic->isChecked();
@@ -917,6 +913,8 @@ void TextEdit::showSymbolWithStyle(Symbol symbolToInsert) {
     format.setFontPointSize(symbolToInsert.getSymbolStyle().getFontSize());
     format.setForeground(QColor(QString::fromStdString(symbolToInsert.getSymbolStyle().getColor())));
 
+    QTextCursor cur = textEdit->textCursor();
+    cur.beginEditBlock();
     int endIndex;
     cur.hasSelection() ? endIndex = cur.selectionEnd() : endIndex = -90;
     int oldPos = pos < cur.position() ? cur.position() + 1 : cur.position();
@@ -1039,14 +1037,6 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
         }
         std::cout << std::endl;*/
         if (obj == textEdit) {
-            /*
-            Style style;
-            textEdit->setFontWeight(QFont::Normal);
-            textEdit->setFontItalic(false);
-            textEdit->setFontUnderline(false);
-            textEdit->setFontPointSize(8);
-            textEdit->setFontFamily("Helvetica");
-             */
             if (!key_ev->text().isEmpty()) {
                 QTextCursor cursor = textEdit->textCursor();
                 int pos, startIndex, endIndex;
@@ -1178,19 +1168,6 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                 else if (key_ev->text().toStdString().c_str()[0] == 22) {
                     QClipboard *clipboard = QGuiApplication::clipboard();
                     QString pastedText = clipboard->text();
-                    //TO DO VEDERE SE FUNZIONA
-                    textEdit->setFontWeight(QFont::Normal);
-                    textEdit->setFontItalic(false);
-                    textEdit->setFontUnderline(false);
-                    textEdit->setFontPointSize(8);
-                    textEdit->setFontFamily("Helvetica");
-                    QTextCharFormat form;
-                    form.setFontWeight(QFont::Normal);
-                    form.setFontItalic(false);
-                    form.setFontUnderline(false);
-                    form.setFontPointSize(8);
-                    form.setFontFamily("Helvetica");
-                    cursor.setCharFormat(form);
                     textEdit->setTextCursor(cursor);
 
                     std::vector<std::string> usernameToInsert;
@@ -1250,7 +1227,6 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         };
                         client_->sendAtServer(j);
                     }
-                    //TO DO: probabilente aggiornare cursori anche qui
                     drawGraphicCursor();
                     incrementPosition(startPos, dim);
                 }
@@ -1611,7 +1587,7 @@ void TextEdit::changeStyle(json js) {
                     if (js.contains("fontFamily"))
                         oldFormat.setFontFamily(QString::fromStdString(js.at("fontFamily").get<std::string>()));
                     if (js.contains("fontSize"))
-                        oldFormat.setFontWeight(js.at("fontSize").get<int>()); //TODO: weight??
+                        oldFormat.setFontPointSize(js.at("fontSize").get<int>());
                     cursor.setPosition(count);
                     cursor.setPosition(count + 1, QTextCursor::KeepAnchor);
                     cursor.mergeCharFormat(oldFormat);
