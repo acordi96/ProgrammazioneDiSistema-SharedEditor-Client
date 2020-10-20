@@ -67,6 +67,8 @@ const QString rsrcPath = ":/images/win";
     #define DEFAULT_FONT_SIZE 9
 #endif
 
+#define MAX_ALLOWED_CHARS 1000
+
 TextEdit::TextEdit(Client *c, QWidget *parent)
         : QMainWindow(parent), client_(c) {
 #ifdef Q_OS_MACOS
@@ -492,229 +494,254 @@ void TextEdit::filePrintPdf() {
 
 void TextEdit::textBold() {
     QTextCursor cursor = textEdit->textCursor();
-    actionTextBold->isChecked() ? textEdit->setFontWeight(QFont::Bold) : textEdit->setFontWeight(QFont::Normal);
-    if (!cursor.hasSelection())
-        cursor.select(QTextCursor::WordUnderCursor);
-    if (!cursor.hasSelection())
-        return;
-    bool bold = actionTextBold->isChecked();
-    std::vector<std::string> usernameToChange;
-    std::vector<wchar_t> charToChange;
-    std::vector<std::vector<int>> crdtToChange;
-    int i = cursor.selectionStart();
-    for (auto style = client_->symbols.begin() + cursor.selectionStart();
-         style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
-        QTextCharFormat fmt = style->getTextCharFormat();
-        fmt.setFontWeight(bold ? QFont::Bold : QFont::Normal);
-        cursor.mergeCharFormat(fmt);
-        textEdit->mergeCurrentCharFormat(fmt);
+    if(cursor.selectionEnd()-cursor.selectionStart() > MAX_ALLOWED_CHARS){
+        this->alert();
+    }else{
+        actionTextBold->isChecked() ? textEdit->setFontWeight(QFont::Bold) : textEdit->setFontWeight(QFont::Normal);
+        if (!cursor.hasSelection())
+            cursor.select(QTextCursor::WordUnderCursor);
+        if (!cursor.hasSelection())
+            return;
+        bool bold = actionTextBold->isChecked();
+        std::vector<std::string> usernameToChange;
+        std::vector<wchar_t> charToChange;
+        std::vector<std::vector<int>> crdtToChange;
+        int i = cursor.selectionStart();
+        for (auto style = client_->symbols.begin() + cursor.selectionStart();
+             style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
+            QTextCharFormat fmt = style->getTextCharFormat();
+            fmt.setFontWeight(bold ? QFont::Bold : QFont::Normal);
+            cursor.mergeCharFormat(fmt);
+            textEdit->mergeCurrentCharFormat(fmt);
 
-        usernameToChange.push_back(client_->symbols[i].getUsername());
-        charToChange.push_back(client_->symbols[i].getCharacter());
-        crdtToChange.push_back(client_->symbols[i].getPosizione());
-        client_->symbols[i].symbolStyle.setBold(bold);
-        i++;
+            usernameToChange.push_back(client_->symbols[i].getUsername());
+            charToChange.push_back(client_->symbols[i].getCharacter());
+            crdtToChange.push_back(client_->symbols[i].getPosizione());
+            client_->symbols[i].symbolStyle.setBold(bold);
+            i++;
+        }
+
+        json j = json{
+                {"operation",        "styleChanged"},
+                {"usernameToChange", usernameToChange},
+                {"charToChange",     charToChange},
+                {"crdtToChange",     crdtToChange},
+                {"bold",             bold}
+        };
+
+        client_->sendAtServer(j);
     }
 
-    json j = json{
-            {"operation",        "styleChanged"},
-            {"usernameToChange", usernameToChange},
-            {"charToChange",     charToChange},
-            {"crdtToChange",     crdtToChange},
-            {"bold",             bold}
-    };
-
-    client_->sendAtServer(j);
 }
 
 void TextEdit::textUnderline() {
     QTextCursor cursor = textEdit->textCursor();
-    textEdit->setFontUnderline(actionTextUnderline->isChecked());
-    if (!cursor.hasSelection())
-        cursor.select(QTextCursor::WordUnderCursor);
-    if (!cursor.hasSelection())
-        return;
-    bool underlined = actionTextUnderline->isChecked();
-    std::vector<std::string> usernameToChange;
-    std::vector<wchar_t> charToChange;
-    std::vector<std::vector<int>> crdtToChange;
-    int i = cursor.selectionStart();
-    for (auto style = client_->symbols.begin() + cursor.selectionStart();
-         style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
-        QTextCharFormat fmt = style->getTextCharFormat();
-        fmt.setFontUnderline(underlined);
-        cursor.mergeCharFormat(fmt);
-        textEdit->mergeCurrentCharFormat(fmt);
+    if(cursor.selectionEnd()-cursor.selectionStart() > MAX_ALLOWED_CHARS){
+        this->alert();
+    }else{
+        textEdit->setFontUnderline(actionTextUnderline->isChecked());
+        if (!cursor.hasSelection())
+            cursor.select(QTextCursor::WordUnderCursor);
+        if (!cursor.hasSelection())
+            return;
+        bool underlined = actionTextUnderline->isChecked();
+        std::vector<std::string> usernameToChange;
+        std::vector<wchar_t> charToChange;
+        std::vector<std::vector<int>> crdtToChange;
+        int i = cursor.selectionStart();
+        for (auto style = client_->symbols.begin() + cursor.selectionStart();
+             style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
+            QTextCharFormat fmt = style->getTextCharFormat();
+            fmt.setFontUnderline(underlined);
+            cursor.mergeCharFormat(fmt);
+            textEdit->mergeCurrentCharFormat(fmt);
 
-        usernameToChange.push_back(client_->symbols[i].getUsername());
-        charToChange.push_back(client_->symbols[i].getCharacter());
-        crdtToChange.push_back(client_->symbols[i].getPosizione());
-        client_->symbols[i].symbolStyle.setUnderlined(underlined);
-        i++;
-    }
+            usernameToChange.push_back(client_->symbols[i].getUsername());
+            charToChange.push_back(client_->symbols[i].getCharacter());
+            crdtToChange.push_back(client_->symbols[i].getPosizione());
+            client_->symbols[i].symbolStyle.setUnderlined(underlined);
+            i++;
+        }
 
-    json j = json{
-            {"operation",        "styleChanged"},
-            {"usernameToChange", usernameToChange},
-            {"charToChange",     charToChange},
-            {"crdtToChange",     crdtToChange},
-            {"underlined",       underlined}
+        json j = json{
+        {"operation",        "styleChanged"},
+        {"usernameToChange", usernameToChange},
+        {"charToChange",     charToChange},
+        {"crdtToChange",     crdtToChange},
+        {"underlined",       underlined}
     };
-    client_->sendAtServer(j);
-
+        client_->sendAtServer(j);
+    }
 }
 
 void TextEdit::textItalic() {
     QTextCursor cursor = textEdit->textCursor();
-    textEdit->setFontItalic(actionTextItalic->isChecked());
-    if (!cursor.hasSelection())
-        cursor.select(QTextCursor::WordUnderCursor);
-    if (!cursor.hasSelection())
-        return;
-    bool italic = actionTextItalic->isChecked();
-    std::vector<std::string> usernameToChange;
-    std::vector<wchar_t> charToChange;
-    std::vector<std::vector<int>> crdtToChange;
-    int i = cursor.selectionStart();
-    for (auto style = client_->symbols.begin() + cursor.selectionStart();
-         style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
-        QTextCharFormat fmt = style->getTextCharFormat();
-        fmt.setFontItalic(italic);
-        cursor.mergeCharFormat(fmt);
-        textEdit->mergeCurrentCharFormat(fmt);
+    if(cursor.selectionEnd()-cursor.selectionStart() > MAX_ALLOWED_CHARS){
+        this->alert();
+    }else{
+        textEdit->setFontItalic(actionTextItalic->isChecked());
+        if (!cursor.hasSelection())
+            cursor.select(QTextCursor::WordUnderCursor);
+        if (!cursor.hasSelection())
+            return;
+        bool italic = actionTextItalic->isChecked();
+        std::vector<std::string> usernameToChange;
+        std::vector<wchar_t> charToChange;
+        std::vector<std::vector<int>> crdtToChange;
+        int i = cursor.selectionStart();
+        for (auto style = client_->symbols.begin() + cursor.selectionStart();
+             style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
+            QTextCharFormat fmt = style->getTextCharFormat();
+            fmt.setFontItalic(italic);
+            cursor.mergeCharFormat(fmt);
+            textEdit->mergeCurrentCharFormat(fmt);
 
-        usernameToChange.push_back(client_->symbols[i].getUsername());
-        charToChange.push_back(client_->symbols[i].getCharacter());
-        crdtToChange.push_back(client_->symbols[i].getPosizione());
-        client_->symbols[i].symbolStyle.setItalic(italic);
-        i++;
-    }
+            usernameToChange.push_back(client_->symbols[i].getUsername());
+            charToChange.push_back(client_->symbols[i].getCharacter());
+            crdtToChange.push_back(client_->symbols[i].getPosizione());
+            client_->symbols[i].symbolStyle.setItalic(italic);
+            i++;
+        }
 
-    json j = json{
-            {"operation",        "styleChanged"},
-            {"usernameToChange", usernameToChange},
-            {"charToChange",     charToChange},
-            {"crdtToChange",     crdtToChange},
-            {"italic",           italic}
+        json j = json{
+        {"operation",        "styleChanged"},
+        {"usernameToChange", usernameToChange},
+        {"charToChange",     charToChange},
+        {"crdtToChange",     crdtToChange},
+        {"italic",           italic}
     };
-    client_->sendAtServer(j);
-
+        client_->sendAtServer(j);
+    }
 }
 
 void TextEdit::textColor() {
-    QColor color = QColorDialog::getColor(textEdit->textColor(), this);
-    textEdit->setTextColor(color);
-    if (!color.isValid())
-        return;
-    QPixmap pix(16, 16);
-    pix.fill(color);
-    actionTextColor->setIcon(pix);
-
     QTextCursor cursor = textEdit->textCursor();
-    if (!cursor.hasSelection())
-        cursor.select(QTextCursor::WordUnderCursor);
-    if (!cursor.hasSelection())
-        return;
-    std::vector<std::string> usernameToChange;
-    std::vector<wchar_t> charToChange;
-    std::vector<std::vector<int>> crdtToChange;
-    int i = cursor.selectionStart();
-    for (auto style = client_->symbols.begin() + cursor.selectionStart();
-         style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
-        QTextCharFormat fmt = style->getTextCharFormat();
-        fmt.setForeground(color);
-        cursor.mergeCharFormat(fmt);
-        textEdit->mergeCurrentCharFormat(fmt);
+    if(cursor.selectionEnd()-cursor.selectionStart() > MAX_ALLOWED_CHARS){
+        this->alert();
+    }else{
+        QColor color = QColorDialog::getColor(textEdit->textColor(), this);
+        textEdit->setTextColor(color);
+        if (!color.isValid())
+            return;
+        QPixmap pix(16, 16);
+        pix.fill(color);
+        actionTextColor->setIcon(pix);
 
-        usernameToChange.push_back(client_->symbols[i].getUsername());
-        charToChange.push_back(client_->symbols[i].getCharacter());
-        crdtToChange.push_back(client_->symbols[i].getPosizione());
-        client_->symbols[i].symbolStyle.setColor(color.name().toStdString());
-        i++;
-    }
 
-    json j = json{
-            {"operation",        "styleChanged"},
-            {"usernameToChange", usernameToChange},
-            {"charToChange",     charToChange},
-            {"crdtToChange",     crdtToChange},
-            {"color",            color.name().toStdString()}
+        if (!cursor.hasSelection())
+            cursor.select(QTextCursor::WordUnderCursor);
+        if (!cursor.hasSelection())
+            return;
+        std::vector<std::string> usernameToChange;
+        std::vector<wchar_t> charToChange;
+        std::vector<std::vector<int>> crdtToChange;
+        int i = cursor.selectionStart();
+        for (auto style = client_->symbols.begin() + cursor.selectionStart();
+             style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
+            QTextCharFormat fmt = style->getTextCharFormat();
+            fmt.setForeground(color);
+            cursor.mergeCharFormat(fmt);
+            textEdit->mergeCurrentCharFormat(fmt);
+
+            usernameToChange.push_back(client_->symbols[i].getUsername());
+            charToChange.push_back(client_->symbols[i].getCharacter());
+            crdtToChange.push_back(client_->symbols[i].getPosizione());
+            client_->symbols[i].symbolStyle.setColor(color.name().toStdString());
+            i++;
+        }
+
+        json j = json{
+        {"operation",        "styleChanged"},
+        {"usernameToChange", usernameToChange},
+        {"charToChange",     charToChange},
+        {"crdtToChange",     crdtToChange},
+        {"color",            color.name().toStdString()}
     };
-    client_->sendAtServer(j);
+        client_->sendAtServer(j);
+    }
 }
 
 void TextEdit::textFamily(const QString &f) {
     QTextCursor cursor = textEdit->textCursor();
-    textEdit->setFontFamily(f);
-    if (!cursor.hasSelection())
-        cursor.select(QTextCursor::WordUnderCursor);
-    if (!cursor.hasSelection())
-        return;
-    int i = cursor.selectionStart();
-    std::vector<std::string> usernameToChange;
-    std::vector<wchar_t> charToChange;
-    std::vector<std::vector<int>> crdtToChange;
-    for (auto style = client_->symbols.begin() + cursor.selectionStart();
-         style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
-        QTextCharFormat fmt = style->getTextCharFormat();
-        fmt.setFontFamily(f);
-        cursor.mergeCharFormat(fmt);
-        textEdit->mergeCurrentCharFormat(fmt);
+    if(cursor.selectionEnd()-cursor.selectionStart() > MAX_ALLOWED_CHARS){
+        this->alert();
+    }else{
+        textEdit->setFontFamily(f);
+        if (!cursor.hasSelection())
+            cursor.select(QTextCursor::WordUnderCursor);
+        if (!cursor.hasSelection())
+            return;
+        int i = cursor.selectionStart();
+        std::vector<std::string> usernameToChange;
+        std::vector<wchar_t> charToChange;
+        std::vector<std::vector<int>> crdtToChange;
+        for (auto style = client_->symbols.begin() + cursor.selectionStart();
+             style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
+            QTextCharFormat fmt = style->getTextCharFormat();
+            fmt.setFontFamily(f);
+            cursor.mergeCharFormat(fmt);
+            textEdit->mergeCurrentCharFormat(fmt);
 
-        usernameToChange.push_back(client_->symbols[i].getUsername());
-        charToChange.push_back(client_->symbols[i].getCharacter());
-        crdtToChange.push_back(client_->symbols[i].getPosizione());
-        client_->symbols[i].symbolStyle.setFontFamily(f.toStdString());
-        i++;
-    }
+            usernameToChange.push_back(client_->symbols[i].getUsername());
+            charToChange.push_back(client_->symbols[i].getCharacter());
+            crdtToChange.push_back(client_->symbols[i].getPosizione());
+            client_->symbols[i].symbolStyle.setFontFamily(f.toStdString());
+            i++;
+        }
 
-    json j = json{
-            {"operation",        "styleChanged"},
-            {"usernameToChange", usernameToChange},
-            {"charToChange",     charToChange},
-            {"crdtToChange",     crdtToChange},
-            {"fontFamily",       f.toStdString()}
+        json j = json{
+        {"operation",        "styleChanged"},
+        {"usernameToChange", usernameToChange},
+        {"charToChange",     charToChange},
+        {"crdtToChange",     crdtToChange},
+        {"fontFamily",       f.toStdString()}
     };
-    client_->sendAtServer(j);
-
+        client_->sendAtServer(j);
+    }
 }
 
 void TextEdit::textSize(const QString &p) {
-    qreal pointSize = p.toFloat();
-    textEdit->setFontPointSize(pointSize);
-    if (p.toFloat() <= 0)
-        return;
     QTextCursor cursor = textEdit->textCursor();
-    if (!cursor.hasSelection())
-        cursor.select(QTextCursor::WordUnderCursor);
-    if (!cursor.hasSelection())
-        return;
-    int i = cursor.selectionStart();
-    std::vector<std::string> usernameToChange;
-    std::vector<wchar_t> charToChange;
-    std::vector<std::vector<int>> crdtToChange;
-    for (auto style = client_->symbols.begin() + cursor.selectionStart();
-         style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
-        QTextCharFormat fmt = style->getTextCharFormat();
-        fmt.setFontPointSize(p.toDouble());
-        cursor.mergeCharFormat(fmt);
-        textEdit->mergeCurrentCharFormat(fmt);
+    if(cursor.selectionEnd()-cursor.selectionStart() > MAX_ALLOWED_CHARS){
+        this->alert();
+    }else{
+        qreal pointSize = p.toFloat();
+        textEdit->setFontPointSize(pointSize);
+        if (p.toFloat() <= 0)
+            return;
 
-        usernameToChange.push_back(client_->symbols[i].getUsername());
-        charToChange.push_back(client_->symbols[i].getCharacter());
-        crdtToChange.push_back(client_->symbols[i].getPosizione());
-        client_->symbols[i].symbolStyle.setFontSize(p.toInt());
-        i++;
+        if (!cursor.hasSelection())
+            cursor.select(QTextCursor::WordUnderCursor);
+        if (!cursor.hasSelection())
+            return;
+        int i = cursor.selectionStart();
+        std::vector<std::string> usernameToChange;
+        std::vector<wchar_t> charToChange;
+        std::vector<std::vector<int>> crdtToChange;
+        for (auto style = client_->symbols.begin() + cursor.selectionStart();
+             style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
+            QTextCharFormat fmt = style->getTextCharFormat();
+            fmt.setFontPointSize(p.toDouble());
+            cursor.mergeCharFormat(fmt);
+            textEdit->mergeCurrentCharFormat(fmt);
+
+            usernameToChange.push_back(client_->symbols[i].getUsername());
+            charToChange.push_back(client_->symbols[i].getCharacter());
+            crdtToChange.push_back(client_->symbols[i].getPosizione());
+            client_->symbols[i].symbolStyle.setFontSize(p.toInt());
+            i++;
+        }
+
+        json j = json{
+                {"operation",        "styleChanged"},
+                {"usernameToChange", usernameToChange},
+                {"charToChange",     charToChange},
+                {"crdtToChange",     crdtToChange},
+                {"size",         p.toInt()}
+        };
+        client_->sendAtServer(j);
+
     }
-
-    json j = json{
-            {"operation",        "styleChanged"},
-            {"usernameToChange", usernameToChange},
-            {"charToChange",     charToChange},
-            {"crdtToChange",     crdtToChange},
-            {"size",         p.toInt()}
-    };
-    client_->sendAtServer(j);
 
 }
 
@@ -788,24 +815,6 @@ void TextEdit::showSymbolWithId(Symbol symbolToInsert) {
     textEdit->setFocus();
 
 }
-
-
-//void QTextEdit::insertFromMimeData(const QMimeData *source){
-//    if(source->hasText()){
-//        QString text = source->text();
-//        QTextCursor cursor = textCursor();
-
-//        QTextCharFormat fmt;
-//        fmt.setFontFamily("Helvetica");
-//        fmt.setFontItalic(false);
-//        fmt.setFontUnderline(false);
-//        fmt.setFontWeight(QFont::Normal);
-//        fmt.setFontPointSize(8);
-//        cursor.setCharFormat(fmt);
-//        cursor.insertText(text);
-
-//    }
-//}
 
 void TextEdit::showSymbolWithStyle(Symbol symbolToInsert) {
 
@@ -1305,33 +1314,40 @@ void TextEdit::drawRemoteCursors() {
 
 }
 
+
 void TextEdit::highlightcharacter() {
     QObject *sender = QObject::sender();
     QString name = sender->objectName();
     QTextCursor cursor = textEdit->textCursor();
     QTextCursor tempCursor = QTextCursor(cursor);
-    int pos = 0;
-    for (auto s: client_->symbols) {
-        if (s.getUsername() == name.toStdString()) {
-            tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
-            tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
-            tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
-            textEdit->setTextCursor(tempCursor);
-            if (name == client_->getUser())
-                textEdit->setTextBackgroundColor(client_->getColor());
-            else
-                textEdit->setTextBackgroundColor(_listParticipantsAndColors[name]);
+    int dim = client_->symbols.size();
+    if(dim > 5000){
+            this->alert();
+    }else{
+        int pos = 0;
+        for (auto s: client_->symbols) {
+            if (s.getUsername() == name.toStdString()) {
+                tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
+                tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
+                tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
+                textEdit->setTextCursor(tempCursor);
+                if (name == client_->getUser())
+                    textEdit->setTextBackgroundColor(client_->getColor());
+                else
+                    textEdit->setTextBackgroundColor(_listParticipantsAndColors[name]);
 
+            }
+            pos++;
         }
-        pos++;
+
+        textEdit->setTextCursor(cursor);
+        textEdit->setTextBackgroundColor(QColor(255, 255, 255, 255));
+        textEdit->setFocus();
+
+        timer->start(3500);
+
+
     }
-
-    textEdit->setTextCursor(cursor);
-    textEdit->setTextBackgroundColor(QColor(255, 255, 255, 255));
-    textEdit->setFocus();
-
-    timer->start(3500);
-
 }
 
 void TextEdit::drawGraphicCursor() {
@@ -1520,4 +1536,11 @@ void TextEdit::changeStyle(json js) {
     cursor.endEditBlock();
 
     textEdit->setFocus();
+}
+void TextEdit::alert(){
+    QMessageBox *msgB = new QMessageBox(QMessageBox::Critical,tr("Alert"),tr("Too much chars!Try to select less chars."),
+                                        QMessageBox::NoButton,this,Qt::CustomizeWindowHint);
+
+    msgB->setIconPixmap(QPixmap(rsrcPath+QString::fromUtf8("/triangle.png")));
+    msgB->show();
 }
