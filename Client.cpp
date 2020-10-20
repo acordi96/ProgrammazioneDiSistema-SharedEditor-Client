@@ -147,7 +147,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         for (int i = 0; i < usernameToInsert.size(); i++) {
             Style style = {bold, underlined, italic, fontFamily, fontSize, color};
             Symbol symbolToInsert(charToInsert[i], usernameToInsert[i], crdtToInsert[i], style);
-            emit insertSymbolWithStyle(symbolToInsert);
+            emit insertSymbolWithStyle(symbolToInsert, false);
         }
         return type_request;
     } else if (type_request == "remove_res") {
@@ -249,7 +249,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
                 forceCRDT.push_back((this->writing * this->maxBufferSymbol) + i);
             }
             Symbol symbolToInsert(charToInsert[i], usernameToId.at(usernameToInsert[i]), js.contains("first_open") ? forceCRDT :crdtToInsert[i], style);
-            emit insertSymbolWithStyle(symbolToInsert);
+            emit insertSymbolWithStyle(symbolToInsert, true);
         }
         if (js.contains("endOpenFile")) {
             this->writing = 0;

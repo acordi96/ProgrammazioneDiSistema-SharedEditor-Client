@@ -53,7 +53,7 @@ public slots:
 
     void showSymbolWithId(Symbol symbolToInsert);
 
-    void showSymbolWithStyle(Symbol symbolToInsert);
+    void showSymbolWithStyle(Symbol symbolToInsert, bool open);
 
     void updateRemotePosition(QString user, int pos);
 
@@ -127,6 +127,8 @@ private slots:
     void highlightcharacter();
 
     void clearHighlights();
+
+    void resetUpdateCursor();
 
 private:
     Client *client_;
@@ -208,7 +210,8 @@ private:
     std::map<QString, QColor> _listParticipantsAndColors;
     std::map<QString, QLabel *> _labels;
 
-    QTimer *timer;
+    QTimer *timerHighlight;
+    QTimer *timerUpdateCursor;
 };
 
 

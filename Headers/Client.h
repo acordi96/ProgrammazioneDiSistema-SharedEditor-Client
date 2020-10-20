@@ -95,7 +95,7 @@ signals:
     void insertSymbol(int pos, QChar c);
 
     void insertSymbolWithId(Symbol symbolToInsert);
-    void insertSymbolWithStyle(Symbol symbolToInsert);
+    void insertSymbolWithStyle(Symbol symbolToInsert, bool open);
 
     void eraseSymbols(std::vector<Symbol> symbolsToErase);
 

@@ -75,10 +75,13 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
     setUnifiedTitleAndToolBarOnMac(true);
 #endif
     textEdit = new MyQTextEdit(this);
-    timer = new QTimer(this);
-    timer->setSingleShot(true);
+    timerHighlight = new QTimer(this);
+    timerHighlight->setSingleShot(true);
+    timerUpdateCursor = new QTimer(this);
+    timerUpdateCursor->setSingleShot(true);
 
-    connect(timer, &QTimer::timeout, this, &TextEdit::clearHighlights);
+    connect(timerHighlight, &QTimer::timeout, this, &TextEdit::clearHighlights);
+    connect(timerUpdateCursor, &QTimer::timeout, this, &TextEdit::resetUpdateCursor);
     connect(this, &TextEdit::updateCursor, this, &TextEdit::drawGraphicCursor);
 
     connect(client_, &Client::insertSymbol, this, &TextEdit::showSymbol);
@@ -162,6 +165,10 @@ void TextEdit::clearHighlights() {
     textEdit->setTextCursor(tempCursor);
     textEdit->setTextBackgroundColor(Qt::white);
     textEdit->setTextCursor(cursor);
+}
+
+void TextEdit::resetUpdateCursor() {
+    client_->updateChangesCursor = true;
 }
 
 void TextEdit::closeEvent(QCloseEvent *e) {
@@ -901,7 +908,11 @@ void TextEdit::showSymbolWithId(Symbol symbolToInsert) {
 
 }
 
-void TextEdit::showSymbolWithStyle(Symbol symbolToInsert) {
+void TextEdit::showSymbolWithStyle(Symbol symbolToInsert, bool open) {
+    if(open) {
+        client_->updateChangesCursor = false;
+        timerUpdateCursor->start(5);
+    }
 
     int pos = client_->generateIndexCRDT(symbolToInsert, 0, -1, -1);
     client_->insertSymbolIndex(symbolToInsert, pos);
@@ -1057,6 +1068,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                 if (cursor.hasSelection() && key_ev->text().toStdString().c_str()[0] != 3 &&
                     key_ev->text().toStdString().c_str()[0] != 1) {
                     client_->updateChangesCursor = false;
+                    timerUpdateCursor->start(1000);
                     startIndex = cursor.selectionStart();
                     endIndex = cursor.selectionEnd();
                     pos = startIndex;
@@ -1120,7 +1132,6 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     }
                     decreentPosition(startIndex, dim);
                     drawGraphicCursor();
-                    client_->updateChangesCursor = true;
                 } else {
                     pos = cursor.position();
                 }
@@ -1321,6 +1332,9 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
 
 void TextEdit::eraseSymbols(std::vector<Symbol> symbolsToErase) {
 
+    client_->updateChangesCursor = false;
+    timerUpdateCursor->start(symbolsToErase.size() * 5);
+
     std::vector<int> erased = client_->eraseSymbolCRDT(symbolsToErase);
 
     for (int i = 0; i < erased.size(); i++) {
@@ -1421,6 +1435,7 @@ void TextEdit::highlightcharacter() {
     }else{
         int pos = 0;
         client_->updateChangesCursor = false;
+        timerUpdateCursor->start(1000);
         for (auto s = client_->symbols.begin() + start; s != client_->symbols.begin() + end; ++s) {
             if (s->getUsername() == name.toStdString()) {
                 tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
@@ -1435,12 +1450,11 @@ void TextEdit::highlightcharacter() {
             }
             pos++;
         }
-        client_->updateChangesCursor = true;
 
         textEdit->setTextCursor(cursor);
         textEdit->setTextBackgroundColor(QColor(255, 255, 255, 255));
         textEdit->setFocus();
-        timer->start(3000);
+        timerHighlight->start(3000);
 
     }
 }
