@@ -288,7 +288,6 @@ void TextEdit::setupTextActions() {
     const QList<int> standardSizes = QFontDatabase::standardSizes();
     for (int size : standardSizes)
         comboSize->addItem(QString::number(size));
-    qDebug()<<"Font Size"<<QApplication::font().pointSize();
     comboSize->setCurrentIndex(standardSizes.indexOf(QApplication::font().pointSize()));
 
     connect(comboSize, QOverload<const QString &>::of(&QComboBox::activated), this, &TextEdit::textSize);
@@ -500,7 +499,7 @@ void TextEdit::textBold() {
         return;
     bool bold = actionTextBold->isChecked();
     std::vector<std::string> usernameToChange;
-    std::vector<char> charToChange;
+    std::vector<wchar_t> charToChange;
     std::vector<std::vector<int>> crdtToChange;
     int i = cursor.selectionStart();
     for (auto style = client_->symbols.begin() + cursor.selectionStart();
@@ -537,7 +536,7 @@ void TextEdit::textUnderline() {
         return;
     bool underlined = actionTextUnderline->isChecked();
     std::vector<std::string> usernameToChange;
-    std::vector<char> charToChange;
+    std::vector<wchar_t> charToChange;
     std::vector<std::vector<int>> crdtToChange;
     int i = cursor.selectionStart();
     for (auto style = client_->symbols.begin() + cursor.selectionStart();
@@ -574,7 +573,7 @@ void TextEdit::textItalic() {
         return;
     bool italic = actionTextItalic->isChecked();
     std::vector<std::string> usernameToChange;
-    std::vector<char> charToChange;
+    std::vector<wchar_t> charToChange;
     std::vector<std::vector<int>> crdtToChange;
     int i = cursor.selectionStart();
     for (auto style = client_->symbols.begin() + cursor.selectionStart();
@@ -617,7 +616,7 @@ void TextEdit::textColor() {
     if (!cursor.hasSelection())
         return;
     std::vector<std::string> usernameToChange;
-    std::vector<char> charToChange;
+    std::vector<wchar_t> charToChange;
     std::vector<std::vector<int>> crdtToChange;
     int i = cursor.selectionStart();
     for (auto style = client_->symbols.begin() + cursor.selectionStart();
@@ -653,7 +652,7 @@ void TextEdit::textFamily(const QString &f) {
         return;
     int i = cursor.selectionStart();
     std::vector<std::string> usernameToChange;
-    std::vector<char> charToChange;
+    std::vector<wchar_t> charToChange;
     std::vector<std::vector<int>> crdtToChange;
     for (auto style = client_->symbols.begin() + cursor.selectionStart();
          style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
@@ -692,7 +691,7 @@ void TextEdit::textSize(const QString &p) {
         return;
     int i = cursor.selectionStart();
     std::vector<std::string> usernameToChange;
-    std::vector<char> charToChange;
+    std::vector<wchar_t> charToChange;
     std::vector<std::vector<int>> crdtToChange;
     for (auto style = client_->symbols.begin() + cursor.selectionStart();
          style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
@@ -804,7 +803,7 @@ void TextEdit::cursorPositionChanged() {
             {"username",  client_->getUser().toStdString()},
             {"pos",       pos}
     };
-    client_->sendAtServer(j);
+    //client_->sendAtServer(j);
 }
 
 void TextEdit::showSymbolWithId(Symbol symbolToInsert) {
@@ -883,7 +882,7 @@ void TextEdit::showSymbolWithStyle(Symbol symbolToInsert) {
 
     int pos = client_->generateIndexCRDT(symbolToInsert, 0, -1, -1);
     client_->insertSymbolIndex(symbolToInsert, pos);
-    char c = symbolToInsert.getCharacter();
+    wchar_t c = symbolToInsert.getCharacter();
     QString user = QString::fromStdString(symbolToInsert.getUsername());
 
     QTextCharFormat format;
@@ -953,7 +952,7 @@ void TextEdit::showSymbolWithStyle(Symbol symbolToInsert) {
 void TextEdit::showSymbol(int pos, QChar c) {
     QTextCharFormat format;
     format.setFontWeight(QFont::Normal);
-    format.setFontFamily("Helvetica");
+    format.setFontFamily(DEFAULT_FONT_FAMILY);
 
     QTextCursor cur = textEdit->textCursor();
 
@@ -1520,7 +1519,7 @@ void TextEdit::changeStyle(json js) {
 
     std::vector<Symbol> symbolsToChange;
     for (int i = 0; i < js.at("usernameToChange").get<std::vector<std::string>>().size(); i++) {
-        symbolsToChange.emplace_back(Symbol(js.at("charToChange").get<std::vector<char>>()[i],
+        symbolsToChange.emplace_back(Symbol(js.at("charToChange").get<std::vector<wchar_t>>()[i],
                                             js.at("usernameToChange").get<std::vector<std::string>>()[i],
                                             js.at("crdtToChange").get<std::vector<std::vector<int>>>()[i]));
     }

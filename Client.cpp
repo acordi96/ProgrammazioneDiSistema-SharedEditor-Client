@@ -2,8 +2,8 @@
 // Created by Sam on 22/apr/2020.
 //
 
-//#define serverRoute "93.43.250.236"
-#define serverRoute "127.0.0.1"
+#define serverRoute "93.43.250.236"
+//#define serverRoute "127.0.0.1"
 
 #include <QtWidgets/QMessageBox>
 #include "Headers/Client.h"
@@ -132,7 +132,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
     } else if (type_request == "insertAndStyle_res") {
         //prendo il vettore di symbol
         std::vector<std::string> usernameToInsert = js.at("usernameToInsert").get<std::vector<std::string>>();
-        std::vector<char> charToInsert = js.at("charToInsert").get<std::vector<char>>();
+        std::vector<wchar_t> charToInsert = js.at("charToInsert").get<std::vector<wchar_t>>();
         std::vector<std::vector<int>> crdtToInsert = js.at("crdtToInsert").get<std::vector<std::vector<int>>>();
         std::string fontFamily = js.at("fontFamily").get<std::string>();
         int fontSize = js.at("size").get<int>();
