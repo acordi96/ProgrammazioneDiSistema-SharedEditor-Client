@@ -32,6 +32,7 @@ public:
     std::map<std::pair<std::string, std::string>, std::string> files; //<<owner, filename>, invitation>
     std::vector<Symbol> symbols;
     int maxBufferSymbol;
+    bool updateChangesCursor;
 
     Client();
 

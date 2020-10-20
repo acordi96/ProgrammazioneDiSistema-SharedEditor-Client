@@ -752,14 +752,16 @@ void TextEdit::updateRemotePosition(QString user, int pos) {
 
 void TextEdit::cursorPositionChanged() {
     QTextCursor cursor = textEdit->textCursor();
-    int pos = cursor.position();
+    if(client_->updateChangesCursor && !cursor.hasSelection()) {
+        int pos = cursor.position();
 
-    json j = json{
-            {"operation", "update_cursorPosition"},
-            {"username",  client_->getUser().toStdString()},
-            {"pos",       pos}
-    };
-    //client_->sendAtServer(j);
+        json j = json{
+                {"operation", "update_cursorPosition"},
+                {"username",  client_->getUser().toStdString()},
+                {"pos",       pos}
+        };
+        client_->sendAtServer(j);
+    }
 }
 
 void TextEdit::showSymbolWithId(Symbol symbolToInsert) {
@@ -971,6 +973,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                 //cancella caratteri se sono selezionati (tranne per ctrl+a e ctrl+c
                 if (cursor.hasSelection() && key_ev->text().toStdString().c_str()[0] != 3 &&
                     key_ev->text().toStdString().c_str()[0] != 1) {
+                    client_->updateChangesCursor = false;
                     startIndex = cursor.selectionStart();
                     endIndex = cursor.selectionEnd();
                     pos = startIndex;
@@ -1034,6 +1037,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     }
                     decreentPosition(startIndex, dim);
                     drawGraphicCursor();
+                    client_->updateChangesCursor = true;
                 } else {
                     pos = cursor.position();
                 }
@@ -1320,15 +1324,24 @@ void TextEdit::highlightcharacter() {
     QString name = sender->objectName();
     QTextCursor cursor = textEdit->textCursor();
     QTextCursor tempCursor = QTextCursor(cursor);
-    int dim = client_->symbols.size();
-    if(dim > 5000){
+    int start, end;
+    if(cursor.hasSelection()) {
+        start = cursor.selectionStart();
+        end = cursor.selectionEnd();
+        cursor.clearSelection();
+    } else {
+        start = 0;
+        end = client_->symbols.size();
+    }
+    if((end - start) > (client_->maxBufferSymbol * 5)){
             this->alert();
     }else{
         int pos = 0;
-        for (auto s: client_->symbols) {
-            if (s.getUsername() == name.toStdString()) {
+        client_->updateChangesCursor = false;
+        for (auto s = client_->symbols.begin() + start; s != client_->symbols.begin() + end; ++s) {
+            if (s->getUsername() == name.toStdString()) {
                 tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
-                tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
+                tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos + start);
                 tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
                 textEdit->setTextCursor(tempCursor);
                 if (name == client_->getUser())
@@ -1339,13 +1352,12 @@ void TextEdit::highlightcharacter() {
             }
             pos++;
         }
+        client_->updateChangesCursor = true;
 
         textEdit->setTextCursor(cursor);
         textEdit->setTextBackgroundColor(QColor(255, 255, 255, 255));
         textEdit->setFocus();
-
-        timer->start(3500);
-
+        timer->start(3000);
 
     }
 }
@@ -1538,7 +1550,7 @@ void TextEdit::changeStyle(json js) {
     textEdit->setFocus();
 }
 void TextEdit::alert(){
-    QMessageBox *msgB = new QMessageBox(QMessageBox::Critical,tr("Alert"),tr("Too much chars!Try to select less chars."),
+    QMessageBox *msgB = new QMessageBox(QMessageBox::Critical,tr("Alert"),tr("Select fewer characters!"),
                                         QMessageBox::NoButton,this,Qt::CustomizeWindowHint);
 
     msgB->setIconPixmap(QPixmap(rsrcPath+QString::fromUtf8("/triangle.png")));

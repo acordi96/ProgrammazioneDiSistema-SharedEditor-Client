@@ -18,6 +18,7 @@ Client::Client()
         io_context_.run(); //boost thread loop start
     });
     this->maxBufferSymbol = 1;
+    this->updateChangesCursor = true;
     do_connect();
 }
 
