@@ -674,6 +674,15 @@ void Userpage::on_openButton_clicked() {
     };
     client_->setFileName(QString::fromStdString( filename));
     client_->sendAtServer(j);
+    //deseleziono vecchio button e seleziono quello nuovo
+    QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
+    deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                              "background-color:#84ACD7;\n"
+                                              "border:1px;\n"
+                                              "border-radius:5px;\n"
+                                              "color:#FFFFFF;\n"
+                                              "font: 75 14pt \"Sawasdee Bold\";\n"
+                                              "}"));
     selectedFile="";
 }
 
