@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         customcursor.cpp \
         main.cpp \
+    myqtextedit.cpp \
         stacked.cpp \
         textedit.cpp \
         Client.cpp  \
@@ -39,7 +40,8 @@ HEADERS += \
         Headers/userpage.h \
         Headers/Style.h\
         Libs/md5.h \
-        Libs/json.hpp
+        Libs/json.hpp \
+        myqtextedit.h
 
 RESOURCES += \
     project_icons.qrc
