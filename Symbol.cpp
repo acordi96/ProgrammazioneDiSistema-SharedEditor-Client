@@ -10,7 +10,7 @@ Symbol::Symbol(wchar_t car, std::string usr, std::vector<int> pos) : character(c
                                                                   posizione(std::move(pos)) {
 
 }
-Symbol::Symbol(char car, std::string usr, std::vector<int> pos, Style style) : character(car), username(std::move(usr)),
+Symbol::Symbol(wchar_t car, std::string usr, std::vector<int> pos, Style style) : character(car), username(std::move(usr)),
                                                                   posizione(std::move(pos)), symbolStyle(std::move(style)) {
 
 }

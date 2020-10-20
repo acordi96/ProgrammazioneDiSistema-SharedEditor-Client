@@ -6,7 +6,7 @@
 #define PROGETTO_PROVA_STYLE_H
 
 #define DEFAULT_FONT_FAMILY "Helvetica"
-#define DEFAULT_COLOR "#00ffffff"
+#define DEFAULT_COLOR "#000000"
 #ifdef __linux__
     #define DEFAULT_FONT_SIZE 11
 #else //winzoz

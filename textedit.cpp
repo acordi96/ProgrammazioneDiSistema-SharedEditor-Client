@@ -713,7 +713,7 @@ void TextEdit::textSize(const QString &p) {
             {"usernameToChange", usernameToChange},
             {"charToChange",     charToChange},
             {"crdtToChange",     crdtToChange},
-            {"fontSize",         p.toInt()}
+            {"size",         p.toInt()}
     };
     client_->sendAtServer(j);
 
@@ -1145,7 +1145,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                             {"underlined",       textEdit->fontUnderline()},
                             {"color",            color},
                             {"fontFamily",       fontFamily},
-                            {"fontSize",         size}
+                            {"size",         size}
                     };
                     client_->sendAtServer(j);
                     //drawRemoteCursors();
@@ -1548,8 +1548,8 @@ void TextEdit::changeStyle(json js) {
                     oldFormat.setForeground(QColor(QString::fromStdString(js.at("color").get<std::string>())));
                 if (js.contains("fontFamily"))
                     oldFormat.setFontFamily(QString::fromStdString(js.at("fontFamily").get<std::string>()));
-                if (js.contains("fontSize"))
-                    oldFormat.setFontPointSize(js.at("fontSize").get<int>());
+                if (js.contains("size"))
+                    oldFormat.setFontPointSize(js.at("size").get<int>());
                 cursor.setPosition(count);
                 cursor.setPosition(count + 1, QTextCursor::KeepAnchor);
                 cursor.mergeCharFormat(oldFormat);
@@ -1575,8 +1575,8 @@ void TextEdit::changeStyle(json js) {
                         oldFormat.setForeground(QColor(QString::fromStdString(js.at("color").get<std::string>())));
                     if (js.contains("fontFamily"))
                         oldFormat.setFontFamily(QString::fromStdString(js.at("fontFamily").get<std::string>()));
-                    if (js.contains("fontSize"))
-                        oldFormat.setFontPointSize(js.at("fontSize").get<int>());
+                    if (js.contains("size"))
+                        oldFormat.setFontPointSize(js.at("size").get<int>());
                     cursor.setPosition(count);
                     cursor.setPosition(count + 1, QTextCursor::KeepAnchor);
                     cursor.mergeCharFormat(oldFormat);

@@ -135,7 +135,7 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::vector<char> charToInsert = js.at("charToInsert").get<std::vector<char>>();
         std::vector<std::vector<int>> crdtToInsert = js.at("crdtToInsert").get<std::vector<std::vector<int>>>();
         std::string fontFamily = js.at("fontFamily").get<std::string>();
-        int fontSize = js.at("fontSize").get<int>();
+        int fontSize = js.at("size").get<int>();
         bool bold = js.at("bold").get<bool>();
         bool italic = js.at("italic").get<bool>();
         bool underlined = js.at("underlined").get<bool>();
@@ -206,16 +206,21 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         std::vector<wchar_t> charToInsert = js.at("charToInsert").get<std::vector<wchar_t>>();
         std::vector<std::vector<int>> crdtToInsert = js.at("crdtToInsert").get<std::vector<std::vector<int>>>();
         std::vector<std::string> idToUsername = js.at("usernameToId").get<std::vector<std::string>>();
+        std::vector<int> bold = js.at("bold").get<std::vector<int>>();
+        std::vector<int> italic = js.at("italic").get<std::vector<int>>();
+        std::vector<int> underlined = js.at("underlined").get<std::vector<int>>();
+        std::vector<std::string> colorj = js.at("color").get<std::vector<std::string>>();
+        std::vector<std::string> fontFamily = js.at("fontFamily").get<std::vector<std::string>>();
+        std::vector<int> size = js.at("size").get<std::vector<int>>();
+
         std::map<int, std::string> usernameToId;
         for (int i = 0; i < idToUsername.size(); i++)
             usernameToId.insert({i, idToUsername[i]});
         for (int i = 0; i < usernameToInsert.size(); i++) {
             //ricreo il simbolo
-            Symbol symbolToInsert(charToInsert[i], usernameToId.at(usernameToInsert[i]), crdtToInsert[i]);
-            int index = this->generateIndexCRDT(symbolToInsert, 0, -1, -1);
-            //aggiungo al crdt
-            this->insertSymbolIndex(symbolToInsert, index);
-            emit insertSymbol(index, charToInsert[i]);
+            Style style(bold[i] == 1, underlined[i] == 1,italic[i] == 1, fontFamily[i], size[i], colorj[i]);
+            Symbol symbolToInsert(charToInsert[i], usernameToId.at(usernameToInsert[i]), crdtToInsert[i], style);
+            emit insertSymbolWithStyle(symbolToInsert);
         }
         if (js.contains("endOpenFile")) {
             this->writing = 0;
@@ -395,7 +400,7 @@ std::map<std::pair<std::string, std::string>, std::string> Client::getFiles() co
 }
 
 //stessa cosa di sotto ma con style
-std::vector<int> Client::insertSymbolNewCRDT(int index, char character, const std::string &username, Style style) {
+std::vector<int> Client::insertSymbolNewCRDT(int index, wchar_t character, const std::string &username, Style style) {
     std::vector<int> vector;
     if (this->symbols.empty()) {
         vector = {0};
