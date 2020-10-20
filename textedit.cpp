@@ -314,7 +314,7 @@ void TextEdit::updateConnectedUser(QString user, QString color) {
 }
 
 void TextEdit::setupConnectedUsers() {
-    QDockWidget *dock = new QDockWidget(tr("Connected Users"), this);
+    QDockWidget *dock = new QDockWidget(tr("Users Online"), this);
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     connectedUsers = new QListWidget(dock);
     QLabel *label = new QLabel(client_->getUser());
@@ -717,77 +717,6 @@ void TextEdit::textSize(const QString &p) {
     client_->sendAtServer(j);
 
 }
-/*
-void TextEdit::textStyle(int styleIndex) {
-    QTextCursor cursor = textEdit->textCursor();
-    QTextListFormat::Style style = QTextListFormat::ListStyleUndefined;
-
-    switch (styleIndex) {
-        case 1:
-            style = QTextListFormat::ListDisc;
-            break;
-        case 2:
-            style = QTextListFormat::ListCircle;
-            break;
-        case 3:
-            style = QTextListFormat::ListSquare;
-            break;
-        case 4:
-            style = QTextListFormat::ListDecimal;
-            break;
-        case 5:
-            style = QTextListFormat::ListLowerAlpha;
-            break;
-        case 6:
-            style = QTextListFormat::ListUpperAlpha;
-            break;
-        case 7:
-            style = QTextListFormat::ListLowerRoman;
-            break;
-        case 8:
-            style = QTextListFormat::ListUpperRoman;
-            break;
-        default:
-            break;
-    }
-
-    cursor.beginEditBlock();
-
-    QTextBlockFormat blockFmt = cursor.blockFormat();
-
-    if (style == QTextListFormat::ListStyleUndefined) {
-        blockFmt.setObjectIndex(-1);
-        int headingLevel = styleIndex >= 9 ? styleIndex - 9 + 1 : 0; // H1 to H6, or Standard
-        blockFmt.setHeadingLevel(headingLevel);
-        cursor.setBlockFormat(blockFmt);
-
-        int sizeAdjustment = headingLevel ? 4 - headingLevel : 0; // H1 to H6: +3 to -2
-        QTextCharFormat fmt;
-        fmt.setFontWeight(headingLevel ? QFont::Bold : QFont::Normal);
-        fmt.setProperty(QTextFormat::FontSizeAdjustment, sizeAdjustment);
-        cursor.select(QTextCursor::LineUnderCursor);
-        cursor.mergeCharFormat(fmt);
-        textEdit->mergeCurrentCharFormat(fmt);
-    } else {
-        QTextListFormat listFmt;
-        if (cursor.currentList()) {
-            listFmt = cursor.currentList()->format();
-        } else {
-            listFmt.setIndent(blockFmt.indent() + 1);
-            blockFmt.setIndent(0);
-            cursor.setBlockFormat(blockFmt);
-        }
-        listFmt.setStyle(style);
-        cursor.createList(listFmt);
-    }
-
-    cursor.endEditBlock();
-}*/
-
-/*void TextEdit::currentCharFormatChanged(const QTextCharFormat &format) {
-    fontChanged(format.font());
-    colorChanged(format.foreground().color());
-}*/
 
 void TextEdit::updateRemotePosition(QString user, int pos) {
     _cursorsVector[user].setPosition(pos);
@@ -1012,7 +941,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
     if (ev->type() == QEvent::KeyPress) {
         QKeyEvent *key_ev = static_cast<QKeyEvent *>(ev);
         int key = key_ev->key();
-        std::cout << "FILE CRDT: " << std::flush; //print crdt
+        /*std::cout << "FILE CRDT: " << std::flush; //print crdt
         for (auto iterPositions = client_->symbols.begin(); iterPositions != client_->symbols.end(); ++iterPositions) {
             if (iterPositions->getCharacter() != 10 && iterPositions->getCharacter() != 13)
                 std::wcout << "{" << (int) iterPositions->getCharacter() << "(" << iterPositions->getCharacter()
@@ -1024,7 +953,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
             std::cout << "] - " << iterPositions->getUsername() << std::flush;
             std::cout << "}" << std::flush;
         }
-        std::cout << std::endl;
+        std::cout << std::endl;*/
         if (obj == textEdit) {
             if (!key_ev->text().isEmpty()) {
                 QTextCursor cursor = textEdit->textCursor();

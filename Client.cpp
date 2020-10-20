@@ -2,8 +2,10 @@
 // Created by Sam on 22/apr/2020.
 //
 
-#define serverRoute "93.43.250.236"
-//#define serverRoute "127.0.0.1"
+//#define serverRoute "93.43.250.236"
+#define serverRoute "127.0.0.1"
+
+#define serverPort "3000"
 
 #include <QtWidgets/QMessageBox>
 #include "Headers/Client.h"
@@ -20,7 +22,7 @@ Client::Client()
 }
 
 void Client::do_connect() {
-    auto endpoints = resolver_.resolve(serverRoute, "3000");
+    auto endpoints = resolver_.resolve(serverRoute, serverPort);
     boost::asio::async_connect(socket_, endpoints, [this](boost::system::error_code ec, tcp::endpoint) {
         if (!ec) {
             std::cout << "CONNESSO AL SERVER" << std::endl;
@@ -318,6 +320,11 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         usernames = js.at("usernames").get<std::vector<std::string>>();
         usersInFile users;
         for (int i = 0; i < usernames.size(); i++) {
+            for(auto pair = users.begin(); pair != users.end(); ++pair)
+                if(pair->first == usernames[i]) {
+                    users.erase(pair);
+                    break;
+                }
             users.insert(std::pair<std::string, std::string>(usernames[i], colors[i]));
         }
         emit updateUserslist(users);
@@ -504,12 +511,14 @@ int Client::generateIndexCRDT(Symbol symbol, int iter, int start,
 std::vector<int> Client::eraseSymbolCRDT(std::vector<Symbol> symbolsToErase) {
     int lastFound = 0;
     std::vector<int> erased;
-    bool foundSecondPart = false;
     for (auto iterSymbolsToErase = symbolsToErase.begin(); iterSymbolsToErase !=
                                                            symbolsToErase.end(); ++iterSymbolsToErase) { //cerca prima da dove hai trovato prima in poi
         int count = lastFound;
         if ((lastFound - 2) >= 0)
             lastFound -= 2;
+        else if ((lastFound - 1) >= 0)
+            lastFound--;
+        bool foundSecondPart = false;
         for (auto iterSymbols = this->symbols.begin() + lastFound; iterSymbols != this->symbols.end(); ++iterSymbols) {
             if (*iterSymbolsToErase == *iterSymbols) {
                 erased.push_back(generateIndexCRDT(*iterSymbols, 0, -1, -1));
