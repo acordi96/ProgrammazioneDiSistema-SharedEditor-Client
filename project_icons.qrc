@@ -66,5 +66,7 @@
         <file>images/mac/color-picker.png</file>
         <file>images/win/hourglass.png</file>
         <file>images/mac/hourglass.png</file>
+        <file>images/win/triangle.png</file>
+        <file>images/mac/triangle.png</file>
     </qresource>
 </RCC>

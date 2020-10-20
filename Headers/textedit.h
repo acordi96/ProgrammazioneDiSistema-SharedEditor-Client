@@ -79,6 +79,8 @@ signals:
 
     void updateCursor();
 
+    void closeLoading();
+
 private slots:
 
     void fileOpen();
@@ -162,6 +164,7 @@ private:
 
     void closingFile();
 
+    void alert();
 
     void drawGraphicCursor();
 

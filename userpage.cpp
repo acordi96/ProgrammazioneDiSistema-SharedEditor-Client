@@ -44,7 +44,6 @@ Userpage::Userpage(QWidget *parent, Client *c) :
 
     setCentralWidget(page);
     QObject::connect(client_, &Client::updateFile, this, &Userpage::updateRecentFiles);
-    QObject::connect(client_, &Client::updateUser, this, &Userpage::updateUserFile);
     //QObject::connect(page, &stacked::updateRecentFiles, this, &Userpage::updateFiles);
 }
 
@@ -673,8 +672,9 @@ void Userpage::on_openButton_clicked() {
             {"name",      filename},
             {"username",  owner}
     };
+    client_->setFileName(QString::fromStdString( filename));
     client_->sendAtServer(j);
-
+    selectedFile="";
 }
 
 void Userpage::on_renameButton_clicked() {
@@ -784,10 +784,18 @@ void Userpage::on_renameButton_clicked() {
                     {"username",  client_->getUser().toStdString()}
             };
             client_->sendAtServer(j);
-
+            //deselect button
+            QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
+            deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                                      "background-color:#84ACD7;\n"
+                                                      "border:1px;\n"
+                                                      "border-radius:5px;\n"
+                                                      "color:#FFFFFF;\n"
+                                                      "font: 75 14pt \"Sawasdee Bold\";\n"
+                                                      "}"));
+            selectedFile="";
         }
     }
-
 }
 
 void Userpage::on_deleteButton_clicked() {
@@ -832,7 +840,7 @@ void Userpage::on_deleteButton_clicked() {
                     {"owner",     owner}
             };
             client_->sendAtServer(j);
-
+            selectedFile="";
         }
 
     } else { //non sei l'owner: rimuovi invito
@@ -863,7 +871,16 @@ void Userpage::on_deleteButton_clicked() {
                     {"owner",     owner}
             };
             client_->sendAtServer(j);
-
+            //deselect button
+            QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
+            deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                                      "background-color:#84ACD7;\n"
+                                                      "border:1px;\n"
+                                                      "border-radius:5px;\n"
+                                                      "color:#FFFFFF;\n"
+                                                      "font: 75 14pt \"Sawasdee Bold\";\n"
+                                                      "}"));
+            selectedFile="";
         }
     }
 
@@ -982,6 +999,7 @@ void Userpage::on_inviteButton_clicked() {
                                                   "font: 75 14pt \"Sawasdee Bold\";\n"
                                                   "}"));
 
+        selectedFile="";
         return;
     }
     const char *code;
@@ -1006,6 +1024,7 @@ void Userpage::on_inviteButton_clicked() {
                                               "color:#FFFFFF;\n"
                                               "font: 75 14pt \"Sawasdee Bold\";\n"
                                               "}"));
+    selectedFile="";
 }
 
 std::pair<std::string, std::string> Userpage::parseFileButton(const std::string &button) {
@@ -1042,10 +1061,6 @@ std::string Userpage::generateFileButton(const std::string &owner, const std::st
 
 void Userpage::clearLineURL() {
     lineURL->clear();
-}
-
-void Userpage::updateUserFile(QString old, QString newN) {
-    //aggiornare interfaccia grafica
 }
 
 void Userpage::updateInfo() {
