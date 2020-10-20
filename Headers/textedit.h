@@ -13,7 +13,7 @@
 
 #include "Headers/Client.h"
 #include "Headers/customcursor.h"
-
+#include "myqtextedit.h"
 QT_BEGIN_NAMESPACE
 class QAction;
 
@@ -69,7 +69,6 @@ protected:
     void closeEvent(QCloseEvent *e) override;
 
     bool eventFilter(QObject *obj, QEvent *ev) override;
-
 signals:
 
     void logout();
@@ -195,7 +194,7 @@ private:
 
     QToolBar *tb;
     QString fileName;
-    QTextEdit *textEdit;
+    MyQTextEdit *textEdit;
     QListWidget *connectedUsers;
 
     bool key_to_handle = false;

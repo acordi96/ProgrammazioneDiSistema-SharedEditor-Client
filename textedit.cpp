@@ -72,7 +72,7 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
 #ifdef Q_OS_MACOS
     setUnifiedTitleAndToolBarOnMac(true);
 #endif
-    textEdit = new QTextEdit(this);
+    textEdit = new MyQTextEdit(this);
     timer = new QTimer(this);
     timer->setSingleShot(true);
 
@@ -114,7 +114,7 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
         spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         tb->addWidget(spacer);
 
-        const QIcon quitIcon = QIcon::fromTheme("quit", QIcon(rsrcPath + "/logout.png"));
+        const QIcon quitIcon = QIcon::fromTheme("shared-editor", QIcon(rsrcPath + "/logout.png"));
         QAction *a = tb->addAction(quitIcon, tr("&Logout"), this, [=]() {
             requestLogout();
             emit this->logout();
@@ -192,7 +192,7 @@ void TextEdit::setupFileActions() {
     QToolBar *tb = addToolBar(tr("File Actions"));
     tb->setStyleSheet(QString::fromUtf8("QToolButton:hover {background-color:#E6E7E8;border:1px;}"));
 
-    const QIcon backIcon = QIcon::fromTheme("go-back", QIcon(rsrcPath + "/left-arrow.png"));
+    const QIcon backIcon = QIcon::fromTheme("shared-editor", QIcon(rsrcPath + "/left-arrow.png"));
     QAction *a = tb->addAction(backIcon, tr("&Close File"), this, [=]() {
         closingFile();
         emit this->closeFile();
@@ -200,7 +200,7 @@ void TextEdit::setupFileActions() {
 
 #ifndef QT_NO_PRINTER
 
-    const QIcon exportPdfIcon = QIcon::fromTheme("exportpdf", QIcon(rsrcPath + "/exportpdf.png"));
+    const QIcon exportPdfIcon = QIcon::fromTheme("shared-editor", QIcon(rsrcPath + "/exportpdf.png"));
     a = tb->addAction(exportPdfIcon, tr("&Export PDF..."), this, &TextEdit::filePrintPdf);
     a->setPriority(QAction::LowPriority);
     a->setShortcut(Qt::CTRL + Qt::Key_D);
@@ -213,6 +213,7 @@ void TextEdit::setupEditActions() {
     QToolBar *tb = addToolBar(tr("Edit Actions"));
     QMenu *menu = menuBar()->addMenu(tr("&Edit"));
 
+    qDebug()<<"SETUP EDIT ACTIONS";
     const QIcon undoIcon = QIcon::fromTheme("edit-undo", QIcon(rsrcPath + "/editundo.png"));
 
 
@@ -243,7 +244,7 @@ void TextEdit::setupTextActions() {
     QToolBar *tb = addToolBar(tr("Format Actions"));
     tb->setStyleSheet(QString::fromUtf8("QToolButton:hover {background-color:#E6E7E8;border:1px;}"));
 
-    const QIcon boldIcon = QIcon::fromTheme("format-text-bold", QIcon(rsrcPath + "/textbold.png"));
+    const QIcon boldIcon = QIcon::fromTheme("shared-editor", QIcon(rsrcPath + "/textbold.png"));
     actionTextBold = tb->addAction(boldIcon, tr("&Bold"), this, &TextEdit::textBold);
     actionTextBold->setShortcut(Qt::CTRL + Qt::Key_B);
     actionTextBold->setPriority(QAction::LowPriority);
@@ -252,7 +253,7 @@ void TextEdit::setupTextActions() {
     actionTextBold->setFont(bold);
     actionTextBold->setCheckable(true);
 
-    const QIcon italicIcon = QIcon::fromTheme("format-text-italic", QIcon(rsrcPath + "/textitalic.png"));
+    const QIcon italicIcon = QIcon::fromTheme("shared-editor", QIcon(rsrcPath + "/textitalic.png"));
     actionTextItalic = tb->addAction(italicIcon, tr("&Italic"), this, &TextEdit::textItalic);
     actionTextItalic->setPriority(QAction::LowPriority);
     actionTextItalic->setShortcut(Qt::CTRL + Qt::Key_I);
@@ -261,7 +262,7 @@ void TextEdit::setupTextActions() {
     actionTextItalic->setFont(italic);
     actionTextItalic->setCheckable(true);
 
-    const QIcon underlineIcon = QIcon::fromTheme("format-text-underline", QIcon(rsrcPath + "/textunder.png"));
+    const QIcon underlineIcon = QIcon::fromTheme("shared-editor", QIcon(rsrcPath + "/textunder.png"));
     actionTextUnderline = tb->addAction(underlineIcon, tr("&Underline"), this, &TextEdit::textUnderline);
     actionTextUnderline->setShortcut(Qt::CTRL + Qt::Key_U);
     actionTextUnderline->setPriority(QAction::LowPriority);
@@ -287,6 +288,7 @@ void TextEdit::setupTextActions() {
     const QList<int> standardSizes = QFontDatabase::standardSizes();
     for (int size : standardSizes)
         comboSize->addItem(QString::number(size));
+    qDebug()<<"Font Size"<<QApplication::font().pointSize();
     comboSize->setCurrentIndex(standardSizes.indexOf(QApplication::font().pointSize()));
 
     connect(comboSize, QOverload<const QString &>::of(&QComboBox::activated), this, &TextEdit::textSize);
@@ -859,6 +861,23 @@ void TextEdit::showSymbolWithId(Symbol symbolToInsert) {
 
 }
 
+
+//void QTextEdit::insertFromMimeData(const QMimeData *source){
+//    if(source->hasText()){
+//        QString text = source->text();
+//        QTextCursor cursor = textCursor();
+
+//        QTextCharFormat fmt;
+//        fmt.setFontFamily("Helvetica");
+//        fmt.setFontItalic(false);
+//        fmt.setFontUnderline(false);
+//        fmt.setFontWeight(QFont::Normal);
+//        fmt.setFontPointSize(8);
+//        cursor.setCharFormat(fmt);
+//        cursor.insertText(text);
+
+//    }
+//}
 
 void TextEdit::showSymbolWithStyle(Symbol symbolToInsert) {
 
