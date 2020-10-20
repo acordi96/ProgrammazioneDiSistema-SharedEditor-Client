@@ -507,6 +507,7 @@ void TextEdit::textBold() {
         std::vector<wchar_t> charToChange;
         std::vector<std::vector<int>> crdtToChange;
         int i = cursor.selectionStart();
+        int count = 0;
         for (auto style = client_->symbols.begin() + cursor.selectionStart();
              style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
             QTextCharFormat fmt = style->getTextCharFormat();
@@ -519,17 +520,31 @@ void TextEdit::textBold() {
             crdtToChange.push_back(client_->symbols[i].getPosizione());
             client_->symbols[i].symbolStyle.setBold(bold);
             i++;
+            if(++count == client_->maxBufferSymbol) {
+                json j = json{
+                        {"operation",        "styleChanged"},
+                        {"usernameToChange", usernameToChange},
+                        {"charToChange",     charToChange},
+                        {"crdtToChange",     crdtToChange},
+                        {"bold",             bold}
+                };
+                client_->sendAtServer(j);
+                usernameToChange.clear();
+                charToChange.clear();
+                crdtToChange.clear();
+                count = 0;
+            }
         }
-
-        json j = json{
-                {"operation",        "styleChanged"},
-                {"usernameToChange", usernameToChange},
-                {"charToChange",     charToChange},
-                {"crdtToChange",     crdtToChange},
-                {"bold",             bold}
-        };
-
-        client_->sendAtServer(j);
+        if(!usernameToChange.empty()) {
+            json j = json{
+                    {"operation",        "styleChanged"},
+                    {"usernameToChange", usernameToChange},
+                    {"charToChange",     charToChange},
+                    {"crdtToChange",     crdtToChange},
+                    {"bold",             bold}
+            };
+            client_->sendAtServer(j);
+        }
     }
 
 }
@@ -549,6 +564,7 @@ void TextEdit::textUnderline() {
         std::vector<wchar_t> charToChange;
         std::vector<std::vector<int>> crdtToChange;
         int i = cursor.selectionStart();
+        int count = 0;
         for (auto style = client_->symbols.begin() + cursor.selectionStart();
              style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
             QTextCharFormat fmt = style->getTextCharFormat();
@@ -561,16 +577,29 @@ void TextEdit::textUnderline() {
             crdtToChange.push_back(client_->symbols[i].getPosizione());
             client_->symbols[i].symbolStyle.setUnderlined(underlined);
             i++;
+            if(++count == client_->maxBufferSymbol) {
+                json j = json{
+                        {"operation",        "styleChanged"},
+                        {"usernameToChange", usernameToChange},
+                        {"charToChange",     charToChange},
+                        {"crdtToChange",     crdtToChange},
+                        {"underlined",       underlined}};
+                client_->sendAtServer(j);
+                usernameToChange.clear();
+                charToChange.clear();
+                crdtToChange.clear();
+                count=0;
+            }
         }
-
-        json j = json{
-        {"operation",        "styleChanged"},
-        {"usernameToChange", usernameToChange},
-        {"charToChange",     charToChange},
-        {"crdtToChange",     crdtToChange},
-        {"underlined",       underlined}
-    };
-        client_->sendAtServer(j);
+        if(!usernameToChange.empty()) {
+            json j = json{
+                    {"operation",        "styleChanged"},
+                    {"usernameToChange", usernameToChange},
+                    {"charToChange",     charToChange},
+                    {"crdtToChange",     crdtToChange},
+                    {"underlined",       underlined}};
+            client_->sendAtServer(j);
+        }
     }
 }
 
@@ -589,6 +618,7 @@ void TextEdit::textItalic() {
         std::vector<wchar_t> charToChange;
         std::vector<std::vector<int>> crdtToChange;
         int i = cursor.selectionStart();
+        int count = 0;
         for (auto style = client_->symbols.begin() + cursor.selectionStart();
              style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
             QTextCharFormat fmt = style->getTextCharFormat();
@@ -601,16 +631,29 @@ void TextEdit::textItalic() {
             crdtToChange.push_back(client_->symbols[i].getPosizione());
             client_->symbols[i].symbolStyle.setItalic(italic);
             i++;
+            if(++count == client_->maxBufferSymbol) {
+                json j = json{
+                        {"operation",        "styleChanged"},
+                        {"usernameToChange", usernameToChange},
+                        {"charToChange",     charToChange},
+                        {"crdtToChange",     crdtToChange},
+                        {"italic",           italic}};
+                client_->sendAtServer(j);
+                usernameToChange.clear();
+                charToChange.clear();
+                crdtToChange.clear();
+                count = 0;
+            }
         }
-
-        json j = json{
-        {"operation",        "styleChanged"},
-        {"usernameToChange", usernameToChange},
-        {"charToChange",     charToChange},
-        {"crdtToChange",     crdtToChange},
-        {"italic",           italic}
-    };
-        client_->sendAtServer(j);
+        if(!usernameToChange.empty()) {
+            json j = json{
+                    {"operation",        "styleChanged"},
+                    {"usernameToChange", usernameToChange},
+                    {"charToChange",     charToChange},
+                    {"crdtToChange",     crdtToChange},
+                    {"italic",           italic}};
+            client_->sendAtServer(j);
+        }
     }
 }
 
@@ -636,6 +679,7 @@ void TextEdit::textColor() {
         std::vector<wchar_t> charToChange;
         std::vector<std::vector<int>> crdtToChange;
         int i = cursor.selectionStart();
+        int count = 0;
         for (auto style = client_->symbols.begin() + cursor.selectionStart();
              style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
             QTextCharFormat fmt = style->getTextCharFormat();
@@ -648,16 +692,29 @@ void TextEdit::textColor() {
             crdtToChange.push_back(client_->symbols[i].getPosizione());
             client_->symbols[i].symbolStyle.setColor(color.name().toStdString());
             i++;
+            if(++count == client_->maxBufferSymbol) {
+                json j = json{
+                        {"operation",        "styleChanged"},
+                        {"usernameToChange", usernameToChange},
+                        {"charToChange",     charToChange},
+                        {"crdtToChange",     crdtToChange},
+                        {"color",            color.name().toStdString()}};
+                client_->sendAtServer(j);
+                usernameToChange.clear();
+                charToChange.clear();
+                crdtToChange.clear();
+                count = 0;
+            }
         }
-
-        json j = json{
-        {"operation",        "styleChanged"},
-        {"usernameToChange", usernameToChange},
-        {"charToChange",     charToChange},
-        {"crdtToChange",     crdtToChange},
-        {"color",            color.name().toStdString()}
-    };
-        client_->sendAtServer(j);
+        if(!usernameToChange.empty()) {
+            json j = json{
+                    {"operation",        "styleChanged"},
+                    {"usernameToChange", usernameToChange},
+                    {"charToChange",     charToChange},
+                    {"crdtToChange",     crdtToChange},
+                    {"color",            color.name().toStdString()}};
+            client_->sendAtServer(j);
+        }
     }
 }
 
@@ -675,6 +732,7 @@ void TextEdit::textFamily(const QString &f) {
         std::vector<std::string> usernameToChange;
         std::vector<wchar_t> charToChange;
         std::vector<std::vector<int>> crdtToChange;
+        int count = 0;
         for (auto style = client_->symbols.begin() + cursor.selectionStart();
              style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
             QTextCharFormat fmt = style->getTextCharFormat();
@@ -687,16 +745,29 @@ void TextEdit::textFamily(const QString &f) {
             crdtToChange.push_back(client_->symbols[i].getPosizione());
             client_->symbols[i].symbolStyle.setFontFamily(f.toStdString());
             i++;
+            if(++count == client_->maxBufferSymbol) {
+                json j = json{
+                        {"operation",        "styleChanged"},
+                        {"usernameToChange", usernameToChange},
+                        {"charToChange",     charToChange},
+                        {"crdtToChange",     crdtToChange},
+                        {"fontFamily",       f.toStdString()}};
+                client_->sendAtServer(j);
+                usernameToChange.clear();
+                charToChange.clear();
+                crdtToChange.clear();
+                count = 0;
+            }
         }
-
-        json j = json{
-        {"operation",        "styleChanged"},
-        {"usernameToChange", usernameToChange},
-        {"charToChange",     charToChange},
-        {"crdtToChange",     crdtToChange},
-        {"fontFamily",       f.toStdString()}
-    };
-        client_->sendAtServer(j);
+        if(!usernameToChange.empty()) {
+            json j = json{
+                    {"operation",        "styleChanged"},
+                    {"usernameToChange", usernameToChange},
+                    {"charToChange",     charToChange},
+                    {"crdtToChange",     crdtToChange},
+                    {"fontFamily",       f.toStdString()}};
+            client_->sendAtServer(j);
+        }
     }
 }
 
@@ -718,6 +789,7 @@ void TextEdit::textSize(const QString &p) {
         std::vector<std::string> usernameToChange;
         std::vector<wchar_t> charToChange;
         std::vector<std::vector<int>> crdtToChange;
+        int count = 0;
         for (auto style = client_->symbols.begin() + cursor.selectionStart();
              style != client_->symbols.begin() + cursor.selectionEnd(); ++style) {
             QTextCharFormat fmt = style->getTextCharFormat();
@@ -730,19 +802,30 @@ void TextEdit::textSize(const QString &p) {
             crdtToChange.push_back(client_->symbols[i].getPosizione());
             client_->symbols[i].symbolStyle.setFontSize(p.toInt());
             i++;
+            if(++count == client_->maxBufferSymbol) {
+                json j = json{
+                        {"operation",        "styleChanged"},
+                        {"usernameToChange", usernameToChange},
+                        {"charToChange",     charToChange},
+                        {"crdtToChange",     crdtToChange},
+                        {"size",         p.toInt()}};
+                client_->sendAtServer(j);
+                usernameToChange.clear();
+                charToChange.clear();
+                crdtToChange.clear();
+                count = 0;
+            }
         }
-
-        json j = json{
-                {"operation",        "styleChanged"},
-                {"usernameToChange", usernameToChange},
-                {"charToChange",     charToChange},
-                {"crdtToChange",     crdtToChange},
-                {"size",         p.toInt()}
-        };
-        client_->sendAtServer(j);
-
+        if(!usernameToChange.empty()) {
+            json j = json{
+                    {"operation",        "styleChanged"},
+                    {"usernameToChange", usernameToChange},
+                    {"charToChange",     charToChange},
+                    {"crdtToChange",     crdtToChange},
+                    {"size",         p.toInt()}};
+            client_->sendAtServer(j);
+        }
     }
-
 }
 
 void TextEdit::updateRemotePosition(QString user, int pos) {
