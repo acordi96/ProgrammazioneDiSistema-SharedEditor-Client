@@ -911,7 +911,7 @@ void TextEdit::showSymbolWithId(Symbol symbolToInsert) {
 void TextEdit::showSymbolWithStyle(Symbol symbolToInsert, bool open) {
     if(open) {
         client_->updateChangesCursor = false;
-        timerUpdateCursor->start(5);
+        //timerUpdateCursor->start(5);
     }
 
     int pos = client_->generateIndexCRDT(symbolToInsert, 0, -1, -1);

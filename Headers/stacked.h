@@ -43,7 +43,7 @@ private slots:
    void closeAll();
    void closeFile();
    void editPage();
-   void showLoading(bool active);
+   void showLoading();
 /*signals:
     void updateRecentFiles();*/
 private:

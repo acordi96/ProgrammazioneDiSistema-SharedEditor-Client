@@ -105,7 +105,8 @@ signals:
 
     void clearEditor();
 
-    void loading(bool active);
+    void showLoading();
+    void closeLoading();
 
     //per lo stile
     void changeFontFamily(int startIndex, int endIndex, std::string fontFamily);
