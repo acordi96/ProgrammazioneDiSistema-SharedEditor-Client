@@ -1086,7 +1086,6 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
 
                     int dim = endIndex - startIndex;
                     int count = 0;
-                    std::cout << "START:" << std::to_string(startIndex) << " END:" << std::to_string(endIndex) << " DIM:" << std::to_string(dim) << std::endl;
                     for(int iter = 0; iter < dim; iter++) {
                         symbolsToErase.push_back(client_->symbols.at(iter + startIndex));
                         usernameToErase.push_back(client_->symbols.at(iter + startIndex).getUsername());
@@ -1237,7 +1236,40 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     wchar_t c;
                     int startPos = pos;
                     int dim = pastedText.size();
-                    int of = dim / client_->maxBufferSymbol;
+                    int count = 0;
+                    for(int iter = 0; iter < dim; iter++) {
+                        textEdit->setTextCursor(cursor);
+                        usernameToInsert.push_back(client_->getUser().toStdString());
+                        c = pastedText.toStdWString().c_str()[iter];
+                        charToInsert.push_back(c);
+                        crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
+                        crdtToInsert.push_back(crdt);
+                        pos++;
+                        if(++count == client_->maxBufferSymbol) {
+                            json j = json{
+                                    {"operation",        "insert"},
+                                    {"usernameToInsert", usernameToInsert},
+                                    {"charToInsert",     charToInsert},
+                                    {"crdtToInsert",     crdtToInsert}
+                            };
+                            client_->sendAtServer(j);
+
+                            usernameToInsert.clear();
+                            charToInsert.clear();
+                            crdtToInsert.clear();
+                            count = 0;
+                        }
+                    }
+                    if(!usernameToInsert.empty()) {
+                        json j = json{
+                                {"operation",        "insert"},
+                                {"usernameToInsert", usernameToInsert},
+                                {"charToInsert",     charToInsert},
+                                {"crdtToInsert",     crdtToInsert}
+                        };
+                        client_->sendAtServer(j);
+                    }
+                    /*int of = dim / client_->maxBufferSymbol;
                     int i = 0;
 
                     while ((i + 1) * client_->maxBufferSymbol <= dim) {
@@ -1286,7 +1318,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                                 {"crdtToInsert",     crdtToInsert}
                         };
                         client_->sendAtServer(j);
-                    }
+                    }*/
                     drawGraphicCursor();
                     incrementPosition(startPos, dim);
                 }
