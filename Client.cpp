@@ -189,22 +189,13 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         QString res = QString::fromStdString(type_request);
         emit formResultSuccess(res);
         return type_request;
-    } else if (type_request == "file_opened") {
-        //file aperto con successo
-        QString res = QString::fromStdString("file_opened");
-        emit formResultSuccess(res);
-        emit clearEditor();
-        std::string toWrite = js.at("toWrite");
-        for (int i = 0; i < toWrite.length(); i++)
-                emit insertSymbol(i, toWrite[i]);
-        return type_request;
-
     } else if (type_request == "open_file") {
         //prima parte di file deve pulire il testo
         if (this->writing == 0) {
+            this->symbols.clear();
             emit clearEditor();
-            //if(!js.contains("endOpenFile"))
-                //emit showLoading();
+            if(!js.contains("endOpenFile"))
+                emit showLoading();
         }
         std::vector<int> usernameToInsert = js.at("usernameToInsert").get<std::vector<int>>();
         std::vector<wchar_t> charToInsert = js.at("charToInsert").get<std::vector<wchar_t>>();
@@ -249,12 +240,12 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
                 forceCRDT.clear();
                 forceCRDT.push_back((this->writing * this->maxBufferSymbol) + i);
             }
-            Symbol symbolToInsert(charToInsert[i], usernameToId.at(usernameToInsert[i]), js.contains("first_open") ? forceCRDT :crdtToInsert[i], style);
+            Symbol symbolToInsert(charToInsert[i], usernameToId.at(usernameToInsert[i]), js.contains("first_open") ? forceCRDT : crdtToInsert[i], style);
             emit insertSymbolWithStyle(symbolToInsert, true);
         }
         if (js.contains("endOpenFile")) {
             this->writing = 0;
-            //emit closeLoading();
+            emit closeLoading();
             emit formResultSuccess(QString::fromStdString("file_opened"));
         } else {
             this->writing++;

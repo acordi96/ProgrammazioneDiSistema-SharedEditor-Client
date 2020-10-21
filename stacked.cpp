@@ -169,18 +169,6 @@ void stacked::showPopupSuccess(QString result) {
     QVBoxLayout *layout = new QVBoxLayout();
     dialog->setLayout(layout);
     if (result == "LOGIN_SUCCESS" || result == "SIGNUP_SUCCESS") {
-        up = new Userpage(this, client_);
-        te = new TextEdit(client_);
-        connect(te, &TextEdit::logout, this, &stacked::logout);
-        connect(up, &Userpage::upLogout, this, &stacked::logout);
-        connect(te, &TextEdit::closeFile, this, &stacked::closeFile);
-        connect(te, &TextEdit::closeAll, this, &stacked::closeAll);
-        connect(up, &Userpage::goToEdit, this, &stacked::editPage);
-        connect(client_, &Client::showLoading, this, &stacked::showLoading);
-
-        //ui->setupUi(this);
-//        ui->stackedWidget->addWidget(te);
-//        ui->stackedWidget->addWidget(up);
 
         if (result == "SIGNUP_SUCCESS") {
             ui->email_line->clear();
@@ -196,6 +184,15 @@ void stacked::showPopupSuccess(QString result) {
             dialog->show();
             ui->stackedWidget->setCurrentIndex(0);
         } else {
+            up = new Userpage(this, client_);
+            te = new TextEdit(client_);
+            connect(te, &TextEdit::logout, this, &stacked::logout);
+            connect(up, &Userpage::upLogout, this, &stacked::logout);
+            connect(te, &TextEdit::closeFile, this, &stacked::closeFile);
+            connect(te, &TextEdit::closeAll, this, &stacked::closeAll);
+            connect(up, &Userpage::goToEdit, this, &stacked::editPage);
+            connect(client_, &Client::showLoading, this, &stacked::showLoading);
+
             setWindowTitle("SharedEditor - Userpage");
             ui->stackedWidget->addWidget(te);
             ui->stackedWidget->addWidget(up);

@@ -672,7 +672,7 @@ void Userpage::on_openButton_clicked() {
             {"name",      filename},
             {"username",  owner}
     };
-    client_->setFileName(QString::fromStdString( filename));
+    client_->setFileName(QString::fromStdString(filename));
     client_->sendAtServer(j);
     //deseleziono vecchio button e seleziono quello nuovo
     QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
@@ -683,7 +683,7 @@ void Userpage::on_openButton_clicked() {
                                               "color:#FFFFFF;\n"
                                               "font: 75 14pt \"Sawasdee Bold\";\n"
                                               "}"));
-    selectedFile="";
+    selectedFile = "";
 }
 
 void Userpage::on_renameButton_clicked() {
@@ -802,7 +802,7 @@ void Userpage::on_renameButton_clicked() {
                                                       "color:#FFFFFF;\n"
                                                       "font: 75 14pt \"Sawasdee Bold\";\n"
                                                       "}"));
-            selectedFile="";
+            selectedFile = "";
         }
     }
 }
@@ -849,7 +849,7 @@ void Userpage::on_deleteButton_clicked() {
                     {"owner",     owner}
             };
             client_->sendAtServer(j);
-            selectedFile="";
+            selectedFile = "";
         }
 
     } else { //non sei l'owner: rimuovi invito
@@ -889,7 +889,7 @@ void Userpage::on_deleteButton_clicked() {
                                                       "color:#FFFFFF;\n"
                                                       "font: 75 14pt \"Sawasdee Bold\";\n"
                                                       "}"));
-            selectedFile="";
+            selectedFile = "";
         }
     }
 
@@ -1008,7 +1008,7 @@ void Userpage::on_inviteButton_clicked() {
                                                   "font: 75 14pt \"Sawasdee Bold\";\n"
                                                   "}"));
 
-        selectedFile="";
+        selectedFile = "";
         return;
     }
     const char *code;
@@ -1033,7 +1033,7 @@ void Userpage::on_inviteButton_clicked() {
                                               "color:#FFFFFF;\n"
                                               "font: 75 14pt \"Sawasdee Bold\";\n"
                                               "}"));
-    selectedFile="";
+    selectedFile = "";
 }
 
 std::pair<std::string, std::string> Userpage::parseFileButton(const std::string &button) {

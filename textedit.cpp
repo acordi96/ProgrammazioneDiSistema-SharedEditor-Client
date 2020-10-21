@@ -62,9 +62,9 @@ const QString rsrcPath = ":/images/win";
 #endif
 
 #ifdef __linux__
-    #define DEFAULT_FONT_SIZE 11
+#define DEFAULT_FONT_SIZE 11
 #else //winzoz
-    #define DEFAULT_FONT_SIZE 9
+#define DEFAULT_FONT_SIZE 9
 #endif
 
 #define MAX_ALLOWED_CHARS 1000
@@ -222,7 +222,7 @@ void TextEdit::setupEditActions() {
     QToolBar *tb = addToolBar(tr("Edit Actions"));
     QMenu *menu = menuBar()->addMenu(tr("&Edit"));
 
-    qDebug()<<"SETUP EDIT ACTIONS";
+    qDebug() << "SETUP EDIT ACTIONS";
     const QIcon undoIcon = QIcon::fromTheme("edit-undo", QIcon(rsrcPath + "/editundo.png"));
 
 
@@ -501,9 +501,9 @@ void TextEdit::filePrintPdf() {
 
 void TextEdit::textBold() {
     QTextCursor cursor = textEdit->textCursor();
-    if(cursor.selectionEnd()-cursor.selectionStart() > MAX_ALLOWED_CHARS){
+    if (cursor.selectionEnd() - cursor.selectionStart() > MAX_ALLOWED_CHARS) {
         this->alert();
-    }else{
+    } else {
         actionTextBold->isChecked() ? textEdit->setFontWeight(QFont::Bold) : textEdit->setFontWeight(QFont::Normal);
         if (!cursor.hasSelection())
             cursor.select(QTextCursor::WordUnderCursor);
@@ -527,7 +527,7 @@ void TextEdit::textBold() {
             crdtToChange.push_back(client_->symbols[i].getPosizione());
             client_->symbols[i].symbolStyle.setBold(bold);
             i++;
-            if(++count == client_->maxBufferSymbol) {
+            if (++count == client_->maxBufferSymbol) {
                 json j = json{
                         {"operation",        "styleChanged"},
                         {"usernameToChange", usernameToChange},
@@ -542,7 +542,7 @@ void TextEdit::textBold() {
                 count = 0;
             }
         }
-        if(!usernameToChange.empty()) {
+        if (!usernameToChange.empty()) {
             json j = json{
                     {"operation",        "styleChanged"},
                     {"usernameToChange", usernameToChange},
@@ -558,9 +558,9 @@ void TextEdit::textBold() {
 
 void TextEdit::textUnderline() {
     QTextCursor cursor = textEdit->textCursor();
-    if(cursor.selectionEnd()-cursor.selectionStart() > MAX_ALLOWED_CHARS){
+    if (cursor.selectionEnd() - cursor.selectionStart() > MAX_ALLOWED_CHARS) {
         this->alert();
-    }else{
+    } else {
         textEdit->setFontUnderline(actionTextUnderline->isChecked());
         if (!cursor.hasSelection())
             cursor.select(QTextCursor::WordUnderCursor);
@@ -584,7 +584,7 @@ void TextEdit::textUnderline() {
             crdtToChange.push_back(client_->symbols[i].getPosizione());
             client_->symbols[i].symbolStyle.setUnderlined(underlined);
             i++;
-            if(++count == client_->maxBufferSymbol) {
+            if (++count == client_->maxBufferSymbol) {
                 json j = json{
                         {"operation",        "styleChanged"},
                         {"usernameToChange", usernameToChange},
@@ -595,10 +595,10 @@ void TextEdit::textUnderline() {
                 usernameToChange.clear();
                 charToChange.clear();
                 crdtToChange.clear();
-                count=0;
+                count = 0;
             }
         }
-        if(!usernameToChange.empty()) {
+        if (!usernameToChange.empty()) {
             json j = json{
                     {"operation",        "styleChanged"},
                     {"usernameToChange", usernameToChange},
@@ -612,9 +612,9 @@ void TextEdit::textUnderline() {
 
 void TextEdit::textItalic() {
     QTextCursor cursor = textEdit->textCursor();
-    if(cursor.selectionEnd()-cursor.selectionStart() > MAX_ALLOWED_CHARS){
+    if (cursor.selectionEnd() - cursor.selectionStart() > MAX_ALLOWED_CHARS) {
         this->alert();
-    }else{
+    } else {
         textEdit->setFontItalic(actionTextItalic->isChecked());
         if (!cursor.hasSelection())
             cursor.select(QTextCursor::WordUnderCursor);
@@ -638,7 +638,7 @@ void TextEdit::textItalic() {
             crdtToChange.push_back(client_->symbols[i].getPosizione());
             client_->symbols[i].symbolStyle.setItalic(italic);
             i++;
-            if(++count == client_->maxBufferSymbol) {
+            if (++count == client_->maxBufferSymbol) {
                 json j = json{
                         {"operation",        "styleChanged"},
                         {"usernameToChange", usernameToChange},
@@ -652,7 +652,7 @@ void TextEdit::textItalic() {
                 count = 0;
             }
         }
-        if(!usernameToChange.empty()) {
+        if (!usernameToChange.empty()) {
             json j = json{
                     {"operation",        "styleChanged"},
                     {"usernameToChange", usernameToChange},
@@ -666,9 +666,9 @@ void TextEdit::textItalic() {
 
 void TextEdit::textColor() {
     QTextCursor cursor = textEdit->textCursor();
-    if(cursor.selectionEnd()-cursor.selectionStart() > MAX_ALLOWED_CHARS){
+    if (cursor.selectionEnd() - cursor.selectionStart() > MAX_ALLOWED_CHARS) {
         this->alert();
-    }else{
+    } else {
         QColor color = QColorDialog::getColor(textEdit->textColor(), this);
         textEdit->setTextColor(color);
         if (!color.isValid())
@@ -699,7 +699,7 @@ void TextEdit::textColor() {
             crdtToChange.push_back(client_->symbols[i].getPosizione());
             client_->symbols[i].symbolStyle.setColor(color.name().toStdString());
             i++;
-            if(++count == client_->maxBufferSymbol) {
+            if (++count == client_->maxBufferSymbol) {
                 json j = json{
                         {"operation",        "styleChanged"},
                         {"usernameToChange", usernameToChange},
@@ -713,7 +713,7 @@ void TextEdit::textColor() {
                 count = 0;
             }
         }
-        if(!usernameToChange.empty()) {
+        if (!usernameToChange.empty()) {
             json j = json{
                     {"operation",        "styleChanged"},
                     {"usernameToChange", usernameToChange},
@@ -727,9 +727,9 @@ void TextEdit::textColor() {
 
 void TextEdit::textFamily(const QString &f) {
     QTextCursor cursor = textEdit->textCursor();
-    if(cursor.selectionEnd()-cursor.selectionStart() > MAX_ALLOWED_CHARS){
+    if (cursor.selectionEnd() - cursor.selectionStart() > MAX_ALLOWED_CHARS) {
         this->alert();
-    }else{
+    } else {
         textEdit->setFontFamily(f);
         if (!cursor.hasSelection())
             cursor.select(QTextCursor::WordUnderCursor);
@@ -752,7 +752,7 @@ void TextEdit::textFamily(const QString &f) {
             crdtToChange.push_back(client_->symbols[i].getPosizione());
             client_->symbols[i].symbolStyle.setFontFamily(f.toStdString());
             i++;
-            if(++count == client_->maxBufferSymbol) {
+            if (++count == client_->maxBufferSymbol) {
                 json j = json{
                         {"operation",        "styleChanged"},
                         {"usernameToChange", usernameToChange},
@@ -766,7 +766,7 @@ void TextEdit::textFamily(const QString &f) {
                 count = 0;
             }
         }
-        if(!usernameToChange.empty()) {
+        if (!usernameToChange.empty()) {
             json j = json{
                     {"operation",        "styleChanged"},
                     {"usernameToChange", usernameToChange},
@@ -780,9 +780,9 @@ void TextEdit::textFamily(const QString &f) {
 
 void TextEdit::textSize(const QString &p) {
     QTextCursor cursor = textEdit->textCursor();
-    if(cursor.selectionEnd()-cursor.selectionStart() > MAX_ALLOWED_CHARS){
+    if (cursor.selectionEnd() - cursor.selectionStart() > MAX_ALLOWED_CHARS) {
         this->alert();
-    }else{
+    } else {
         qreal pointSize = p.toFloat();
         textEdit->setFontPointSize(pointSize);
         if (p.toFloat() <= 0)
@@ -809,13 +809,13 @@ void TextEdit::textSize(const QString &p) {
             crdtToChange.push_back(client_->symbols[i].getPosizione());
             client_->symbols[i].symbolStyle.setFontSize(p.toInt());
             i++;
-            if(++count == client_->maxBufferSymbol) {
+            if (++count == client_->maxBufferSymbol) {
                 json j = json{
                         {"operation",        "styleChanged"},
                         {"usernameToChange", usernameToChange},
                         {"charToChange",     charToChange},
                         {"crdtToChange",     crdtToChange},
-                        {"size",         p.toInt()}};
+                        {"size",             p.toInt()}};
                 client_->sendAtServer(j);
                 usernameToChange.clear();
                 charToChange.clear();
@@ -823,13 +823,13 @@ void TextEdit::textSize(const QString &p) {
                 count = 0;
             }
         }
-        if(!usernameToChange.empty()) {
+        if (!usernameToChange.empty()) {
             json j = json{
                     {"operation",        "styleChanged"},
                     {"usernameToChange", usernameToChange},
                     {"charToChange",     charToChange},
                     {"crdtToChange",     crdtToChange},
-                    {"size",         p.toInt()}};
+                    {"size",             p.toInt()}};
             client_->sendAtServer(j);
         }
     }
@@ -842,7 +842,7 @@ void TextEdit::updateRemotePosition(QString user, int pos) {
 
 void TextEdit::cursorPositionChanged() {
     QTextCursor cursor = textEdit->textCursor();
-    if(client_->updateChangesCursor && !cursor.hasSelection()) {
+    if (client_->updateChangesCursor && !cursor.hasSelection()) {
         int pos = cursor.position();
 
         json j = json{
@@ -909,9 +909,9 @@ void TextEdit::showSymbolWithId(Symbol symbolToInsert) {
 }
 
 void TextEdit::showSymbolWithStyle(Symbol symbolToInsert, bool open) {
-    if(open) {
+    if (open) {
         client_->updateChangesCursor = false;
-        //timerUpdateCursor->start(5);
+        timerUpdateCursor->start(5);
     }
 
     int pos = client_->generateIndexCRDT(symbolToInsert, 0, -1, -1);
@@ -1046,11 +1046,11 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
     if (ev->type() == QEvent::KeyPress) {
         QKeyEvent *key_ev = static_cast<QKeyEvent *>(ev);
         int key = key_ev->key();
-        /*std::cout << "FILE CRDT: " << std::flush; //print crdt
+        std::cout << "FILE CRDT: " << std::flush; //print crdt
         for (auto iterPositions = client_->symbols.begin(); iterPositions != client_->symbols.end(); ++iterPositions) {
             if (iterPositions->getCharacter() != 10 && iterPositions->getCharacter() != 13)
                 std::wcout << "{" << (int) iterPositions->getCharacter() << "(" << iterPositions->getCharacter()
-                           << ") - " << std::flush;
+                           << ") - [" << std::flush;
             else
                 std::wcout << "[" << (int) iterPositions->getCharacter() << "(\\n) - [" << std::flush;
             for (int i = 0; i < iterPositions->getPosizione().size(); i++)
@@ -1058,7 +1058,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
             std::cout << "] - " << iterPositions->getUsername() << std::flush;
             std::cout << "}" << std::flush;
         }
-        std::cout << std::endl;*/
+        std::cout << std::endl;
         if (obj == textEdit) {
             if (!key_ev->text().isEmpty()) {
                 QTextCursor cursor = textEdit->textCursor();
@@ -1086,12 +1086,12 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
 
                     int dim = endIndex - startIndex;
                     int count = 0;
-                    for(int iter = 0; iter < dim; iter++) {
+                    for (int iter = 0; iter < dim; iter++) {
                         symbolsToErase.push_back(client_->symbols.at(iter + startIndex));
                         usernameToErase.push_back(client_->symbols.at(iter + startIndex).getUsername());
                         charToErase.push_back(client_->symbols.at(iter + startIndex).getCharacter());
                         crdtToErase.push_back(client_->symbols.at(iter + startIndex).getPosizione());
-                        if(++count == client_->maxBufferSymbol) {
+                        if (++count == client_->maxBufferSymbol) {
                             client_->eraseSymbolCRDT(symbolsToErase);
                             iter -= client_->maxBufferSymbol;
                             dim -= client_->maxBufferSymbol;
@@ -1109,7 +1109,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                             count = 0;
                         }
                     }
-                    if(!symbolsToErase.empty()) {
+                    if (!symbolsToErase.empty()) {
                         client_->eraseSymbolCRDT(symbolsToErase);
                         json j = json{
                                 {"operation",       "remove"},
@@ -1214,7 +1214,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                             {"underlined",       textEdit->fontUnderline()},
                             {"color",            color},
                             {"fontFamily",       fontFamily},
-                            {"size",         size}
+                            {"size",             size}
                     };
                     client_->sendAtServer(j);
                     //drawRemoteCursors();
@@ -1237,7 +1237,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                     int startPos = pos;
                     int dim = pastedText.size();
                     int count = 0;
-                    for(int iter = 0; iter < dim; iter++) {
+                    for (int iter = 0; iter < dim; iter++) {
                         textEdit->setTextCursor(cursor);
                         usernameToInsert.push_back(client_->getUser().toStdString());
                         c = pastedText.toStdWString().c_str()[iter];
@@ -1245,7 +1245,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
                         crdtToInsert.push_back(crdt);
                         pos++;
-                        if(++count == client_->maxBufferSymbol) {
+                        if (++count == client_->maxBufferSymbol) {
                             json j = json{
                                     {"operation",        "insert"},
                                     {"usernameToInsert", usernameToInsert},
@@ -1260,7 +1260,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                             count = 0;
                         }
                     }
-                    if(!usernameToInsert.empty()) {
+                    if (!usernameToInsert.empty()) {
                         json j = json{
                                 {"operation",        "insert"},
                                 {"usernameToInsert", usernameToInsert},
@@ -1489,7 +1489,7 @@ void TextEdit::highlightcharacter() {
     QTextCursor cursor = textEdit->textCursor();
     QTextCursor tempCursor = QTextCursor(cursor);
     int start, end;
-    if(cursor.hasSelection()) {
+    if (cursor.hasSelection()) {
         start = cursor.selectionStart();
         end = cursor.selectionEnd();
         cursor.clearSelection();
@@ -1497,9 +1497,9 @@ void TextEdit::highlightcharacter() {
         start = 0;
         end = client_->symbols.size();
     }
-    if((end - start) > (client_->maxBufferSymbol * 5)){
-            this->alert();
-    }else{
+    if ((end - start) > (client_->maxBufferSymbol * 5)) {
+        this->alert();
+    } else {
         int pos = 0;
         client_->updateChangesCursor = false;
         timerUpdateCursor->start(1000);
@@ -1713,10 +1713,11 @@ void TextEdit::changeStyle(json js) {
 
     textEdit->setFocus();
 }
-void TextEdit::alert(){
-    QMessageBox *msgB = new QMessageBox(QMessageBox::Critical,tr("Alert"),tr("Select fewer characters!"),
-                                        QMessageBox::NoButton,this,Qt::CustomizeWindowHint);
 
-    msgB->setIconPixmap(QPixmap(rsrcPath+QString::fromUtf8("/triangle.png")));
+void TextEdit::alert() {
+    QMessageBox *msgB = new QMessageBox(QMessageBox::Critical, tr("Alert"), tr("Select fewer characters!"),
+                                        QMessageBox::NoButton, this, Qt::CustomizeWindowHint);
+
+    msgB->setIconPixmap(QPixmap(rsrcPath + QString::fromUtf8("/triangle.png")));
     msgB->show();
 }
