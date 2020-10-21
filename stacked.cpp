@@ -58,23 +58,17 @@ void stacked::closeEvent(QCloseEvent *e) {
 void stacked::on_loginButton_clicked() {
     QString user = ui->user_log_line->text();
     QString psw = ui->psw_log_line->text();
-    /* QPushButton *b1 = new QPushButton();
-     QPushButton *b2 = new QPushButton();
-     b2->setObjectName("button2");
-     b1->setObjectName("button1");
-     ui->listaProva->*/
-
 
     if (user.isEmpty() || psw.isEmpty()) {
         QDialog *dialog = new QDialog();
+        dialog->setWindowTitle("Shared Editor");
         QVBoxLayout *layout = new QVBoxLayout();
         dialog->setLayout(layout);
         layout->addWidget(new QLabel("Empty username and/or password"));
-        QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+        QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
         layout->addWidget(buttonBox);
 
         connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
-        connect(buttonBox, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
 
         dialog->show();
     } else {
@@ -102,6 +96,7 @@ void stacked::on_form_regButton_clicked() {
 
     if (!email_regex.match(email).hasMatch()) {
         QDialog *dialog = new QDialog();
+        dialog->setWindowTitle("Shared Editor");
         QVBoxLayout *layout = new QVBoxLayout();
         dialog->setLayout(layout);
         layout->addWidget(new QLabel("Wrong email format"));
@@ -114,6 +109,7 @@ void stacked::on_form_regButton_clicked() {
     } else if (!psw_regex.match(psw1).hasMatch()) {
         // check password
         QDialog *dialog = new QDialog();
+        dialog->setWindowTitle("Shared Editor");
         QVBoxLayout *layout = new QVBoxLayout();
         dialog->setLayout(layout);
         layout->addWidget(new QLabel("Password must be at least 8 characters long "
@@ -125,9 +121,9 @@ void stacked::on_form_regButton_clicked() {
         connect(buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
 
         dialog->show();
-        //ui->stackedWidget->setCurrentIndex(3);
     } else if (!(psw1 == psw2)) {
         QDialog *dialog = new QDialog();
+        dialog->setWindowTitle("Shared Editor");
         QVBoxLayout *layout = new QVBoxLayout();
         dialog->setLayout(layout);
         layout->addWidget(new QLabel("Non matching password!"));
@@ -139,6 +135,7 @@ void stacked::on_form_regButton_clicked() {
         dialog->show();
     } else if (user.length() > 10) {
         QDialog *dialog = new QDialog();
+        dialog->setWindowTitle("Shared Editor");
         QVBoxLayout *layout = new QVBoxLayout();
         dialog->setLayout(layout);
         layout->addWidget(new QLabel("User length max 10 char "));
@@ -165,8 +162,8 @@ void stacked::on_form_regButton_clicked() {
 
 void stacked::showPopupSuccess(QString result) {
     QDialog *dialog = new QDialog();
-    dialog->setWindowTitle(QString::fromUtf8(" Shared Editor "));
-    QVBoxLayout *layout = new QVBoxLayout();
+    dialog->setWindowTitle(QString::fromUtf8("Shared Editor"));
+    QVBoxLayout *layout = new QVBoxLayout();;
     dialog->setLayout(layout);
     if (result == "LOGIN_SUCCESS" || result == "SIGNUP_SUCCESS") {
 
@@ -198,7 +195,6 @@ void stacked::showPopupSuccess(QString result) {
             ui->stackedWidget->addWidget(up);
             ui->stackedWidget->setCurrentIndex(4);
         }
-        //ui->stackedWidget->setCurrentIndex(2);
     } else {
 
         if (result == "QUERY_ERROR" || result == "CONNESSION_ERROR" || result == "SIGNUP_ERROR_INSERT_FAILED") {
@@ -212,16 +208,14 @@ void stacked::showPopupSuccess(QString result) {
         } else if (result == "new_file_created") {
 
             layout->addWidget(new QLabel("File correctly created"));
-            //index 2 = text editor
+            //index 3 = text editor
             setWindowTitle("SharedEditor - " + client_->getUser() + " @ " + client_->getFileName());
             ui->stackedWidget->setCurrentIndex(3);
-            //ui->stackedWidget->setCurrentIndex(3);
         } else if (result == "new_file_already_exist") {
             layout->addWidget(new QLabel("File already exists"));
         } else if (result == "file_opened") {
             setWindowTitle("SharedEditor - " + client_->getUser() + " @ " + client_->getFileName());
             ui->stackedWidget->setCurrentIndex(3);
-            //layout->addWidget(new QLabel("File correctly opened"));
         } else if (result == "errore_rinomina_file") {
             layout->addWidget(new QLabel("Rename file error"));
         } else if (result == "file_renamed") {
@@ -243,6 +237,8 @@ void stacked::showPopupSuccess(QString result) {
         } else if (result == "edit_failed") {
             ui->stackedWidget->setCurrentIndex(4);
             layout->addWidget(new QLabel("Error in update profile."));
+        } else if (result == "invitation_error"){
+            layout->addWidget(new QLabel("Invalid invitation code!"));
         }
 
         QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
@@ -275,7 +271,6 @@ void stacked::logout() {
     ui->stackedWidget->setCurrentIndex(0);
     delete up;
     delete te;
-    //ui->stackedWidget->setCurrentIndex(3);
 }
 
 void stacked::closeFile() {
@@ -311,11 +306,13 @@ void stacked::editPage() {
     ui->edit_newpsw_line->clear();
     ui->edit_confnewpsw_line->clear();
     ui->edit_oldpsw_line->setFocus();
+    setWindowTitle("Shared Editor - Edit Profile");
     ui->stackedWidget->setCurrentIndex(2);
 
 }
 
 void stacked::on_edit_backButton_clicked() {
+    setWindowTitle("Shared Editor - Userpage");
     ui->stackedWidget->setCurrentIndex(4);
 }
 

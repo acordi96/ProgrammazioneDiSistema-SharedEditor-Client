@@ -37,25 +37,17 @@ private slots:
    void on_edit_backButton_clicked();
    void on_colorPicker_clicked();
    void on_edit_saveButton_clicked();
-   //void on_fileButton_clicked();
-   //void on_newFileButton_clicked();
+
    void logout();
    void closeAll();
    void closeFile();
    void editPage();
    void showLoading();
-/*signals:
-    void updateRecentFiles();*/
+
 private:
    Userpage *up;
    TextEdit *te;
 
-   //for loading
-   QWidget *loadLabel;
-   QLabel *label;
-   QWidget *hourglass;
-   QHBoxLayout *layout;
-   QColorDialog *colorDialog;
    QString selectedColor="";
 };
 

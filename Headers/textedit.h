@@ -41,13 +41,10 @@ Q_OBJECT
 public:
     TextEdit(Client *c, QWidget *parent = 0);
 
-    bool load(const QString &f);
-
     QString getFileName() const;
 
 public slots:
 
-    void fileNew();
 
     void showSymbol(int pos, QChar c);
 
@@ -66,8 +63,6 @@ public slots:
     void changeStyle(json js);
 
 protected:
-    void closeEvent(QCloseEvent *e) override;
-
     bool eventFilter(QObject *obj, QEvent *ev) override;
 signals:
 
@@ -82,16 +77,6 @@ signals:
     void closeLoading();
 
 private slots:
-
-    void fileOpen();
-
-    bool fileSave();
-
-    bool fileSaveAs();
-
-    void filePrint();
-
-    void filePrintPreview();
 
     void filePrintPdf();
 
@@ -116,10 +101,6 @@ private slots:
 
     void clipboardDataChanged();
 
-    void about();
-
-    void printPreview(QPrinter *);
-
     void drawRemoteCursors();
 
     void updateListParticipants(usersInFile users);
@@ -138,8 +119,6 @@ private:
     void setupEditActions();
 
     void setupTextActions();
-
-    bool maybeSave();
 
     void setCurrentFileName(const QString &fileName);
 
@@ -202,7 +181,6 @@ private:
     MyQTextEdit *textEdit;
     QListWidget *connectedUsers;
 
-    bool key_to_handle = false;
     CustomCursor _newCursor = CustomCursor();
     CustomCursor _oldCursor = CustomCursor();
     QString _currentText = QString{};

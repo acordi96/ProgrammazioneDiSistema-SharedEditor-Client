@@ -44,7 +44,6 @@ Userpage::Userpage(QWidget *parent, Client *c) :
 
     setCentralWidget(page);
     QObject::connect(client_, &Client::updateFile, this, &Userpage::updateRecentFiles);
-    //QObject::connect(page, &stacked::updateRecentFiles, this, &Userpage::updateFiles);
 }
 
 void Userpage::setupUserinfo() {
@@ -91,8 +90,6 @@ void Userpage::setupUserinfo() {
     QSpacerItem *vSpacer = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Fixed);
     userVLayout3->addItem(vSpacer);
 /************************************** ICON ***********************************************/
-//    QHBoxLayout *icon_userLayout = new QHBoxLayout();
-//    icon_userLayout->setSpacing(0);
 
     QHBoxLayout *iconLayout = new QHBoxLayout();
     iconLayout->setObjectName(QString::fromUtf8("iconSpace"));
@@ -236,13 +233,11 @@ void Userpage::setupUserinfo() {
 
     lineURL = new QLineEdit(userinfo);
     lineURL->setObjectName(QString::fromUtf8("lineURL"));
-    //lineURL->setGeometry(QRect(80,480,211,25));
     lineURL->setPlaceholderText(QString::fromUtf8("Insert Invitation Code Here..."));
     urlLayout->addWidget(lineURL);
 
     openURLbutton = new QPushButton("Accept", userinfo);
     openURLbutton->setObjectName(QString::fromUtf8("openURLbutton"));
-    //openURLbutton->setGeometry(QRect(310,480,71,25));
     openURLbutton->setStyleSheet(QString::fromUtf8("QPushButton#openURLbutton{\n"
                                                    "background-color:#84ACD7;\n"
                                                    "border:1px;\n"
@@ -297,7 +292,6 @@ void Userpage::setupRecentFiles() {
 
     QLabel *recentLabel = new QLabel("Files", recent);
     recentLabel->setObjectName(QString::fromUtf8("recentLabel"));
-    //recentLabel->setGeometry(QRect(10, 0, 281, 31));
     recentLabel->setStyleSheet(QString::fromUtf8("font: 75 25pt \"Sawasdee Bold\";"));
     recentLabel->setAlignment(Qt::AlignCenter);
 
@@ -313,8 +307,7 @@ void Userpage::setupRecentFiles() {
                                                     "border:1px;\n"
                                                     "border-radius:5px;"
                                                     "}"));
-    //upLogoutButton->setGeometry(QRect(400,0,40,30));
-
+    
     QIcon logoutIcon;
     logoutIcon.addFile(rsrcPath + QString::fromUtf8("/logout.png"), QSize(), QIcon::Normal, QIcon::On);
     upLogoutButton->setIcon(logoutIcon);
@@ -365,12 +358,10 @@ void Userpage::setupRecentFiles() {
                                                 "}"));
 
         button->setFlat(true);
-        //button->setContentsMargins(10,0,0,0);
+
         verticalLayout->addWidget(button);
 
         connect(button, SIGNAL(clicked()), SLOT(on_fileName_clicked()));
-        /*connect(button, SIGNAL(customContextMenuRequested(QPoint)),
-                SLOT(customMenuRequested(QPoint)));*/
     }
 
     scrollAreaWidgets->setLayout(verticalLayout);
@@ -448,8 +439,6 @@ void Userpage::setupRecentFiles() {
 
     connect(deleteButton, SIGNAL(clicked()), SLOT(on_deleteButton_clicked()));
 
-    //hLayout->addWidget(recent);
-
     grid->addWidget(deleteButton, 1, 0, 1, 1);
 
     inviteButton->setObjectName(QString::fromUtf8("inviteButton"));
@@ -480,7 +469,6 @@ void Userpage::setupRecentFiles() {
     hLayout4->addItem(hSpacer4);
     hLayout4->addLayout(vLayout3);
 
-//    hLayout->addWidget(recent);
 }
 
 void Userpage::requestLogout() {
@@ -584,35 +572,11 @@ void Userpage::handleNewFileButton() {
         QString testo = modalWindow.textValue();
         client_->setFileName(testo);
     }
-    //modalWindow.exec()
-    //ui->stackedWidget->setCurrentIndex(3);
 }
 
 void Userpage::sendmessage(message mess) {
     client_->write(mess);
 }
-
-/*
-void Userpage::customMenuRequested(QPoint pos) {
-    //QModelIndex index=button->indexAt(pos);
-
-
-    QObject *sender =  QObject::sender();
-    QString str = sender->objectName();
-    fileName = str.toStdString();
-    //QMessageBox::information(0, "Button", sender->objectName());
-    std::cout << "\n bottone schiacciato " << fileName <<"\n";
-
-
-    std::cout << "\n creazione del menu \n" << "pos = " << pos.x() <<","<<pos.y();
-    QMenu *menu=new QMenu(this);
-    menu->addAction("Open", this,SLOT(openFile()));
-    menu->addAction("Rename", this,SLOT(renameFile()));
-    menu->addAction("Delete", this, SLOT(deleteFile()));
-
-    menu->exec(QCursor::pos());
-}
-*/
 
 void Userpage::on_fileName_clicked(int i) {
 
@@ -621,7 +585,6 @@ void Userpage::on_fileName_clicked(int i) {
         QObject *sender = QObject::sender();
         QString str = sender->objectName();
         s = str.toStdString();
-        //QMessageBox::information(0, "Button", sender->objectName());
     } else {
         s = fileName;
     }
@@ -645,7 +608,7 @@ void Userpage::on_fileName_clicked(int i) {
     b->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                        "border:1px;\n"
                                        "border-radius:5px;\n"
-                                       "background-color:#C97064;\n"
+                                       "background-color:#016FB9;\n"
                                        "color:#FFFFFF;\n"
                                        "font: 75 14pt \"Sawasdee Bold\";\n"
                                        "}"));
@@ -825,7 +788,6 @@ void Userpage::on_deleteButton_clicked() {
         QMessageBox msgBox;
         msgBox.setWindowTitle(" Shared Editor ");
         msgBox.setText("Do you really want to delete the selected file?");
-        //msgBox.setInformativeText("Do you want to save your changes?");
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         msgBox.setDefaultButton(QMessageBox::Yes);
         int ret = msgBox.exec();
@@ -856,7 +818,6 @@ void Userpage::on_deleteButton_clicked() {
         QMessageBox msgBox;
         msgBox.setWindowTitle(" Shared Editor");
         msgBox.setText("Do you really want to remove the file invitation?");
-        //msgBox.setInformativeText("Do you want to save your changes?");
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         msgBox.setDefaultButton(QMessageBox::Yes);
         int ret = msgBox.exec();
@@ -906,8 +867,7 @@ void Userpage::updateRecentFiles(QString old, QString newN, QString owner, QStri
         QPushButton *button;
         auto scrollAreaWidgets = page->findChild<QWidget *>("scrollAreaWidgets");
         button = new QPushButton(scrollAreaWidgets);
-        //button->setContextMenuPolicy(Qt::CustomContextMenu);
-        //std::cout << "\n" << p.first << ": " << p.second << "\n";
+
         button->setObjectName(QString::fromStdString(generateFileButton(owner, filename)));
         button->setText("(" + QString::fromStdString(owner) + "): " + QString::fromStdString(filename));
         button->setStyleSheet(QString::fromUtf8("QPushButton{\n"
@@ -931,8 +891,7 @@ void Userpage::updateRecentFiles(QString old, QString newN, QString owner, QStri
         QPushButton *button;
         auto scrollAreaWidgets = page->findChild<QWidget *>("scrollAreaWidgets");
         button = new QPushButton(scrollAreaWidgets);
-        //button->setContextMenuPolicy(Qt::CustomContextMenu);
-        //std::cout << "\n" << p.first << ": " << p.second << "\n";
+
         button->setObjectName(QString::fromStdString(generateFileButton(owner, filename)));
         button->setText("(" + QString::fromStdString(owner) + "): " + QString::fromStdString(filename));
         button->setStyleSheet(QString::fromUtf8("QPushButton{\n"

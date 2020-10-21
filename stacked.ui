@@ -222,7 +222,8 @@
                  <item>
                   <widget class="QLabel" name="label_4">
                    <property name="styleSheet">
-                    <string notr="true">font: 75 11pt &quot;Sawasdee Bold&quot;;</string>
+                    <string notr="true">font: 75 11pt &quot;Sawasdee Bold&quot;;
+</string>
                    </property>
                    <property name="text">
                     <string>Username</string>

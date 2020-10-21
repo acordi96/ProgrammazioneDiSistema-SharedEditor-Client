@@ -2,8 +2,8 @@
 // Created by Sam on 22/apr/2020.
 //
 
-#define serverRoute "93.43.250.236"
-//#define serverRoute "127.0.0.1"
+//#define serverRoute "93.43.250.236"
+#define serverRoute "127.0.0.1"
 
 #define serverPort "3000"
 
@@ -259,6 +259,9 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
                                                           js.at("filename").get<std::string>()), "///////////////"});
         emit updateFile("", QString::fromStdString(name), "", QString::fromStdString("add_new_file_invitation"));
         return type_request;
+    } else if (type_request == "invitation_error"){
+        QString res = QString::fromStdString("invitation_error");
+        emit formResultSuccess(res);
     } else if (type_request == "file_renamed") {
         QString res = QString::fromStdString("file_renamed");
         for (auto &iter : files) {

@@ -115,12 +115,15 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
     {
         QToolBar *tb = addToolBar(tr("Logout"));
         tb->setStyleSheet(QString::fromUtf8("QToolButton:hover {background-color:#E6E7E8;border:1px;}"));
+        const QIcon eyeIcon = QIcon::fromTheme("shared-editor",QIcon(rsrcPath+"/eye.png"));
+        QAction *a= tb->addAction(eyeIcon,tr("Highlight Characters"),this,&TextEdit::highlightcharacter);
+
         QWidget *spacer = new QWidget();
         spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         tb->addWidget(spacer);
 
         const QIcon quitIcon = QIcon::fromTheme("shared-editor", QIcon(rsrcPath + "/logout.png"));
-        QAction *a = tb->addAction(quitIcon, tr("&Logout"), this, [=]() {
+        a = tb->addAction(quitIcon, tr("&Logout"), this, [=]() {
             requestLogout();
             emit this->logout();
         });
@@ -143,7 +146,7 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
 #endif
 
     textEdit->setFocus();
-    setCurrentFileName(QString());
+    //setCurrentFileName(QString());
 
 #ifdef Q_OS_MACOS
     // Use dark text on light background on macOS, also in dark mode.
@@ -169,13 +172,6 @@ void TextEdit::clearHighlights() {
 
 void TextEdit::resetUpdateCursor() {
     client_->updateChangesCursor = true;
-}
-
-void TextEdit::closeEvent(QCloseEvent *e) {
-    if (maybeSave())
-        e->accept();
-    else
-        e->ignore();
 }
 
 void TextEdit::requestLogout() {
@@ -222,7 +218,6 @@ void TextEdit::setupEditActions() {
     QToolBar *tb = addToolBar(tr("Edit Actions"));
     QMenu *menu = menuBar()->addMenu(tr("&Edit"));
 
-    qDebug() << "SETUP EDIT ACTIONS";
     const QIcon undoIcon = QIcon::fromTheme("edit-undo", QIcon(rsrcPath + "/editundo.png"));
 
 
@@ -303,23 +298,16 @@ void TextEdit::setupTextActions() {
 }
 
 void TextEdit::updateConnectedUser(QString user, QString color) {
-    QPushButton *label = new QPushButton(user);
+    QLabel *label = new QLabel(user);
     label->setObjectName(user);
-    label->setStyleSheet(
-            "QPushButton{height:50px;border:1px;text-align:left;font-size:22px;font-weight: bold; color: " + color +
-            "}\n"
-            "QPushButton:hover{background-color:rgb(243,243,243);border:1px;}");
-
-    QIcon icon;
-    icon.addFile(rsrcPath + QString::fromUtf8("/eye.png"), QSize(), QIcon::Normal, QIcon::On);
-    label->setIcon(icon);
-    label->setIconSize(QSize(16, 16));
-    label->setFlat(true);
+    label->setStyleSheet(QString::fromUtf8("QLabel{\n"
+                                           "font-size:16px;\n"
+                                           "font-weight:bold;\n"
+                                           "color:")+color+QString::fromUtf8(";}"));
 
     QListWidgetItem *item = new QListWidgetItem();
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
-    connect(label, SIGNAL(clicked()), SLOT(highlightcharacter()));
 }
 
 void TextEdit::setupConnectedUsers() {
@@ -327,54 +315,15 @@ void TextEdit::setupConnectedUsers() {
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     connectedUsers = new QListWidget(dock);
     QLabel *label = new QLabel(client_->getUser());
-    label->setStyleSheet("font-weight: bold; color: " + client_->getColor());
+    label->setStyleSheet(QString::fromUtf8("QLabel{font-weight:bold; color:")+client_->getColor()+QString::fromUtf8(";}"));
     QListWidgetItem *item = new QListWidgetItem();
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
     dock->setWidget(connectedUsers);
     dock->setFeatures(QDockWidget::NoDockWidgetFeatures);
     addDockWidget(Qt::RightDockWidgetArea, dock);
-
-
 }
-
-bool TextEdit::load(const QString &f) {
-    if (!QFile::exists(f))
-        return false;
-    QFile file(f);
-    if (!file.open(QFile::ReadOnly))
-        return false;
-
-    QByteArray data = file.readAll();
-    QTextCodec *codec = Qt::codecForHtml(data);
-    QString str = codec->toUnicode(data);
-    if (Qt::mightBeRichText(str)) {
-        textEdit->setHtml(str);
-    } else {
-        str = QString::fromLocal8Bit(data);
-        textEdit->setPlainText(str);
-    }
-
-    setCurrentFileName(f);
-    return true;
-}
-
-bool TextEdit::maybeSave() {
-    if (!textEdit->document()->isModified())
-        return true;
-
-    const QMessageBox::StandardButton ret =
-            QMessageBox::warning(this, QCoreApplication::applicationName(),
-                                 tr("The document has been modified.\n"
-                                    "Do you want to save your changes?"),
-                                 QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-    if (ret == QMessageBox::Save)
-        return fileSave();
-    else if (ret == QMessageBox::Cancel)
-        return false;
-    return true;
-}
-
+/*
 void TextEdit::setCurrentFileName(const QString &fileName) {
     this->fileName = fileName;
     textEdit->document()->setModified(false);
@@ -388,94 +337,7 @@ void TextEdit::setCurrentFileName(const QString &fileName) {
     setWindowTitle(tr("%1[*] - %2").arg(shownName, QCoreApplication::applicationName()));
     setWindowModified(false);
 }
-
-void TextEdit::fileNew() {
-    if (maybeSave()) {
-        textEdit->clear();
-        setCurrentFileName(QString());
-    }
-}
-
-void TextEdit::fileOpen() {
-    QFileDialog fileDialog(this, tr("Open File..."));
-    fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
-    fileDialog.setFileMode(QFileDialog::ExistingFile);
-    fileDialog.setMimeTypeFilters(QStringList() << "text/html" << "text/plain");
-    if (fileDialog.exec() != QDialog::Accepted)
-        return;
-    const QString fn = fileDialog.selectedFiles().first();
-    if (load(fn))
-        statusBar()->showMessage(tr("Opened \"%1\"").arg(QDir::toNativeSeparators(fn)));
-    else
-        statusBar()->showMessage(tr("Could not open \"%1\"").arg(QDir::toNativeSeparators(fn)));
-}
-
-bool TextEdit::fileSave() {
-    if (fileName.isEmpty())
-        return fileSaveAs();
-    if (fileName.startsWith(QStringLiteral(":/")))
-        return fileSaveAs();
-
-    QTextDocumentWriter writer(fileName);
-    bool success = writer.write(textEdit->document());
-    if (success) {
-        textEdit->document()->setModified(false);
-        statusBar()->showMessage(tr("Wrote \"%1\"").arg(QDir::toNativeSeparators(fileName)));
-    } else {
-        statusBar()->showMessage(tr("Could not write to file \"%1\"")
-                                         .arg(QDir::toNativeSeparators(fileName)));
-    }
-    return success;
-}
-
-bool TextEdit::fileSaveAs() {
-    QFileDialog fileDialog(this, tr("Save as..."));
-    fileDialog.setAcceptMode(QFileDialog::AcceptSave);
-    QStringList mimeTypes;
-    mimeTypes << "application/vnd.oasis.opendocument.text" << "text/html" << "text/plain";
-    fileDialog.setMimeTypeFilters(mimeTypes);
-    fileDialog.setDefaultSuffix("odt");
-    if (fileDialog.exec() != QDialog::Accepted)
-        return false;
-    const QString fn = fileDialog.selectedFiles().first();
-    setCurrentFileName(fn);
-    return fileSave();
-}
-
-void TextEdit::filePrint() {
-
-#if QT_CONFIG(printdialog)
-    QPrinter printer(QPrinter::HighResolution);
-    QPrintDialog *dlg = new QPrintDialog(&printer, this);
-    if (textEdit->textCursor().hasSelection())
-        dlg->addEnabledOption(QAbstractPrintDialog::PrintSelection);
-    dlg->setWindowTitle(tr("Print Document"));
-    if (dlg->exec() == QDialog::Accepted)
-        textEdit->print(&printer);
-    delete dlg;
-#endif
-}
-
-void TextEdit::filePrintPreview() {
-
-#if QT_CONFIG(printpreviewdialog)
-    QPrinter printer(QPrinter::HighResolution);
-    QPrintPreviewDialog preview(&printer, this);
-    connect(&preview, &QPrintPreviewDialog::paintRequested, this, &TextEdit::printPreview);
-    preview.exec();
-#endif
-
-}
-
-void TextEdit::printPreview(QPrinter *printer) {
-
-#ifdef QT_NO_PRINTER
-    Q_UNUSED(printer);
-#else
-    textEdit->print(printer);
-#endif
-
-}
+*/
 
 void TextEdit::filePrintPdf() {
 
@@ -1020,12 +882,6 @@ void TextEdit::showSymbol(int pos, QChar c) {
 
 void TextEdit::clipboardDataChanged() {}
 
-void TextEdit::about() {
-    QMessageBox::about(this, tr("About"), tr("This example demonstrates Qt's "
-                                             "rich text editing facilities in action, providing an example "
-                                             "document for you to experiment with."));
-}
-
 void TextEdit::mergeFormatOnWordOrSelection(const QTextCharFormat &format) {
     QTextCursor cursor = textEdit->textCursor();
     if (!cursor.hasSelection())
@@ -1482,7 +1338,6 @@ void TextEdit::drawRemoteCursors() {
 
 }
 
-
 void TextEdit::highlightcharacter() {
     QObject *sender = QObject::sender();
     QString name = sender->objectName();
@@ -1589,24 +1444,17 @@ void TextEdit::updateListParticipants(usersInFile users) {
 
 void TextEdit::updateConnectedUsers(usersInFile users) {
     connectedUsers->clear();
-    //QLabel * label = new QLabel(client_->getUser());
-    QPushButton *label = new QPushButton(client_->getUser());
+    QLabel * label = new QLabel(client_->getUser());
+    //QPushButton *label = new QPushButton(client_->getUser());
     label->setObjectName(client_->getUser());
-    label->setStyleSheet(
-            "QPushButton{border:1px;text-align:left;font-size:22px;font-weight: bold; color: " + client_->getColor() +
-            "}\n"
-            "QPushButton:hover{border:1px;background-color:rgb(243,243,243)}");
-
-    QIcon icon;
-    icon.addFile(rsrcPath + QString::fromUtf8("/eye.png"), QSize(), QIcon::Normal, QIcon::On);
-    label->setIcon(icon);
-    label->setIconSize(QSize(16, 16));
-    label->setFlat(true);
+    label->setStyleSheet(QString::fromUtf8("QLabel{\n"
+                                           "font-size:16px;\n"
+                                           "font-weight:bold;\n"
+                                           "color:")+client_->getColor()+QString::fromUtf8(";}"));
 
     QListWidgetItem *item = new QListWidgetItem();
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
-    connect(label, SIGNAL(clicked()), SLOT(highlightcharacter()));
     for (auto u:_listParticipantsAndColors) {
         if (u.first.toStdString() != client_->getUser().toStdString())
             updateConnectedUser(u.first, u.second.name());
@@ -1623,12 +1471,6 @@ void TextEdit::resetCursors() {
     _newCursor = CustomCursor(QTextCursor(textEdit->textCursor()));
 }
 
-/*
-void TextEdit::updateCursors() {
-    CustomCursor cursor = CustomCursor(QTextCursor(textEdit->textCursor()));
-    updateCursors(cursor);
-}
-*/
 void TextEdit::updateCursors(const CustomCursor &cursor) {
     _oldCursor = CustomCursor(_newCursor);
     _newCursor = CustomCursor(cursor);
