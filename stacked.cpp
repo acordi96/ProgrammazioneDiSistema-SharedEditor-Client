@@ -230,8 +230,8 @@ void stacked::showPopupSuccess(QString result) {
             layout->addWidget(new QLabel("New name already exist"));
         } else if (result == "file_deleted") {
             layout->addWidget(new QLabel("File correctly deleted"));
-        } else if (result == "ERRORE_ELIMINAZIONE_FILE") {
-            layout->addWidget(new QLabel("Delete file error"));
+        } else if (result == "error_file_in_use_d") {
+            layout->addWidget(new QLabel("File in use, delete failed"));
         } else if (result == "error_file_in_use") {
             layout->addWidget(new QLabel("File in use, rename failed"));
         } else if (result == "wrong_old_password") {
@@ -273,6 +273,8 @@ void stacked::logout() {
     ui->stackedWidget->removeWidget(te);
     ui->stackedWidget->removeWidget(up);
     ui->stackedWidget->setCurrentIndex(0);
+    delete up;
+    delete te;
     //ui->stackedWidget->setCurrentIndex(3);
 }
 
