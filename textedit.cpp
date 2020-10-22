@@ -115,8 +115,8 @@ TextEdit::TextEdit(Client *c, QWidget *parent)
     {
         QToolBar *tb = addToolBar(tr("Logout"));
         tb->setStyleSheet(QString::fromUtf8("QToolButton:hover {background-color:#E6E7E8;border:1px;}"));
-        const QIcon eyeIcon = QIcon::fromTheme("shared-editor",QIcon(rsrcPath+"/eye.png"));
-        QAction *a= tb->addAction(eyeIcon,tr("Highlight Characters"),this,&TextEdit::highlightcharacter);
+        const QIcon eyeIcon = QIcon::fromTheme("shared-editor", QIcon(rsrcPath + "/eye.png"));
+        QAction *a = tb->addAction(eyeIcon, tr("Highlight Characters"), this, &TextEdit::highlightcharacter);
 
         QWidget *spacer = new QWidget();
         spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -303,7 +303,7 @@ void TextEdit::updateConnectedUser(QString user, QString color) {
     label->setStyleSheet(QString::fromUtf8("QLabel{\n"
                                            "font-size:16px;\n"
                                            "font-weight:bold;\n"
-                                           "color:")+color+QString::fromUtf8(";}"));
+                                           "color:") + color + QString::fromUtf8(";}"));
 
     QListWidgetItem *item = new QListWidgetItem();
     connectedUsers->addItem(item);
@@ -315,7 +315,8 @@ void TextEdit::setupConnectedUsers() {
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     connectedUsers = new QListWidget(dock);
     QLabel *label = new QLabel(client_->getUser());
-    label->setStyleSheet(QString::fromUtf8("QLabel{font-weight:bold; color:")+client_->getColor()+QString::fromUtf8(";}"));
+    label->setStyleSheet(
+            QString::fromUtf8("QLabel{font-weight:bold; color:") + client_->getColor() + QString::fromUtf8(";}"));
     QListWidgetItem *item = new QListWidgetItem();
     connectedUsers->addItem(item);
     connectedUsers->setItemWidget(item, label);
@@ -323,21 +324,6 @@ void TextEdit::setupConnectedUsers() {
     dock->setFeatures(QDockWidget::NoDockWidgetFeatures);
     addDockWidget(Qt::RightDockWidgetArea, dock);
 }
-/*
-void TextEdit::setCurrentFileName(const QString &fileName) {
-    this->fileName = fileName;
-    textEdit->document()->setModified(false);
-
-    QString shownName;
-    if (fileName.isEmpty())
-        shownName = "untitled.txt";
-    else
-        shownName = QFileInfo(fileName).fileName();
-
-    setWindowTitle(tr("%1[*] - %2").arg(shownName, QCoreApplication::applicationName()));
-    setWindowModified(false);
-}
-*/
 
 void TextEdit::filePrintPdf() {
 
@@ -975,51 +961,6 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         };
                         client_->sendAtServer(j);
                     }
-                    /*int k = 0;
-                    int of = dim / client_->maxBufferSymbol;
-                    while ((k + 1) * client_->maxBufferSymbol <= dim) {
-                        symbolsToErase.clear();
-                        usernameToErase.clear();
-                        charToErase.clear();
-                        crdtToErase.clear();
-                        for (int i = 0; i < client_->maxBufferSymbol; i++) {
-                            symbolsToErase.push_back(client_->symbols.at((client_->maxBufferSymbol * k) + i + startIndex));
-                            usernameToErase.push_back(client_->symbols.at((client_->maxBufferSymbol * k) + i + startIndex).getUsername());
-                            charToErase.push_back(client_->symbols.at((client_->maxBufferSymbol * k) + i + startIndex).getCharacter());
-                            crdtToErase.push_back(client_->symbols.at((client_->maxBufferSymbol * k) + i + startIndex).getPosizione());
-                        }
-                        client_->eraseSymbolCRDT(symbolsToErase);
-
-                        json j = json{
-                                {"operation",       "remove"},
-                                {"usernameToErase", usernameToErase},
-                                {"charToErase",     charToErase},
-                                {"crdtToErase",     crdtToErase}
-                        };
-                        client_->sendAtServer(j);
-                        k++;
-                    }
-
-                    if ((dim % client_->maxBufferSymbol) > 0) {
-                        symbolsToErase.clear();
-                        usernameToErase.clear();
-                        charToErase.clear();
-                        crdtToErase.clear();
-                        for (int i = 0; i < (dim % client_->maxBufferSymbol); i++) {
-                            symbolsToErase.push_back(client_->symbols.at((client_->maxBufferSymbol * of) + i + startIndex));
-                            usernameToErase.push_back(client_->symbols.at((client_->maxBufferSymbol * of) + i + startIndex).getUsername());
-                            charToErase.push_back(client_->symbols.at((client_->maxBufferSymbol * of) + i + startIndex).getCharacter());
-                            crdtToErase.push_back(client_->symbols.at((client_->maxBufferSymbol * of) + i + startIndex).getPosizione());
-                        }
-                        client_->eraseSymbolCRDT(symbolsToErase);
-                        json j = json{
-                                {"operation",       "remove"},
-                                {"usernameToErase", usernameToErase},
-                                {"charToErase",     charToErase},
-                                {"crdtToErase",     crdtToErase}
-                        };
-                        client_->sendAtServer(j);
-                    }*/
                     decreentPosition(startIndex, dim);
                     drawGraphicCursor();
                 } else {
@@ -1125,56 +1066,6 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
                         };
                         client_->sendAtServer(j);
                     }
-                    /*int of = dim / client_->maxBufferSymbol;
-                    int i = 0;
-
-                    while ((i + 1) * client_->maxBufferSymbol <= dim) {
-                        usernameToInsert.clear();
-                        charToInsert.clear();
-                        crdtToInsert.clear();
-
-                        for (int k = 0; k < client_->maxBufferSymbol; k++) {
-                            textEdit->setTextCursor(cursor);
-                            usernameToInsert.push_back(client_->getUser().toStdString());
-                            c = pastedText.toStdWString().c_str()[(i * client_->maxBufferSymbol) + k];
-                            charToInsert.push_back(c);
-                            crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
-                            crdtToInsert.push_back(crdt);
-                            pos++;
-                        }
-                        json j = json{
-                                {"operation",        "insert"},
-                                {"usernameToInsert", usernameToInsert},
-                                {"charToInsert",     charToInsert},
-                                {"crdtToInsert",     crdtToInsert}
-                        };
-                        client_->sendAtServer(j);
-                        i++;
-                    }
-
-
-                    if ((dim % client_->maxBufferSymbol) > 0) {
-                        usernameToInsert.clear();
-                        charToInsert.clear();
-                        crdtToInsert.clear();
-
-                        for (int i = 0; i < (dim % client_->maxBufferSymbol); i++) {
-                            textEdit->setTextCursor(cursor);
-                            usernameToInsert.push_back(client_->getUser().toStdString());
-                            c = pastedText.toStdWString().c_str()[(of * client_->maxBufferSymbol) + i];
-                            charToInsert.push_back(c);
-                            crdt = client_->insertSymbolNewCRDT(pos, c, client_->getUser().toStdString());
-                            crdtToInsert.push_back(crdt);
-                            pos++;
-                        }
-                        json j = json{
-                                {"operation",        "insert"},
-                                {"usernameToInsert", usernameToInsert},
-                                {"charToInsert",     charToInsert},
-                                {"crdtToInsert",     crdtToInsert}
-                        };
-                        client_->sendAtServer(j);
-                    }*/
                     drawGraphicCursor();
                     incrementPosition(startPos, dim);
                 }
@@ -1339,8 +1230,6 @@ void TextEdit::drawRemoteCursors() {
 }
 
 void TextEdit::highlightcharacter() {
-    QObject *sender = QObject::sender();
-    QString name = sender->objectName();
     QTextCursor cursor = textEdit->textCursor();
     QTextCursor tempCursor = QTextCursor(cursor);
     int start, end;
@@ -1352,32 +1241,29 @@ void TextEdit::highlightcharacter() {
         start = 0;
         end = client_->symbols.size();
     }
-    if ((end - start) > (client_->maxBufferSymbol * 5)) {
+    if ((end - start) > MAX_ALLOWED_CHARS) {
         this->alert();
     } else {
         int pos = 0;
         client_->updateChangesCursor = false;
         timerUpdateCursor->start(1000);
         for (auto s = client_->symbols.begin() + start; s != client_->symbols.begin() + end; ++s) {
-            if (s->getUsername() == name.toStdString()) {
+            if (_listParticipantsAndColors.count(QString::fromStdString(s->getUsername())) == 1 ||
+                s->getUsername() == client_->getUser().toStdString()) {
                 tempCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor, 1);
                 tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos + start);
                 tempCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 1);
                 textEdit->setTextCursor(tempCursor);
-                if (name == client_->getUser())
-                    textEdit->setTextBackgroundColor(client_->getColor());
-                else
-                    textEdit->setTextBackgroundColor(_listParticipantsAndColors[name]);
-
+                s->getUsername() == client_->getUser().toStdString() ? textEdit->setTextBackgroundColor(
+                        client_->getColor()) : textEdit->setTextBackgroundColor(
+                        _listParticipantsAndColors[QString::fromStdString(s->getUsername())]);
             }
             pos++;
         }
-
         textEdit->setTextCursor(cursor);
         textEdit->setTextBackgroundColor(QColor(255, 255, 255, 255));
         textEdit->setFocus();
         timerHighlight->start(3000);
-
     }
 }
 
@@ -1444,13 +1330,13 @@ void TextEdit::updateListParticipants(usersInFile users) {
 
 void TextEdit::updateConnectedUsers(usersInFile users) {
     connectedUsers->clear();
-    QLabel * label = new QLabel(client_->getUser());
+    QLabel *label = new QLabel(client_->getUser());
     //QPushButton *label = new QPushButton(client_->getUser());
     label->setObjectName(client_->getUser());
     label->setStyleSheet(QString::fromUtf8("QLabel{\n"
                                            "font-size:16px;\n"
                                            "font-weight:bold;\n"
-                                           "color:")+client_->getColor()+QString::fromUtf8(";}"));
+                                           "color:") + client_->getColor() + QString::fromUtf8(";}"));
 
     QListWidgetItem *item = new QListWidgetItem();
     connectedUsers->addItem(item);

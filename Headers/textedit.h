@@ -160,12 +160,6 @@ private:
     QAction *actionTextUnderline;
     QAction *actionTextItalic;
     QAction *actionTextColor;
-    /*QAction *actionAlignLeft;
-    QAction *actionAlignCenter;
-    QAction *actionAlignRight;
-    QAction *actionAlignJustify;*/
-    /*QAction *actionUndo;
-    QAction *actionRedo;*/
 #ifndef QT_NO_CLIPBOARD
     QAction *actionCut;
     QAction *actionCopy;
