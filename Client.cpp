@@ -469,6 +469,8 @@ int Client::generateIndexCRDT(Symbol symbol, int iter, int start,
     if (start == -1 && end == -1) {
         if (this->symbols.empty())
             return 0;
+        if(symbol.getPosizione()[0] > this->symbols[this->symbols.size() - 1].getPosizione()[0])
+            return this->symbols.size();
         if (symbol.getPosizione()[0] < this->symbols[0].getPosizione()[0])
             return 0;
         start = 0;
