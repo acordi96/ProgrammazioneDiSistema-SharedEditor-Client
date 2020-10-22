@@ -8,7 +8,9 @@ class MyQTextEdit : public QTextEdit
 {
     Q_OBJECT
 public:
-    MyQTextEdit(QWidget *parent):QTextEdit(parent){};
+    MyQTextEdit(QWidget *parent):QTextEdit(parent){
+        setContextMenuPolicy(Qt::NoContextMenu);
+    };
 
     void insertFromMimeData(const QMimeData *source) override;
 
