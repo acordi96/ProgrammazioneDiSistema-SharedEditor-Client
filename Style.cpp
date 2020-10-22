@@ -14,7 +14,6 @@ bool Style::isBold() const {
 
 void Style::setBold(bool bold) {
     Style::bold = bold;
-
 }
 
 bool Style::isUnderlined() const {
@@ -71,7 +70,10 @@ QTextCharFormat Style::getTextCharFormat() {
 }
 
 void Style::setTextCharFormat(QTextCharFormat tcf) {
-    this->bold = tcf.fontWeight();
+    if(tcf.fontWeight() == QFont::Bold)
+        this->bold = true;
+    else
+        this->bold = false;
     this->italic = tcf.fontItalic();
     this->underlined = tcf.fontUnderline();
     this->color = tcf.foreground().color().name().toStdString();

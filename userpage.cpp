@@ -916,14 +916,14 @@ void Userpage::updateRecentFiles(QString old, QString newN, QString owner, QStri
         return;
     }
     if (request == "delete_file") { //aggiorniamo dopo una delete
-        this->selectedFile = "";
         QPushButton *b = recent->findChild<QPushButton *>(
                 QString::fromStdString(generateFileButton(newN.toStdString(), old.toStdString())));
         page->findChild<QVBoxLayout *>("verticalLayout")->removeWidget(b);
         delete b;
+        this->selectedFile = "";
     }
     if (request == "rename_file") { //aggiorniamo dopo rename
-        QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
+        QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(generateFileButton(client_->getUser().toStdString(), old.toStdString())));
         deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                                   "background-color:#84ACD7;\n"
                                                   "border:1px;\n"
@@ -931,13 +931,13 @@ void Userpage::updateRecentFiles(QString old, QString newN, QString owner, QStri
                                                   "color:#FFFFFF;\n"
                                                   "font: 75 14pt \"Sawasdee Bold\";\n"
                                                   "}"));
-        this->selectedFile = "";
         recent->findChild<QPushButton *>(
                 QString::fromStdString(generateFileButton(owner.toStdString(), old.toStdString())))->setText(
                 "(" + owner + "): " + newN);
         recent->findChild<QPushButton *>(
                 QString::fromStdString(generateFileButton(owner.toStdString(), old.toStdString())))->setObjectName(
                 QString::fromStdString(generateFileButton(owner.toStdString(), newN.toStdString())));
+        this->selectedFile = "";
     }
 
 }
