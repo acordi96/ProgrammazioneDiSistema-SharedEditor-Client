@@ -923,7 +923,7 @@ void Userpage::updateRecentFiles(QString old, QString newN, QString owner, QStri
         this->selectedFile = "";
     }
     if (request == "rename_file") { //aggiorniamo dopo rename
-        QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(generateFileButton(client_->getUser().toStdString(), old.toStdString())));
+        QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(generateFileButton(owner.toStdString(), old.toStdString())));
         deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
                                                   "background-color:#84ACD7;\n"
                                                   "border:1px;\n"
