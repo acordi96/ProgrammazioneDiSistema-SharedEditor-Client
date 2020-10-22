@@ -315,14 +315,8 @@ std::string Client::handleRequestType(const json &js, const std::string &type_re
         colors = js.at("colorsList").get<std::vector<std::string>>();
         usernames = js.at("usernames").get<std::vector<std::string>>();
         usersInFile users;
-        for (int i = 0; i < usernames.size(); i++) {
-            for(auto pair = users.begin(); pair != users.end(); ++pair)
-                if(pair->first == usernames[i]) {
-                    users.erase(pair);
-                    break;
-                }
+        for (int i = 0; i < usernames.size(); i++)
             users.insert(std::pair<std::string, std::string>(usernames[i], colors[i]));
-        }
         emit updateUserslist(users);
 
     } else if (type_request == "user_already_logged") {

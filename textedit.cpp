@@ -518,13 +518,12 @@ void TextEdit::textColor() {
         this->alert();
     } else {
         QColor color = QColorDialog::getColor(textEdit->textColor(), this);
-        textEdit->setTextColor(color);
         if (!color.isValid())
             return;
+        textEdit->setTextColor(color);
         QPixmap pix(16, 16);
         pix.fill(color);
         actionTextColor->setIcon(pix);
-
 
         if (!cursor.hasSelection())
             cursor.select(QTextCursor::WordUnderCursor);
@@ -690,6 +689,17 @@ void TextEdit::updateRemotePosition(QString user, int pos) {
 
 void TextEdit::cursorPositionChanged() {
     QTextCursor cursor = textEdit->textCursor();
+    if (client_->symbols.size() > cursor.position()) {
+        actionTextBold->setChecked(client_->symbols[cursor.position()].symbolStyle.isBold());
+        actionTextItalic->setChecked(client_->symbols[cursor.position()].symbolStyle.isItalic());
+        actionTextUnderline->setChecked(client_->symbols[cursor.position()].symbolStyle.isUnderlined());
+        QPixmap pix(16, 16);
+        pix.fill(QColor(QString::fromStdString(client_->symbols[cursor.position()].symbolStyle.getColor())));
+        actionTextColor->setIcon(pix);
+        comboFont->setCurrentFont(
+                QString::fromStdString(client_->symbols[cursor.position()].symbolStyle.getFontFamily()));
+        comboSize->setCurrentIndex(QFontDatabase::standardSizes().indexOf(client_->symbols[cursor.position()].symbolStyle.getFontSize()));
+    }
     if (client_->updateChangesCursor && !cursor.hasSelection()) {
         int pos = cursor.position();
 
@@ -888,7 +898,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
     if (ev->type() == QEvent::KeyPress) {
         QKeyEvent *key_ev = static_cast<QKeyEvent *>(ev);
         int key = key_ev->key();
-        std::cout << "FILE CRDT: " << std::flush; //print crdt
+        /*std::cout << "FILE CRDT: " << std::flush; //print crdt
         for (auto iterPositions = client_->symbols.begin(); iterPositions != client_->symbols.end(); ++iterPositions) {
             if (iterPositions->getCharacter() != 10 && iterPositions->getCharacter() != 13)
                 std::wcout << "{" << (int) iterPositions->getCharacter() << "(" << iterPositions->getCharacter()
@@ -900,7 +910,7 @@ bool TextEdit::eventFilter(QObject *obj, QEvent *ev) {
             std::cout << "] - " << iterPositions->getUsername() << std::flush;
             std::cout << "}" << std::flush;
         }
-        std::cout << std::endl;
+        std::cout << std::endl;*/
         if (obj == textEdit) {
             if (!key_ev->text().isEmpty()) {
                 QTextCursor cursor = textEdit->textCursor();

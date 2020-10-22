@@ -811,6 +811,14 @@ void Userpage::on_deleteButton_clicked() {
                     {"owner",     owner}
             };
             client_->sendAtServer(j);
+            QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
+            deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                                      "background-color:#84ACD7;\n"
+                                                      "border:1px;\n"
+                                                      "border-radius:5px;\n"
+                                                      "color:#FFFFFF;\n"
+                                                      "font: 75 14pt \"Sawasdee Bold\";\n"
+                                                      "}"));
             selectedFile = "";
         }
 
@@ -908,12 +916,22 @@ void Userpage::updateRecentFiles(QString old, QString newN, QString owner, QStri
         return;
     }
     if (request == "delete_file") { //aggiorniamo dopo una delete
+        this->selectedFile = "";
         QPushButton *b = recent->findChild<QPushButton *>(
                 QString::fromStdString(generateFileButton(newN.toStdString(), old.toStdString())));
         page->findChild<QVBoxLayout *>("verticalLayout")->removeWidget(b);
         delete b;
     }
     if (request == "rename_file") { //aggiorniamo dopo rename
+        QPushButton *deselect = recent->findChild<QPushButton *>(QString::fromStdString(selectedFile));
+        deselect->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                                  "background-color:#84ACD7;\n"
+                                                  "border:1px;\n"
+                                                  "border-radius:5px;\n"
+                                                  "color:#FFFFFF;\n"
+                                                  "font: 75 14pt \"Sawasdee Bold\";\n"
+                                                  "}"));
+        this->selectedFile = "";
         recent->findChild<QPushButton *>(
                 QString::fromStdString(generateFileButton(owner.toStdString(), old.toStdString())))->setText(
                 "(" + owner + "): " + newN);
